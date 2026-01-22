@@ -1,0 +1,18 @@
+﻿{
+"folders": [
+{
+"path": "."
+}
+],
+"settings": {
+"files.exclude": {
+"**/node_modules": true,
+"**/vendor": true
+},
+"search.exclude": {
+"**/node_modules": true,
+"**/vendor": true,
+"**/logs": true
+}
+}
+}
