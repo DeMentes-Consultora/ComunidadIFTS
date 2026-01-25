@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de la Comunidad IFTS</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { height: 100vh; width: 100%; }
+        .form-group { margin-bottom: 8px; }
+        .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 2px; }
+        .form-group input { width: 100%; padding: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .carreras-input { margin-bottom: 4px; }
+        .btn-guardar { width: 100%; padding: 8px; background-color: #006633; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 5px; transition: background 0.3s; }
+        .btn-guardar:hover { background-color: #004d26; }
+        .share-buttons { margin-top: 10px; border-top: 1px solid #eee; padding-top: 5px; }
+        .btn-share { text-decoration: none; color: white; padding: 5px 8px; border-radius: 3px; font-size: 11px; margin-right: 5px; display: inline-block; font-family: sans-serif; }
+        .btn-wa { background-color: #25D366; }
+        .btn-tw { background-color: #1DA1F2; }
+        .btn-wa:hover { background-color: #128C7E; }
+        .btn-tw:hover { background-color: #0c85d0; }
+        .btn-toggle-share { background-color: #006633; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 5px; font-family: sans-serif; }
+        .btn-toggle-share:hover { background-color: #004d26; }
+        .btn-route { background-color: #4285F4; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; transition: background 0.3s; }
+        .btn-route:hover { background-color: #3367D6; }
+        
+        /* Estilos para el marcador personalizado (Verde y Azul) */
+        .custom-div-icon { background: transparent; border: none; }
+        .marker-pin {
+            width: 30px; height: 30px;
+            border-radius: 50% 50% 50% 0;
+            background: linear-gradient(45deg, #006633, #66bb6a); /* Degradado Verde Benetton-Verde Claro */
+            position: absolute; transform: rotate(-45deg);
+            left: 50%; top: 50%; margin: -15px 0 0 -15px;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+            border: 2px solid #fff;
+        }
+        .marker-pin::after {
+            content: ''; width: 10px; height: 10px;
+            margin: 8px 0 0 8px; background: #fff;
+            position: absolute; border-radius: 50%;
+        }
+        
+        /* Estilos para el filtro */
+        .filter-control { background: white; padding: 10px; border-radius: 4px; box-shadow: 0 1px 5px rgba(0,0,0,0.4); max-height: 300px; overflow-y: auto; min-width: 200px; display: none; font-family: sans-serif; margin-top: 10px; }
+        .filter-header { font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 5px; font-size: 13px; }
+        .filter-item { display: flex; align-items: center; margin-bottom: 5px; font-size: 12px; }
+        .filter-item input { margin-right: 8px; width: auto; cursor: pointer; }
+        .filter-item label { cursor: pointer; margin: 0; }
+        .filter-toggle-btn { background-color: white; width: 30px; height: 30px; border-radius: 4px; box-shadow: 0 1px 5px rgba(0,0,0,0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none !important; }
+        
+        /* Ajustes globales para popups: reducir márgenes y tamaño */
+        .leaflet-popup-content {
+            margin: 5px 8px !important; /* Reduce drásticamente el espacio en blanco a los lados */
+            width: 250px !important;    /* Fuerza un ancho más compacto */
+        }
+        
+        .btn-like { background-color: white; color: #e91e63; border: 1px solid #e91e63; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 5px; font-family: sans-serif; margin-right: 5px; transition: all 0.3s; }
+        .btn-like:hover { background-color: #fce4ec; }
+        .btn-like.liked { background-color: #e91e63; color: white; border-color: #e91e63; cursor: default; }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script>
+        // 1. Inicializar el mapa centrado en Buenos Aires
+        // Si es dispositivo móvil (ancho menor a 768px), usamos zoom 11 para ver toda la ciudad
+        var initialZoom = window.innerWidth < 768 ? 11 : 13;
+        var map = L.map('map').setView([-34.6037, -58.3816], initialZoom);
+
+        // 2. Cargar capa de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Botón de geolocalización (Mi Ubicación)
+        var locateControl = L.Control.extend({
+            options: { position: 'topleft' },
+            onAdd: function(map) {
+                var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+                container.style.backgroundColor = 'white';
+                container.style.width = '30px';
+                container.style.height = '30px';
+                container.style.cursor = 'pointer';
+                container.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#333" width="18" height="18" style="margin: 6px;"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>';
+                container.title = "Mi ubicación";
+                container.onclick = function(){
+                    map.locate({setView: true, maxZoom: 16});
+                }
+                return container;
+            }
+        });
+        map.addControl(new locateControl());
+
+        var currentUserLocation = null;
+        var routingControl = null;
+
+        map.on('locationfound', function(e) {
+            currentUserLocation = e.latlng;
+            L.circle(e.latlng, {radius: e.accuracy/2, color: '#4285F4', fillOpacity: 0.1}).addTo(map);
+        });
+
+        // Agregar buscador de direcciones
+        L.Control.geocoder({
+            defaultMarkGeocode: false,
+            collapsed: false,
+            placeholder: "Buscar dirección...",
+            geocoder: L.Control.Geocoder.arcgis({
+                geocodingQueryParams: {
+                    sourceCountry: 'ARG'
+                }
+            })
+        })
+        .on('markgeocode', function(e) {
+            var bbox = e.geocode.bbox;
+            if (bbox) {
+                map.fitBounds(bbox);
+            } else {
+                map.setView(e.geocode.center, 16);
+            }
+            map.closePopup();
+            addMarker(e.geocode.center);
+        })
+        .addTo(map);
+
+        // Control de Filtros
+        var FilterControl = L.Control.extend({
+            options: { position: 'topright' },
+            onAdd: function(map) {
+                var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+                container.style.border = 'none';
+                
+                // Botón para abrir/cerrar
+                var btn = L.DomUtil.create('a', 'filter-toggle-btn', container);
+                btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#333"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>';
+                btn.href = '#';
+                btn.title = "Filtrar por carreras";
+                
+                // Panel de opciones
+                var panel = L.DomUtil.create('div', 'filter-control', container);
+                
+                // Header
+                var header = L.DomUtil.create('div', 'filter-header', panel);
+                header.innerHTML = '<span>Buscá por Carreras</span>';
+                var closeBtn = L.DomUtil.create('span', '', header);
+                closeBtn.innerHTML = '×';
+                closeBtn.style.cursor = 'pointer';
+                
+                // Lista de checkboxes
+                var list = L.DomUtil.create('div', 'filter-list', panel);
+                list.id = 'carreras-list';
+
+                btn.onclick = function(e) {
+                    e.preventDefault();
+                    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+                };
+                
+                closeBtn.onclick = function() {
+                    panel.style.display = 'none';
+                };
+
+                L.DomEvent.disableClickPropagation(container);
+                // Evita que la rueda del mouse haga zoom en el mapa cuando el cursor está sobre el control
+                L.DomEvent.disableScrollPropagation(container);
+
+                return container;
+            }
+        });
+        map.addControl(new FilterControl());
+
+        // 3. Definir icono personalizado (Diseño CSS)
+        var customIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: "<div class='marker-pin'></div>",
+            iconSize: [30, 42],
+            iconAnchor: [15, 42],
+            popupAnchor: [0, -30]
+        });
+
+        var isEditing = false;
+
+        function handleLike(id, btnElement, countElement) {
+            fetch('like_institucion.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    countElement.innerText = data.likes;
+                    btnElement.classList.add('liked');
+                    btnElement.disabled = true;
+                    localStorage.setItem('liked_inst_' + id, 'true');
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error de conexión: No se pudo conectar con like_institucion.php. Verifica que el archivo exista en el servidor.');
+        });
+        }
+
+        function calculateRoute(destination) {
+            if (routingControl) {
+                map.removeControl(routingControl);
+            }
+            
+            var startRouting = function(start) {
+                routingControl = L.Routing.control({
+                    waypoints: [start, destination],
+                    language: 'es',
+                    routeWhileDragging: true
+                }).addTo(map);
+
+                // Agregar botón de cerrar dentro del panel de ruta
+                var container = routingControl.getContainer();
+                var closeBtn = L.DomUtil.create('div', '', container);
+                closeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#d32f2f" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+                closeBtn.style.position = 'absolute';
+                closeBtn.style.top = '10px';
+                closeBtn.style.right = '10px';
+                closeBtn.style.cursor = 'pointer';
+                closeBtn.style.zIndex = '1000';
+                closeBtn.title = "Cerrar ruta";
+                closeBtn.onclick = function() {
+                    map.removeControl(routingControl);
+                    routingControl = null;
+                };
+            };
+
+            if (currentUserLocation) {
+                startRouting(currentUserLocation);
+            } else {
+                map.locate({setView: true, maxZoom: 16});
+                map.once('locationfound', function(e) {
+                    startRouting(e.latlng);
+                });
+            }
+        }
+
+        function addMarker(latlng) {
+            if (isEditing) return;
+
+            isEditing = true;
+
+            // Agregar marcador personalizado en la posición
+            var marker = L.marker(latlng, {icon: customIcon}).addTo(map);
+
+            // Crear el HTML del formulario
+            var container = document.createElement('div');
+            // container.style.minWidth = "250px"; // Comentado para permitir que el CSS controle el ancho en móviles
+            // Se reemplaza el formulario estático por uno dinámico para las carreras
+            container.innerHTML = `
+                <h3 style="margin-top: 0; margin-bottom: 10px; color: #006633;">Registrar Nueva Institución</h3>
+                <div class="form-group"><label>Logo:</label><input type="file" accept="image/*" class="logo-input"></div>
+                <div class="form-group"><label>Institución:</label><input type="text" class="inst-nombre" placeholder="Nombre"></div>
+                <div class="form-group"><label>Dirección:</label><input type="text" class="inst-direccion" placeholder="Calle y altura"></div>
+                <div class="form-group"><label>Teléfono:</label><input type="tel" class="inst-telefono" placeholder="Teléfono"></div>
+                <div class="form-group"><label>Mail:</label><input type="email" class="inst-email" placeholder="email@ejemplo.com"></div>
+                <div class="form-group"><label>Sitio Web:</label><input type="url" class="inst-web" placeholder="https://..."></div>
+                
+                <div class="form-group">
+                    <label>Carreras Ofrecidas:</label>
+                    <div class="popup-carreras-list" style="border: 1px solid #ccc; padding: 5px; max-height: 100px; overflow-y: auto; background: #f9f9f9; margin-bottom: 5px;">Cargando...</div>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="text" class="popup-nueva-carrera" placeholder="Agregar otra carrera..." style="flex-grow: 1;">
+                        <button type="button" class="popup-btn-agregar-carrera" style="padding: 5px 10px;">Agregar</button>
+                    </div>
+                </div>
+                <div class="form-group"><label>Observaciones (máx 100):</label><textarea class="obs-input" maxlength="100" style="width: 100%; border: 1px solid #ccc; border-radius: 4px; resize: vertical;" placeholder="Observaciones..."></textarea></div>
+                
+                <button class="btn-guardar">Guardar</button>
+            `;
+
+            var guardado = false;
+
+            container.querySelector('.btn-guardar').onclick = function() {
+                var institucion = container.querySelector('.inst-nombre').value;
+                var direccion = container.querySelector('.inst-direccion').value;
+                var telefono = container.querySelector('.inst-telefono').value;
+                var mail = container.querySelector('.inst-email').value;
+                var web = container.querySelector('.inst-web').value;
+                var observaciones = container.querySelector('.obs-input').value;
+                var fileInput = container.querySelector('.logo-input');
+                
+                // Recopilar carreras desde los checkboxes
+                const checkboxes = container.querySelectorAll('input[name="carreras_seleccionadas"]:checked');
+                let carreras = Array.from(checkboxes).map(cb => cb.value);
+                
+                // Agregar también el valor del input de nueva carrera si el usuario olvidó darle "Agregar"
+                const inputNueva = container.querySelector('.popup-nueva-carrera');
+                if (inputNueva && inputNueva.value.trim()) {
+                    const val = inputNueva.value.trim();
+                    if (!carreras.includes(val)) carreras.push(val);
+                }
+
+                var processSave = function(logoSrc) {
+                    // Enviar datos al servidor (PHP)
+                    fetch('guardar_institucion.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nombre: institucion,
+                            direccion: direccion,
+                            telefono: telefono,
+                            email: mail,
+                            sitio_web: web,
+                            observaciones: observaciones,
+                            latitud: latlng.lat,
+                            longitud: latlng.lng,
+                            logo: logoSrc,
+                            carreras: carreras
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert('Error al guardar en base de datos: ' + data.message);
+                            return;
+                        }
+                        
+                    // Actualizar lista global de marcadores y filtros
+                    allMarkers.push({ marker: marker, carreras: carreras, id: data.id });
+                    updateFilterControl();
+                    
+                    var likes = 0; // Nueva institución empieza con 0 likes
+
+                    var logoHtml = logoSrc ? `<img src="${logoSrc}" style="max-width: 50px; max-height: 50px; object-fit: contain;">` : '';
+                    
+                    var infoDiv = document.createElement('div');
+                    infoDiv.style.minWidth = "200px";
+                    
+                    infoDiv.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            ${logoHtml}
+                            <h3 style="margin: 0; color: #006633;">${institucion}</h3>
+                        </div>
+                        <b>Dirección:</b> ${direccion}<br>
+                        <b>Teléfono:</b> ${telefono}<br>
+                        <b>Mail:</b> ${mail}<br>
+                        <b>Sitio Web:</b> <a href="${web}" target="_blank">${web}</a><br>
+                        <br>
+                        <b>Carreras Ofrecidas:</b><ul>${carreras.map(c => `<li>${c}</li>`).join('')}</ul>
+                        <b>Observaciones:</b> ${observaciones}<br>
+                        <div class="share-buttons" style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <button class="btn-like" id="like-btn-${data.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> <span id="like-count-${data.id}">${likes}</span>
+                            </button>
+                            <button class="btn-route" style="margin: 0; width: auto; padding: 5px 10px; font-size: 12px;">Cómo llegar</button>
+                        </div>
+                    `;
+
+                    infoDiv.querySelector(`#like-btn-${data.id}`).onclick = function() {
+                        handleLike(data.id, this, infoDiv.querySelector(`#like-count-${data.id}`));
+                    };
+
+                    var btnShare = document.createElement('button');
+                    btnShare.className = 'btn-toggle-share';
+                    btnShare.innerHTML = 'Compartir <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>';
+                    
+                    btnShare.onclick = function() {
+                        var shareUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?marker=' + data.id;
+                        if (navigator.share) {
+                            navigator.share({
+                                title: institucion,
+                                text: "Institución: " + institucion + " - Dirección: " + direccion,
+                                url: shareUrl
+                            }).catch(console.error);
+                        } else {
+                            alert("Tu navegador no soporta la función nativa de compartir.");
+                        }
+                    };
+
+                    infoDiv.querySelector('.share-buttons').appendChild(btnShare);
+                    
+                    infoDiv.querySelector('.btn-route').onclick = function() {
+                        var url = `https://www.google.com/maps/dir/?api=1&destination=${latlng.lat},${latlng.lng}&travelmode=transit`;
+                        window.open(url, '_blank');
+                    };
+
+                    guardado = true;
+                    isEditing = false;
+                    marker.setPopupContent(infoDiv);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error de conexión con el servidor.');
+                    });
+                };
+
+                if (fileInput.files && fileInput.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) { processSave(e.target.result); };
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else {
+                    processSave(null);
+                }
+            };
+
+            // Vincular el formulario al popup y abrirlo
+            marker.bindPopup(container, { closeOnClick: false, minWidth: 220, maxWidth: 300 }).openPopup();
+
+            // --- Lógica para el formulario dinámico de carreras ---
+            const carrerasListDiv = container.querySelector('.popup-carreras-list');
+            const nuevaCarreraInput = container.querySelector('.popup-nueva-carrera');
+            const agregarCarreraBtn = container.querySelector('.popup-btn-agregar-carrera');
+
+            const crearCheckboxPopup = (nombre, marcado) => {
+                const div = document.createElement('div');
+                div.className = 'filter-item'; // Re-usamos el estilo del filtro
+                div.innerHTML = `
+                    <label style="display: flex; align-items: center; font-weight: normal; font-size: 12px;">
+                        <input type="checkbox" name="carreras_seleccionadas" value="${nombre}" ${marcado ? 'checked' : ''}>
+                        ${nombre}
+                    </label>
+                `;
+                carrerasListDiv.appendChild(div);
+            };
+
+            fetch('obtener_carreras.php')
+                .then(res => res.json())
+                .then(data => {
+                    carrerasListDiv.innerHTML = ''; // Limpiar "Cargando..."
+                    if (data.success && data.data) {
+                        data.data.forEach(nombreCarrera => crearCheckboxPopup(nombreCarrera, false));
+                    }
+                }).catch(err => {
+                    carrerasListDiv.innerHTML = 'Error al cargar carreras.';
+                });
+
+            const agregarNueva = () => {
+                const nombre = nuevaCarreraInput.value.trim();
+                if (nombre) {
+                    const exists = Array.from(container.querySelectorAll('input[name="carreras_seleccionadas"]')).some(cb => cb.value.toLowerCase() === nombre.toLowerCase());
+                    if (!exists) {
+                        crearCheckboxPopup(nombre, true);
+                    }
+                    nuevaCarreraInput.value = '';
+                    nuevaCarreraInput.focus();
+                }
+            };
+            
+            agregarCarreraBtn.onclick = agregarNueva;
+            nuevaCarreraInput.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); agregarNueva(); } };
+
+            marker.on('popupclose', function() {
+                isEditing = false;
+                if (!guardado) {
+                    map.removeLayer(marker);
+                }
+            });
+        }
+
+        // 4. Evento Click para agregar marcador
+        map.on('click', function(e) {
+            addMarker(e.latlng);
+        });
+
+        var allMarkers = []; // Almacenar referencias para filtrar
+
+        // Función para regenerar el control de filtros
+        function updateFilterControl() {
+            var listContainer = document.getElementById('carreras-list');
+            if (!listContainer) return;
+            
+            var uniqueCarreras = new Set();
+            allMarkers.forEach(item => {
+                item.carreras.forEach(c => { if(c.trim()) uniqueCarreras.add(c.trim()); });
+            });
+
+            listContainer.innerHTML = '';
+            
+            // Opción "Ver Todas"
+            var divAll = document.createElement('div');
+            divAll.className = 'filter-item';
+            var checkboxAll = document.createElement('input');
+            checkboxAll.type = 'checkbox';
+            checkboxAll.id = 'filter-all';
+            checkboxAll.checked = true;
+            checkboxAll.onchange = applyFilters;
+            var labelAll = document.createElement('label');
+            labelAll.htmlFor = 'filter-all';
+            labelAll.textContent = 'Ver Todas';
+            divAll.appendChild(checkboxAll);
+            divAll.appendChild(labelAll);
+            listContainer.appendChild(divAll);
+
+            Array.from(uniqueCarreras).sort().forEach(carrera => {
+                var div = document.createElement('div');
+                div.className = 'filter-item';
+                
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = carrera.toLowerCase();
+                checkbox.id = 'filter-' + carrera.replace(/\s+/g, '-').toLowerCase();
+                checkbox.onchange = applyFilters;
+                
+                var label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.textContent = carrera;
+                
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                listContainer.appendChild(div);
+            });
+        }
+
+        // Función auxiliar para dibujar un marcador (extraída para reusar en caché y fetch)
+        function renderInstitutionMarker(inst) {
+            var latlng = L.latLng(inst.latitud, inst.longitud);
+            var marker = L.marker(latlng, {icon: customIcon}).addTo(map);
+
+            // Guardar referencia y carreras para el filtro
+            allMarkers.push({ marker: marker, carreras: inst.carreras, id: inst.id });
+
+            var likes = inst.likes || 0;
+            var isLiked = localStorage.getItem('liked_inst_' + inst.id);
+            var likeBtnClass = isLiked ? 'btn-like liked' : 'btn-like';
+            var likeBtnDisabled = isLiked ? 'disabled' : '';
+
+            var logoHtml = inst.logo ? `<img src="${inst.logo}" style="max-width: 50px; max-height: 50px; object-fit: contain;">` : '';
+            
+            var infoDiv = document.createElement('div');
+            
+            infoDiv.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    ${logoHtml}
+                    <h3 style="margin: 0; color: #006633;">${inst.nombre}</h3>
+                </div>
+                <b>Dirección:</b> ${inst.direccion}<br>
+                <b>Teléfono:</b> ${inst.telefono}<br>
+                <b>Mail:</b> ${inst.email}<br>
+                <b>Sitio Web:</b> <a href="${inst.sitio_web}" target="_blank">${inst.sitio_web}</a><br>
+                <br>
+                <b>Carreras Ofrecidas:</b><ul>${inst.carreras.map(c => `<li>${c}</li>`).join('')}</ul>
+                <b>Observaciones:</b> ${inst.observaciones}<br>
+                <div class="share-buttons" style="display: flex; gap: 5px; flex-wrap: wrap;">
+                    <button class="${likeBtnClass}" ${likeBtnDisabled} id="like-btn-${inst.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> <span id="like-count-${inst.id}">${likes}</span>
+                    </button>
+                    <button class="btn-route" style="margin: 0; width: auto; padding: 5px 10px; font-size: 12px;">Cómo llegar</button>
+                </div>
+            `;
+
+            if (!isLiked) {
+                infoDiv.querySelector(`#like-btn-${inst.id}`).onclick = function() {
+                    handleLike(inst.id, this, infoDiv.querySelector(`#like-count-${inst.id}`));
+                };
+            }
+
+            var btnShare = document.createElement('button');
+            btnShare.className = 'btn-toggle-share';
+            btnShare.innerHTML = 'Compartir <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>';
+            
+            btnShare.onclick = function() {
+                var shareUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?marker=' + inst.id;
+                if (navigator.share) {
+                    navigator.share({
+                        title: inst.nombre,
+                        text: "Institución: " + inst.nombre + " - Dirección: " + inst.direccion,
+                        url: shareUrl
+                    }).catch(console.error);
+                } else {
+                    alert("Tu navegador no soporta la función nativa de compartir.");
+                }
+            };
+
+            infoDiv.querySelector('.share-buttons').appendChild(btnShare);
+            
+            infoDiv.querySelector('.btn-route').onclick = function() {
+                var url = `https://www.google.com/maps/dir/?api=1&destination=${latlng.lat},${latlng.lng}&travelmode=transit`;
+                window.open(url, '_blank');
+            };
+
+            marker.bindPopup(infoDiv, { minWidth: 200, maxWidth: 300 });
+        }
+
+        // Función para cargar marcadores guardados desde la base de datos
+        function loadMarkers() {
+            // 1. ESTRATEGIA DE CACHÉ: Cargar datos locales inmediatamente si existen
+            var cachedData = localStorage.getItem('instituciones_cache');
+            if (cachedData) {
+                try {
+                    var data = JSON.parse(cachedData);
+                    data.forEach(inst => renderInstitutionMarker(inst));
+                    updateFilterControl();
+                } catch(e) { console.error("Error parsing cache", e); }
+            }
+
+            // 2. Fetch en segundo plano para obtener datos frescos
+            fetch('obtener_instituciones.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Si los datos del servidor son diferentes al caché, actualizamos
+                    if (JSON.stringify(data.data) !== cachedData) {
+                        // Guardar en caché para la próxima visita
+                        localStorage.setItem('instituciones_cache', JSON.stringify(data.data));
+                        
+                        // Limpiar marcadores antiguos para evitar duplicados
+                        allMarkers.forEach(item => map.removeLayer(item.marker));
+                        allMarkers = [];
+                        
+                        // Renderizar datos frescos
+                        data.data.forEach(inst => renderInstitutionMarker(inst));
+                        updateFilterControl();
+
+                        // Verificar si hay un parámetro 'marker' en la URL para abrir automáticamente
+                        var urlParams = new URLSearchParams(window.location.search);
+                        var markerId = urlParams.get('marker');
+                        if (markerId) {
+                            var target = allMarkers.find(m => m.id == markerId);
+                            if (target) {
+                                map.setView(target.marker.getLatLng(), 16);
+                                target.marker.openPopup();
+                            }
+                        }
+                    }
+                } else {
+                    // Solo mostramos alerta si no hay caché, para no molestar si ya se ve el mapa
+                    if (!cachedData) alert('Error al cargar los marcadores: ' + data.message);
+                }
+            })
+            .catch(error => console.error('Error cargando datos:', error));
+        }
+
+        function applyFilters(e) {
+            var allCheckbox = document.getElementById('filter-all');
+            var careerCheckboxes = document.querySelectorAll('#carreras-list input[type="checkbox"]:not(#filter-all)');
+            
+            // Lógica de exclusión mutua entre "Ver Todas" y las carreras
+            if (e && e.target) {
+                if (e.target.id === 'filter-all') {
+                    if (allCheckbox.checked) {
+                        careerCheckboxes.forEach(cb => cb.checked = false);
+                    } else {
+                        // Si se desmarca "Ver Todas" y no hay nada más marcado, volver a marcarlo
+                        if (!Array.from(careerCheckboxes).some(cb => cb.checked)) allCheckbox.checked = true;
+                    }
+                } else {
+                    // Si se marca una carrera, desmarcar "Ver Todas"
+                    if (e.target.checked) allCheckbox.checked = false;
+                    // Si no queda ninguna carrera marcada, marcar "Ver Todas"
+                    else if (!Array.from(careerCheckboxes).some(cb => cb.checked)) allCheckbox.checked = true;
+                }
+            }
+
+            var selected = Array.from(careerCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+            var showAll = allCheckbox.checked || selected.length === 0;
+
+            allMarkers.forEach(item => {
+                var shouldShow = false;
+                
+                if (showAll) {
+                    shouldShow = true;
+                } else {
+                    // Usamos trim() para asegurar que coincida aunque haya espacios extra en la base de datos
+                    shouldShow = item.carreras.some(c => selected.includes(c.trim().toLowerCase()));
+                }
+
+                if (shouldShow) {
+                    if (!map.hasLayer(item.marker)) map.addLayer(item.marker);
+                } else {
+                    if (map.hasLayer(item.marker)) map.removeLayer(item.marker);
+                }
+            });
+        }
+
+        // Ejecutar la carga al iniciar
+        loadMarkers();
+    </script>
+</body>
+</html>
