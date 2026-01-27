@@ -198,7 +198,32 @@ Usar como base el proyecto **LaCanchitaDeLosPibes** que ya tienen:
 - ✅ Relación N:N entre instituciones y carreras
 - ✅ Subida de logos
 
-### Cambios Implementados - 27 de enero de 2026
+### Cambios Implementados - 27 de enero de 2026 (Tarde)
+
+#### ✅ Conexión Backend ↔ Frontend
+- **Modelos TypeScript:** Interface `Institucion` y `Carrera` con tipos completos
+- **Servicio InstitucionesService:** Métodos para obtener instituciones, dar likes y guardar
+- **Environments:** Configuración de URLs de API (desarrollo y producción)
+- **HttpClient:** Configurado en `app.config.ts` con `provideHttpClient()`
+- **Componente Mapa:** Actualizado para consumir API real en lugar de datos hardcodeados
+  - `ngOnInit()` carga instituciones desde el backend
+  - Renderiza marcadores después de cargar datos
+  - Manejo de estados de carga y errores
+- **Servidor Backend:** PHP corriendo en `localhost:8000`
+- **Base de Datos:** `comunidad_ifts_mapa` con 3 instituciones (IFTS 12, 20, 15)
+
+#### 📝 Decisión de Arquitectura - Autenticación
+Discusión sobre manejo de sesiones:
+- ❌ **Sesiones PHP:** Stateful, complica CORS con Angular separado
+- ✅ **JWT (Recomendado):** Stateless, token en `localStorage`, funciona perfecto con APIs REST
+
+**Próxima implementación sugerida:**
+1. Backend genera JWT al login
+2. Frontend guarda token en localStorage
+3. Cada petición incluye header `Authorization: Bearer {token}`
+4. Backend valida token en cada endpoint protegido
+
+### Cambios Implementados - 27 de enero de 2026 (Mañana)
 
 #### ✅ Instalaciones y Configuraciones
 - **Angular CLI global:** Instalado para usar comando `ng` desde cualquier lugar
