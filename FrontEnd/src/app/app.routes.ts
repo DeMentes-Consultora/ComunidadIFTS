@@ -13,12 +13,12 @@ export const routes: Routes = [
     {
     path: 'auth/sign-in',
     loadComponent: () => import('./features/auth/sign-in/sign-in').then(m => m.SignIn),
-    canActivate: [GuestGuard] // Solo para usuarios no autenticados
+      // TODO: agregar GuestGuard cuando esté implementado
   },
   {
     path: 'auth/sign-up',
     loadComponent: () => import('./features/auth/sign-up/sign-up').then(m => m.SignUp),
-    canActivate: [GuestGuard] // Solo para usuarios no autenticados
+      // TODO: agregar GuestGuard cuando esté implementado
   },
   {
     path: '**',

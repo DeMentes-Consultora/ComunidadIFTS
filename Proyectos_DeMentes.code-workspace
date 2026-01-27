@@ -2,6 +2,15 @@
 "folders": [
     {
         "path": "."
+    },
+    {
+        "path": "../LaCanchitaDeLosPibes-BackEnd"
+    },
+    {
+        "path": "../LaCanchitaDeLosPibes-FrontEnd"
+    },
+    {
+        "path": "../IFTS15"
     }
 ],
 "settings": {
@@ -13,6 +22,7 @@
 "**/node_modules": true,
 "**/vendor": true,
 "**/logs": true
-}
+},
+"powershell.cwd": "ComunidadIFTS"
 }
 }

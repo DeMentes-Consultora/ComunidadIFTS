@@ -5,7 +5,7 @@
   <!-- Sidenav Container -->
   <mat-sidenav-container class="sidenav-container">
     <!-- Sidenav -->
-    <mat-sidenav [opened]="sidenavService.isOpen()" mode="over" (backdropClick)="sidenavService.close()">
+    <mat-sidenav #sidenav mode="over" (backdropClick)="sidenavService.close()">
       <app-sidenav></app-sidenav>
     </mat-sidenav>
     

@@ -1,1 +1,41 @@
-<p>sidenav works!</p>
+<nav class="sidebar-nav">
+  <!-- Logo y título -->
+  <div class="sidebar-header">
+    <mat-icon class="header-icon">school</mat-icon>
+    <h2>Comunidad IFTS</h2>
+  </div>
+  
+  <!-- Separador -->
+  <mat-divider></mat-divider>
+  
+  <!-- Enlaces de navegación -->
+  <div class="navigation-section">
+    <a mat-button routerLink="/home" (click)="closeSidenavPanel()" class="nav-link">
+      <mat-icon>home</mat-icon>
+      Inicio
+    </a>
+    
+    <a mat-button routerLink="/instituciones" (click)="closeSidenavPanel()" class="nav-link">
+      <mat-icon>location_city</mat-icon>
+      Instituciones
+    </a>
+    
+    <a mat-button routerLink="/mapa" (click)="closeSidenavPanel()" class="nav-link">
+      <mat-icon>map</mat-icon>
+      Mapa
+    </a>
+    
+    <mat-divider></mat-divider>
+    
+    <a mat-button routerLink="/acerca-de" (click)="closeSidenavPanel()" class="nav-link">
+      <mat-icon>info</mat-icon>
+      Acerca de
+    </a>
+    
+    <a mat-button routerLink="/contacto" (click)="closeSidenavPanel()" class="nav-link">
+      <mat-icon>contact_mail</mat-icon>
+      Contacto
+    </a>
+  </div>
+</nav>
+
