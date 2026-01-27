@@ -1,0 +1,20 @@
+{
+    "name": "dementes/comunidad-ifts-backend",
+    "description": "Backend API para ComunidadIFTS",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "vlucas/phpdotenv": "^5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "DeMentes Consultora",
+            "email": "info@dementes.com"
+        }
+    ]
+}

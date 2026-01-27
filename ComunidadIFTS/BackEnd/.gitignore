@@ -1,0 +1,33 @@
+# Variables de entorno (NUNCA commitear)
+.env
+
+# Composer
+/vendor/
+composer.lock
+
+# Logs
+*.log
+logs/
+
+# Cache
+cache/
+*.cache
+
+# Archivos temporales
+tmp/
+temp/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos subidos por usuarios
+uploads/*
+!uploads/.gitkeep
