@@ -1,6 +1,26 @@
 .home-container {
   width: 100%;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.carrusel-section {
+  width: 100%;
+  padding: 0;
+}
+
+.mapa-section {
+  width: 100%;
+  padding: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .home-container {
+    gap: 0;
+  }
 }
 
 /* Hero Section */

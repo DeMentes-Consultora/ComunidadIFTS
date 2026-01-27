@@ -21,6 +21,10 @@ export const routes: Routes = [
       // TODO: agregar GuestGuard cuando esté implementado
   },
   {
+    path: 'mapa',
+    loadComponent: () => import('./shared/components/mapa/mapa').then(m => m.MapaComponent)
+  },
+  {
     path: '**',
     redirectTo: 'home'
   }

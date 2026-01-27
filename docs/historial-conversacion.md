@@ -198,6 +198,88 @@ Usar como base el proyecto **LaCanchitaDeLosPibes** que ya tienen:
 - ✅ Relación N:N entre instituciones y carreras
 - ✅ Subida de logos
 
+### Cambios Implementados - 27 de enero de 2026
+
+#### ✅ Instalaciones y Configuraciones
+- **Angular CLI global:** Instalado para usar comando `ng` desde cualquier lugar
+- **Node portable:** Configurado en `C:\node` con PATH correcto
+- **Leaflet + plugins:** Instalados para mapas interactivos (leaflet-routing-machine, geocoder)
+- **Script start-dev.bat:** Creado para facilitar inicios del servidor
+
+#### ✅ Componentes Creados
+
+**1. Navbar (`src/app/layouts/navbar/`)**
+- Marca "Comunidad IFTS" con icono de escuela
+- Botón de menú (sidenav toggle)
+- Botón de inicio de sesión
+- Estilos verde Benetton (#006633)
+- Responsive para móvil/desktop
+
+**2. Sidenav (`src/app/layouts/sidenav/`)**
+- Navegación con links: Home, Instituciones, Mapa, Acerca de, Contacto
+- Header con logo y título
+- Cierre al seleccionar un link
+- Estilos coordinados con navbar
+
+**3. Mapa (`src/app/shared/components/mapa/`)**
+- Inicializa con Leaflet centrado en Buenos Aires
+- Carga 3 IFTS de ejemplo (12, 20, 15) con marcadores circulares verdes
+- Popups con info de cada institución (nombre, dirección, teléfono, sitio web)
+- Responsive (zoom 11 móvil, 13 desktop)
+- **TODO:** Conectar con API real `BackEnd/api/instituciones.php`
+
+**4. Carrusel (`src/app/shared/components/carrusel/`)**
+- **5 slides** con imágenes placeholder (Unsplash)
+- Autoplay cada 5 segundos
+- Botones prev/next para navegación manual
+- Indicadores de puntos (se resaltan al interactuar)
+- Transiciones suaves con animations
+- **Nota para futuro:** Crear formulario CMS para gestionar slides dinamicamente
+
+#### ✅ Integración en Home
+- Home ahora contiene:
+  1. Carrusel (arriba)
+  2. Mapa (debajo)
+- Estructura limpia sin márgenes adicionales
+- Responsive en móvil
+
+#### ✅ Estructura de Carpetas
+```
+FrontEnd/src/app/
+├── layouts/
+│   ├── navbar/
+│   ├── sidenav/
+│   └── footer/
+├── shared/
+│   └── components/
+│       ├── mapa/
+│       └── carrusel/
+├── features/
+│   ├── home/
+│   ├── auth/
+│   └── ...
+└── app.ts (actualizado con sidenav integrado)
+```
+
+#### ✅ Rutas Actualizadas
+- `/home` → Home con carrusel + mapa
+- `/mapa` → Componente mapa standalone (reutilizable)
+- Otras rutas sin cambios
+
+#### 📝 Estado Actual
+- **Servidor:** Ejecutando con `npm start` desde FrontEnd
+- **URL base:** `http://localhost:4200`
+- **Home visual:** Carrusel → Mapa integrados correctamente
+- **Errores:** Resuelto GuestGuard no definido (retirado temporalmente con TODOs)
+
+#### ⏭️ Próximos Pasos
+1. Crear servicio para consumir API de instituciones
+2. Conectar mapa a datos reales desde BackEnd/api/instituciones.php
+3. Crear sistema de likes (backend + frontend)
+4. Implementar autenticación básica
+5. Crear panel admin para gestionar slides del carrusel
+6. Validar con usuario (presentar a directora IFTS12)
+
 ---
 
 ## Cambios Implementados - 26 de enero de 2026
