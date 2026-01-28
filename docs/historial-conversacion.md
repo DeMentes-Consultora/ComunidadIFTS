@@ -298,12 +298,32 @@ FrontEnd/src/app/
 - **Errores:** Resuelto GuestGuard no definido (retirado temporalmente con TODOs)
 
 #### ⏭️ Próximos Pasos
-1. Crear servicio para consumir API de instituciones
-2. Conectar mapa a datos reales desde BackEnd/api/instituciones.php
+1. ~~Crear servicio para consumir API de instituciones~~ ✅ HECHO
+2. ~~Conectar mapa a datos reales desde BackEnd/api/instituciones.php~~ ✅ HECHO
 3. Crear sistema de likes (backend + frontend)
-4. Implementar autenticación básica
+4. Implementar autenticación básica con JWT
 5. Crear panel admin para gestionar slides del carrusel
 6. Validar con usuario (presentar a directora IFTS12)
+
+---
+
+## Cambios Implementados - 28 de enero de 2026
+
+### 🐛 Problema Detectado
+- Error `"node" no se reconoce como un comando interno o externo`
+- **Causa:** Node.js portable en `C:\node` - PATH no configurado en algunas terminales
+- **Contexto:** Node.js instalado como portable por restricciones de permisos (sin admin)
+
+### ⚙️ Configuración Actual
+- **Node.js portable:** `C:\node` (v24.13.0)
+- **npm:** 11.6.2
+- **PATH:** Configurado en terminal PowerShell principal
+- **Restricción:** Sin permisos de administrador para instalación estándar
+- **Terminal PowerShell:** Funcionando correctamente
+- **Terminal "php":** Puede no tener PATH configurado para Node.js
+
+### 📝 Nota Importante
+Para nuevas terminales que no reconozcan `node`, asegurar que `C:\node` esté en el PATH de la sesión.
 
 ---
 

@@ -1,0 +1,19 @@
+{
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "../IFTS15"
+        },
+        {
+            "path": "../LaCanchitaDeLosPibes-BackEnd"
+        },
+        {
+            "path": "../LaCanchitaDeLosPibes-FrontEnd"
+        }
+    ],
+    "settings": {
+        "powershell.cwd": "ComunidadIFTS"
+    }
+}
