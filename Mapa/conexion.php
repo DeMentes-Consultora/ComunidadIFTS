@@ -1,26 +1,89 @@
 <?php
-// Configuración de conexión para InfinityFree
-// Estos datos se obtienen del panel de control (VistaPanel) -> MySQL Databases
 
-$host = 'sql302.infinityfree.com';
-$db   = 'if0_40899760_comunidad_ifts'; // Verifica que este sea el nombre exacto creado en el panel
-$user = 'if0_40899760';
-$pass = 'MapaPassIfts'; // REEMPLAZAR: Pon aquí tu contraseña real del panel (la que estaba oculta)
-$charset = 'utf8mb4';
+/**
+ * Configuración de conexión a la base de datos
+ * Usa variables de entorno para seguridad
+ */
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-];
+require_once __DIR__ . '/../BackEnd/vendor/autoload.php';
 
-try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
-    // Si falla la conexión, devolvemos un error JSON y terminamos
-    if (!headers_sent()) header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'message' => 'Error de conexión a la base de datos: ' . $e->getMessage()]);
-    exit;
+use Dotenv\Dotenv;
+
+class Database
+{
+    private static $instance = null;
+    private $connection;
+
+    private function __construct()
+    {
+        // Cargar variables de entorno
+        $dotenv = Dotenv::createImmutable(__DIR__);
+        $dotenv->load();
+
+        $host = $_ENV['DB_HOST'];
+        $dbname = $_ENV['DB_NAME'];
+        $user = $_ENV['DB_USER'];
+        $pass = $_ENV['DB_PASS'];
+        $charset = $_ENV['DB_CHARSET'] ?? 'utf8mb4';
+
+        $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
+        $options = [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ];
+
+        try {
+            $this->connection = new PDO($dsn, $user, $pass, $options);
+        } catch (\PDOException $e) {
+            $this->handleError($e);
+        }
+    }
+
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    private function handleError(\PDOException $e)
+    {
+        // En producción, no mostrar detalles del error
+        $debug = $_ENV['APP_DEBUG'] ?? false;
+
+        if ($debug) {
+            http_response_code(500);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error de conexión a la base de datos',
+                'error' => $e->getMessage()
+            ]);
+        } else {
+            http_response_code(500);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error de conexión al servidor'
+            ]);
+        }
+        exit;
+    }
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+    // Prevenir clonación del singleton
+    private function __clone() {}
+
+    // Prevenir unserialize del singleton
+    public function __wakeup()
+    {
+        throw new \Exception("Cannot unserialize singleton");
+    }
 }
-?>
+
+// Proporcionar la conexión como variable global para que sea accesible en otros archivos
+$pdo = Database::getInstance()->getConnection();
