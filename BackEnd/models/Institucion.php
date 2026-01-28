@@ -85,7 +85,7 @@ class Institucion {
 
         try {
             $stmt = $pdo->prepare(
-                "INSERT INTO instituciones (nombre, direccion, telefono, email, sitio_web, observaciones, latitud, longitud, logo, likes) 
+                "INSERT INTO institucion (nombre_ifts, direccion_ifts, telefono_ifts, email_ifts, sitio_web_ifts, observaciones_ifts, latitud_ifts, longitud_ifts, logo_ifts, likes_ifts) 
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
             
@@ -123,10 +123,10 @@ class Institucion {
      */
     public function actualizar($pdo) {
         $stmt = $pdo->prepare(
-            "UPDATE instituciones 
-             SET nombre = ?, direccion = ?, telefono = ?, email = ?, sitio_web = ?, 
-                 observaciones = ?, latitud = ?, longitud = ?, logo = ? 
-             WHERE id = ?"
+            "UPDATE institucion 
+             SET nombre_ifts = ?, direccion_ifts = ?, telefono_ifts = ?, email_ifts = ?, sitio_web_ifts = ?, 
+                 observaciones_ifts = ?, latitud_ifts = ?, longitud_ifts = ?, logo_ifts = ? 
+             WHERE id_institucion = ?"
         );
         
         return $stmt->execute([
@@ -147,7 +147,7 @@ class Institucion {
      * Incrementar contador de likes
      */
     public function incrementarLikes($pdo) {
-        $stmt = $pdo->prepare("UPDATE instituciones SET likes = likes + 1 WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE institucion SET likes_ifts = likes_ifts + 1 WHERE id_institucion = ?");
         $stmt->execute([$this->id]);
         
         // Actualizar el valor en la instancia
@@ -159,7 +159,7 @@ class Institucion {
      * Eliminar institución
      */
     public function eliminar($pdo) {
-        $stmt = $pdo->prepare("DELETE FROM instituciones WHERE id = ?");
+        $stmt = $pdo->prepare("DELETE FROM institucion WHERE id_institucion = ?");
         return $stmt->execute([$this->id]);
     }
 
@@ -197,7 +197,7 @@ class Institucion {
             $carrera_id = $this->obtenerOCrearCarrera($pdo, $nombre_carrera);
 
             // Crear relación
-            $stmt = $pdo->prepare("INSERT INTO instituciones_carreras (institucion_id, carrera_id) VALUES (?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO institucion_carrera (id_institucion, id_carrera) VALUES (?, ?)");
             $stmt->execute([$this->id, $carrera_id]);
         }
     }
@@ -206,14 +206,14 @@ class Institucion {
      * Obtener ID de carrera o crearla si no existe
      */
     private function obtenerOCrearCarrera($pdo, $nombre_carrera) {
-        $stmt = $pdo->prepare("SELECT id FROM carreras WHERE nombre = ?");
+        $stmt = $pdo->prepare("SELECT id_carrera FROM carrera WHERE nombre_carrera = ?");
         $stmt->execute([$nombre_carrera]);
         $carrera = $stmt->fetch();
 
         if ($carrera) {
-            return $carrera['id'];
+            return $carrera['id_carrera'];
         } else {
-            $stmt = $pdo->prepare("INSERT INTO carreras (nombre) VALUES (?)");
+            $stmt = $pdo->prepare("INSERT INTO carrera (nombre_carrera) VALUES (?)");
             $stmt->execute([$nombre_carrera]);
             return $pdo->lastInsertId();
         }
@@ -225,11 +225,11 @@ class Institucion {
      * Obtener todas las instituciones con sus carreras
      */
     public static function obtenerTodas($pdo) {
-        $sql = "SELECT i.*, GROUP_CONCAT(c.nombre SEPARATOR '|||') as lista_carreras 
-                FROM instituciones i 
-                LEFT JOIN instituciones_carreras ic ON i.id = ic.institucion_id 
-                LEFT JOIN carreras c ON ic.carrera_id = c.id 
-                GROUP BY i.id";
+        $sql = "SELECT i.*, GROUP_CONCAT(c.nombre_carrera SEPARATOR '|||') as lista_carreras 
+                FROM institucion i 
+                LEFT JOIN institucion_carrera ic ON i.id_institucion = ic.id_institucion 
+                LEFT JOIN carrera c ON ic.id_carrera = c.id_carrera 
+                GROUP BY i.id_institucion";
         
         $stmt = $pdo->query($sql);
         $resultados = $stmt->fetchAll();
@@ -242,17 +242,17 @@ class Institucion {
             }
 
             $instituciones[] = new Institucion(
-                $row['nombre'],
-                $row['direccion'],
-                $row['telefono'],
-                $row['email'],
-                $row['sitio_web'],
-                $row['observaciones'],
-                $row['latitud'],
-                $row['longitud'],
-                $row['logo'],
-                $row['id'],
-                $row['likes'] ?? 0,
+                $row['nombre_ifts'],
+                $row['direccion_ifts'],
+                $row['telefono_ifts'],
+                $row['email_ifts'],
+                $row['sitio_web_ifts'],
+                $row['observaciones_ifts'],
+                $row['latitud_ifts'],
+                $row['longitud_ifts'],
+                $row['logo_ifts'],
+                $row['id_institucion'],
+                $row['likes_ifts'] ?? 0,
                 $carreras
             );
         }
@@ -264,7 +264,7 @@ class Institucion {
      * Buscar institución por ID
      */
     public static function buscarPorId($pdo, $id) {
-        $stmt = $pdo->prepare("SELECT * FROM instituciones WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT * FROM institucion WHERE id_institucion = ?");
         $stmt->execute([$id]);
         $row = $stmt->fetch();
 
@@ -272,25 +272,25 @@ class Institucion {
 
         // Obtener carreras
         $stmt = $pdo->prepare(
-            "SELECT c.nombre FROM carreras c 
-             INNER JOIN instituciones_carreras ic ON c.id = ic.carrera_id 
-             WHERE ic.institucion_id = ?"
+            "SELECT c.nombre_carrera FROM carrera c 
+             INNER JOIN institucion_carrera ic ON c.id_carrera = ic.id_carrera 
+             WHERE ic.id_institucion = ?"
         );
         $stmt->execute([$id]);
         $carreras = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         return new Institucion(
-            $row['nombre'],
-            $row['direccion'],
-            $row['telefono'],
-            $row['email'],
-            $row['sitio_web'],
-            $row['observaciones'],
-            $row['latitud'],
-            $row['longitud'],
-            $row['logo'],
-            $row['id'],
-            $row['likes'] ?? 0,
+            $row['nombre_ifts'],
+            $row['direccion_ifts'],
+            $row['telefono_ifts'],
+            $row['email_ifts'],
+            $row['sitio_web_ifts'],
+            $row['observaciones_ifts'],
+            $row['latitud_ifts'],
+            $row['longitud_ifts'],
+            $row['logo_ifts'],
+            $row['id_institucion'],
+            $row['likes_ifts'] ?? 0,
             $carreras
         );
     }

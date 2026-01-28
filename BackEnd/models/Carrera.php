@@ -33,9 +33,9 @@ class Carrera {
      * Guardar carrera en la base de datos
      */
     public function guardar($pdo) {
-        $stmt = $pdo->prepare("INSERT INTO carreras (nombre, descripcion) VALUES (?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO carrera (nombre_carrera) VALUES (?)");
         
-        if ($stmt->execute([$this->nombre, $this->descripcion])) {
+        if ($stmt->execute([$this->nombre])) {
             $this->id = $pdo->lastInsertId();
             return true;
         }
@@ -46,15 +46,15 @@ class Carrera {
      * Actualizar carrera existente
      */
     public function actualizar($pdo) {
-        $stmt = $pdo->prepare("UPDATE carreras SET nombre = ?, descripcion = ? WHERE id = ?");
-        return $stmt->execute([$this->nombre, $this->descripcion, $this->id]);
+        $stmt = $pdo->prepare("UPDATE carrera SET nombre_carrera = ? WHERE id_carrera = ?");
+        return $stmt->execute([$this->nombre, $this->id]);
     }
 
     /**
      * Eliminar carrera
      */
     public function eliminar($pdo) {
-        $stmt = $pdo->prepare("DELETE FROM carreras WHERE id = ?");
+        $stmt = $pdo->prepare("DELETE FROM carrera WHERE id_carrera = ?");
         return $stmt->execute([$this->id]);
     }
 
@@ -75,16 +75,16 @@ class Carrera {
      * Obtener todas las carreras
      */
     public static function obtenerTodas($pdo) {
-        $sql = "SELECT * FROM carreras ORDER BY nombre ASC";
+        $sql = "SELECT * FROM carrera ORDER BY nombre_carrera ASC";
         $stmt = $pdo->query($sql);
         $resultados = $stmt->fetchAll();
 
         $carreras = [];
         foreach ($resultados as $row) {
             $carreras[] = new Carrera(
-                $row['nombre'],
+                $row['nombre_carrera'],
                 $row['descripcion'] ?? null,
-                $row['id']
+                $row['id_carrera']
             );
         }
 
@@ -95,16 +95,16 @@ class Carrera {
      * Buscar carrera por ID
      */
     public static function buscarPorId($pdo, $id) {
-        $stmt = $pdo->prepare("SELECT * FROM carreras WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT * FROM carrera WHERE id_carrera = ?");
         $stmt->execute([$id]);
         $row = $stmt->fetch();
 
         if (!$row) return null;
 
         return new Carrera(
-            $row['nombre'],
+            $row['nombre_carrera'],
             $row['descripcion'] ?? null,
-            $row['id']
+            $row['id_carrera']
         );
     }
 
@@ -112,16 +112,16 @@ class Carrera {
      * Buscar carrera por nombre
      */
     public static function buscarPorNombre($pdo, $nombre) {
-        $stmt = $pdo->prepare("SELECT * FROM carreras WHERE nombre = ?");
+        $stmt = $pdo->prepare("SELECT * FROM carrera WHERE nombre_carrera = ?");
         $stmt->execute([$nombre]);
         $row = $stmt->fetch();
 
         if (!$row) return null;
 
         return new Carrera(
-            $row['nombre'],
+            $row['nombre_carrera'],
             $row['descripcion'] ?? null,
-            $row['id']
+            $row['id_carrera']
         );
     }
 
