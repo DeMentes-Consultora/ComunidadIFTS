@@ -422,10 +422,17 @@ El archivo `.env` tiene la contraseña actual pero **NO se subirá a GitHub** gr
   - Fondo oscuro (#343a40) como IFTS15
   - Títulos en dorado (#FFD700) con línea divisoria degradada debajo
   - Separador dorado degradado en secciones
-  - Iconos Material Icons para toda la UI
+  - **Iconos:** Material Icons para UI general + Bootstrap Icons para redes sociales (iconos oficiales de marcas)
   - **Hover effects en enlaces:** Subrayado animado (::before que crece 0→100%) + traslación horizontal 3px + color dorado (idéntico a IFTS15)
-  - **Hover effects en redes sociales:** Fondo coloreado + color específico (YouTube rojo, Facebook azul, Instagram rosa)
-  - Redes sociales compactas con separación reducida
+  - **Iconos de redes sociales con colores oficiales:**
+    - YouTube: Icono `bi-youtube` en rojo #FF0000
+    - Facebook: Icono `bi-facebook` en azul #1877F2
+    - Instagram: Icono `bi-instagram` en rosa #E4405F
+  - **Hover effects en redes sociales:**
+    - YouTube: Fondo rojo + escala 1.1 + sombra brillante
+    - Facebook: Fondo azul + escala 1.1 + sombra brillante
+    - Instagram: Gradiente animado multicolor (naranja→rojo→rosa→violeta) + escala 1.1
+  - Redes sociales compactas con separación reducida (gap: 4px)
   - Responsive grid (auto-fit) que se adapta a móvil/desktop
   - Animations suaves con transiciones CSS 0.3s ease
 
@@ -437,6 +444,11 @@ El archivo `.env` tiene la contraseña actual pero **NO se subirá a GitHub** gr
 - **Integración:**
   - Footer ya está en `app.ts` y `app.html`
   - Listo para usar en la aplicación
+  - **Estado:** Casi completado (pendiente: decidir si mantener mapa embed o cambiar funcionalidad)
+
+- **Dependencias agregadas:**
+  - Bootstrap Icons CDN 1.11.3 (para iconos oficiales de marcas)
+  - Material Icons (para iconos generales de UI)
 
 ## Última Actualización
 29 de enero de 2026 - Footer Angular implementado replicando diseño de IFTS15
