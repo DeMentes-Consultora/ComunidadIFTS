@@ -1,1 +1,129 @@
-<p>footer works!</p>
+<!-- Footer -->
+<footer class="footer">
+	<div class="footer-container">
+		<div class="footer-content">
+			<!-- Columna 1: Info IFTS -->
+			<div class="footer-column">
+				<h6 class="footer-title">
+					<span class="footer-title-row">
+						<i class="material-icons" style="font-size: 20px; vertical-align: middle; margin-right: 8px;">school</i>
+						Comunidad IFTS
+					</span>
+				</h6>
+				<ul class="footer-list">
+					<li class="footer-item">
+						<i class="material-icons" style="font-size: 16px; color: #FFD700; margin-right: 8px;">location_on</i>
+						<span>Buenos Aires, Argentina</span>
+					</li>
+					<li class="footer-item">
+						<span class="map-embed" id="mapEmbedMobile">
+							<iframe
+								src="https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d26276.51559359395!2d-58.4458!3d-34.5884!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses-419!2sar!4v1764794541823"
+								width="100%"
+								height="120"
+								style="border: 0; border-radius: 4px;"
+								allowfullscreen=""
+								loading="lazy"
+								referrerpolicy="no-referrer-when-downgrade">
+							</iframe>
+						</span>
+					</li>
+				</ul>
+			</div>
+
+			<!-- Columna 2: Enlaces Útiles -->
+			<div class="footer-column">
+				<h6 class="footer-title">
+					<span class="footer-title-row">Enlaces Útiles</span>
+				</h6>
+				<ul class="footer-list">
+					<li class="footer-item">
+						<a href="/home" class="footer-link">
+							<i class="material-icons">chevron_right</i>
+							<span>Inicio</span>
+						</a>
+					</li>
+					<li class="footer-item">
+						<a href="/instituciones" class="footer-link">
+							<i class="material-icons">chevron_right</i>
+							<span>Instituciones</span>
+						</a>
+					</li>
+					<li class="footer-item">
+						<a href="/mapa" class="footer-link">
+							<i class="material-icons">chevron_right</i>
+							<span>Mapa Interactivo</span>
+						</a>
+					</li>
+					<li class="footer-item">
+						<a href="#" class="footer-link" (click)="openContactModal()">
+							<i class="material-icons">chevron_right</i>
+							<span>Contacto</span>
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<!-- Columna 3: Contacto -->
+			<div class="footer-column">
+				<h6 class="footer-title">
+					<span class="footer-title-row">Contacto</span>
+				</h6>
+				<ul class="footer-list">
+					<li class="footer-item">
+						<i class="material-icons" style="font-size: 16px; color: #FFD700;">schedule</i>
+						<span>Atención: Lunes a Viernes 9:00 - 18:00 hs</span>
+					</li>
+					<li class="footer-item">
+						<i class="material-icons" style="font-size: 16px; color: #FFD700;">phone</i>
+						<a href="tel:+5491145551234" class="footer-link-text">(011) 4555-1234</a>
+					</li>
+					<li class="footer-item">
+						<i class="material-icons" style="font-size: 16px; color: #FFD700;">email</i>
+						<a href="mailto:contacto@comunidadifts.com" class="footer-link-text">contacto@comunidadifts.com</a>
+					</li>
+				</ul>
+			</div>
+
+			<!-- Columna 4: Redes Sociales -->
+			<div class="footer-column">
+				<h6 class="footer-title">
+					<span class="footer-title-row">Redes Sociales</span>
+				</h6>
+				<ul class="footer-list social-links">
+					<li class="footer-item">
+						<a href="https://youtube.com" target="_blank" rel="noopener" class="social-link youtube">
+							<i class="material-icons">play_circle</i>
+							<span>YouTube</span>
+						</a>
+					</li>
+					<li class="footer-item">
+						<a href="https://facebook.com" target="_blank" rel="noopener" class="social-link facebook">
+							<i class="material-icons">public</i>
+							<span>Facebook</span>
+						</a>
+					</li>
+					<li class="footer-item">
+						<a href="https://instagram.com" target="_blank" rel="noopener" class="social-link instagram">
+							<i class="material-icons">photo_camera</i>
+							<span>Instagram</span>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- Separador -->
+		<div class="footer-separator"></div>
+
+		<!-- Copyright -->
+		<div class="footer-copyright">
+			<div class="copyright-left">
+				<small>&copy; {{ currentYear }} Comunidad IFTS. Todos los derechos reservados.</small>
+			</div>
+			<div class="copyright-right">
+				<small>Desarrollado por DeMentesConsultora</small>
+			</div>
+		</div>
+	</div>
+</footer>

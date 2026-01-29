@@ -20,9 +20,9 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `comunidad_ifts`
 --
-
+CREATE DATABASE IF NOT EXISTS `comunidad_ifts` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 -- --------------------------------------------------------
-
+USE `comunidad_ifts`;
 --
 -- Estructura de tabla para la tabla `carrera`
 --

@@ -406,3 +406,37 @@ El archivo `.env` tiene la contraseña actual pero **NO se subirá a GitHub** gr
 
 ## Última Actualización
 26 de enero de 2026 - Proyecto completamente reestructurado con frontend Angular y backend PHP profesional
+
+---
+
+## Cambios Implementados - 29 de enero de 2026
+
+### ✅ Footer Angular Creado
+- **Componente Footer:** Replicado del design de IFTS15 con 4 columnas
+  1. **Columna 1:** Ubicación + Mapa embed de Google Maps
+  2. **Columna 2:** Enlaces útiles (Inicio, Instituciones, Mapa, Contacto)
+  3. **Columna 3:** Contacto (Horario, teléfono, email)
+  4. **Columna 4:** Redes Sociales (YouTube, Facebook, Instagram)
+
+- **Estilos implementados:**
+  - Fondo oscuro (#343a40) como IFTS15
+  - Títulos en dorado (#FFD700) con línea divisoria degradada debajo
+  - Separador dorado degradado en secciones
+  - Iconos Material Icons para toda la UI
+  - **Hover effects en enlaces:** Subrayado animado (::before que crece 0→100%) + traslación horizontal 3px + color dorado (idéntico a IFTS15)
+  - **Hover effects en redes sociales:** Fondo coloreado + color específico (YouTube rojo, Facebook azul, Instagram rosa)
+  - Redes sociales compactas con separación reducida
+  - Responsive grid (auto-fit) que se adapta a móvil/desktop
+  - Animations suaves con transiciones CSS 0.3s ease
+
+- **TypeScript:**
+  - Método `openContactModal()` para futura integración de modal
+  - `currentYear` dinámico en copyright
+  - CommonModule importado
+
+- **Integración:**
+  - Footer ya está en `app.ts` y `app.html`
+  - Listo para usar en la aplicación
+
+## Última Actualización
+29 de enero de 2026 - Footer Angular implementado replicando diseño de IFTS15
