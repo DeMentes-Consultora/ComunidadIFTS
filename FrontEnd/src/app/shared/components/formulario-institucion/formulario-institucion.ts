@@ -165,8 +165,19 @@ export class FormularioInstitucionComponent implements OnInit {
     this.cargando = true;
     this.error = null;
 
+    const datosFormulario = this.formulario.getRawValue();
     const datos = {
-      ...this.formulario.getRawValue(),
+      ...datosFormulario,
+      // Campos con y sin sufijo para compatibilidad
+      nombre: datosFormulario.nombre_ifts,
+      direccion: datosFormulario.direccion_ifts,
+      telefono: datosFormulario.telefono_ifts,
+      email: datosFormulario.email_ifts,
+      sitio_web: datosFormulario.sitio_web_ifts,
+      observaciones: datosFormulario.observaciones_ifts,
+      logo: datosFormulario.logo_ifts,
+      latitud: this.coordenadas.lat,
+      longitud: this.coordenadas.lng,
       latitud_ifts: this.coordenadas.lat,
       longitud_ifts: this.coordenadas.lng,
       carreras: this.carrerasSeleccionadas
@@ -176,6 +187,7 @@ export class FormularioInstitucionComponent implements OnInit {
 
     this.institucionesService.guardarInstitucion(datos).subscribe({
       next: (respuesta) => {
+        console.log('Respuesta del backend:', respuesta);
         this.cargando = false;
         this.institucionGuardada.emit(respuesta);
         this.dialogRef.close(respuesta);
