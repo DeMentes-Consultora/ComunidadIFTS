@@ -300,17 +300,17 @@ class Institucion {
      */
     public static function desdeArray($data) {
         return new Institucion(
-            $data['nombre'] ?? '',
-            $data['direccion'] ?? null,
-            $data['telefono'] ?? null,
-            $data['email'] ?? null,
-            $data['sitio_web'] ?? null,
-            $data['observaciones'] ?? null,
-            $data['latitud'] ?? null,
-            $data['longitud'] ?? null,
-            $data['logo'] ?? null,
-            $data['id'] ?? null,
-            $data['likes'] ?? 0,
+            $data['nombre'] ?? $data['nombre_ifts'] ?? '',
+            $data['direccion'] ?? $data['direccion_ifts'] ?? null,
+            $data['telefono'] ?? $data['telefono_ifts'] ?? null,
+            $data['email'] ?? $data['email_ifts'] ?? null,
+            $data['sitio_web'] ?? $data['sitio_web_ifts'] ?? null,
+            $data['observaciones'] ?? $data['observaciones_ifts'] ?? null,
+            $data['latitud'] ?? $data['latitud_ifts'] ?? null,
+            $data['longitud'] ?? $data['longitud_ifts'] ?? null,
+            $data['logo'] ?? $data['logo_ifts'] ?? null,
+            $data['id'] ?? $data['id_institucion'] ?? null,
+            $data['likes'] ?? $data['likes_ifts'] ?? 0,
             $data['carreras'] ?? []
         );
     }

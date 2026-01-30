@@ -28,7 +28,7 @@ try {
     }
 
     // Validar campos requeridos
-    if (empty($input['nombre'])) {
+    if (empty($input['nombre']) && empty($input['nombre_ifts'])) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'El nombre es requerido']);
         exit;

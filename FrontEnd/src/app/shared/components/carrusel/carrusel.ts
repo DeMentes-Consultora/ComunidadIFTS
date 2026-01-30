@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,7 +17,8 @@ interface Slide {
   standalone: true,
   imports: [CommonModule, MatButtonModule, MatIconModule],
   templateUrl: './carrusel.html',
-  styleUrls: ['./carrusel.css']
+  styleUrls: ['./carrusel.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CarruselComponent implements OnInit, OnDestroy {
   slides: Slide[] = [
@@ -25,41 +26,43 @@ export class CarruselComponent implements OnInit, OnDestroy {
       id: 1,
       titulo: 'Bienvenido a Comunidad IFTS',
       descripcion: 'Conecta con todos los Institutos Superiores de Tecnología de Buenos Aires',
-      imagen: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&h=400&fit=crop',
+      imagen: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       enlace: '#'
     },
     {
       id: 2,
       titulo: 'IFTS 12 - Análisis de Sistemas',
       descripcion: 'Forma parte de los mejores programas de tecnología',
-      imagen: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=400&fit=crop',
+      imagen: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
       enlace: '#'
     },
     {
       id: 3,
       titulo: 'IFTS 20 - Gestión de Redes',
       descripcion: 'Especialízate en infraestructura tecnológica',
-      imagen: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&h=400&fit=crop',
+      imagen: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
       enlace: '#'
     },
     {
       id: 4,
       titulo: 'IFTS 15 - Desarrollo Web',
       descripcion: 'Aprende las últimas tecnologías en desarrollo web',
-      imagen: 'https://images.unsplash.com/photo-1517694712529-c74f6c718a20?w=1200&h=400&fit=crop',
+      imagen: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
       enlace: '#'
     },
     {
       id: 5,
       titulo: 'Únete a la comunidad',
       descripcion: 'Descubre oportunidades de aprendizaje y crecimiento profesional',
-      imagen: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=400&fit=crop',
+      imagen: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
       enlace: '#'
     }
   ];
 
   currentIndex = 0;
   private autoPlaySubscription: Subscription | null = null;
+
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.startAutoPlay();
@@ -83,14 +86,17 @@ export class CarruselComponent implements OnInit, OnDestroy {
 
   nextSlide(): void {
     this.currentIndex = (this.currentIndex + 1) % this.slides.length;
+    this.cdr.markForCheck();
   }
 
   prevSlide(): void {
     this.currentIndex = (this.currentIndex - 1 + this.slides.length) % this.slides.length;
+    this.cdr.markForCheck();
   }
 
   goToSlide(index: number): void {
     this.currentIndex = index;
+    this.cdr.markForCheck();
     // Reiniciar el autoplay cuando el usuario interactúa
     this.stopAutoPlay();
     this.startAutoPlay();

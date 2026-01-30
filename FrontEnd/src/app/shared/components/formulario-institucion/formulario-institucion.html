@@ -1,0 +1,193 @@
+<div class="formulario-container">
+  <h2 class="titulo">Registrar Nueva Institución</h2>
+
+  <form [formGroup]="formulario" (ngSubmit)="onSubmit()" class="formulario-form">
+    <!-- Sección de Error -->
+    <div *ngIf="error" class="error-message">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Logo -->
+    <div class="form-section">
+      <h3>Logo de la Institución</h3>
+      <div class="logo-upload">
+        <div *ngIf="logoPreview" class="logo-preview">
+          <img [src]="logoPreview" alt="Logo preview" />
+          <button
+            type="button"
+            class="btn-remove-logo"
+            (click)="logoPreview = null"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <label *ngIf="!logoPreview" class="upload-label">
+          <mat-icon>cloud_upload</mat-icon>
+          <span>Clic para subir logo</span>
+          <input
+            type="file"
+            accept="image/*"
+            (change)="onLogoSeleccionado($event)"
+            style="display: none"
+          />
+        </label>
+      </div>
+    </div>
+
+    <!-- Información Básica -->
+    <div class="form-section">
+      <h3>Información Básica</h3>
+
+      <mat-form-field class="full-width">
+        <mat-label>Nombre de la Institución *</mat-label>
+        <input
+          matInput
+          formControlName="nombre_ifts"
+          placeholder="ej: IFTS 12"
+        />
+        <mat-error *ngIf="formulario.get('nombre_ifts')?.hasError('required')">
+          Este campo es obligatorio
+        </mat-error>
+        <mat-error
+          *ngIf="formulario.get('nombre_ifts')?.hasError('minlength')"
+        >
+          Mínimo 3 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>Dirección *</mat-label>
+        <input
+          matInput
+          formControlName="direccion_ifts"
+          placeholder="ej: Av. Belgrano 637, Buenos Aires"
+          readonly
+        />
+        <mat-error
+          *ngIf="formulario.get('direccion_ifts')?.hasError('minlength')"
+        >
+          Mínimo 5 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>Teléfono *</mat-label>
+        <input
+          matInput
+          formControlName="telefono_ifts"
+          placeholder="ej: 011 4345-6676"
+        />
+        <mat-error
+          *ngIf="formulario.get('telefono_ifts')?.hasError('required')"
+        >
+          Este campo es obligatorio
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Contacto -->
+    <div class="form-section">
+      <h3>Contacto</h3>
+
+      <mat-form-field class="full-width">
+        <mat-label>Email *</mat-label>
+        <input
+          matInput
+          type="email"
+          formControlName="email_ifts"
+          placeholder="ej: contacto@ifts.com.ar"
+        />
+        <mat-error *ngIf="formulario.get('email_ifts')?.hasError('required')">
+          Este campo es obligatorio
+        </mat-error>
+        <mat-error *ngIf="formulario.get('email_ifts')?.hasError('email')">
+          Ingresa un email válido
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>Sitio Web *</mat-label>
+        <input
+          matInput
+          type="url"
+          formControlName="sitio_web_ifts"
+          placeholder="ej: www.ifts.com.ar o https://www.ifts.com.ar"
+        />
+        <mat-error
+          *ngIf="formulario.get('sitio_web_ifts')?.hasError('required')"
+        >
+          Este campo es obligatorio
+        </mat-error>
+        <mat-hint>Puedes ingresar con o sin http:// o https://</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <!-- Ubicación -->
+    <div class="form-section">
+      <h3>Ubicación</h3>
+      <div class="coordenadas-row">
+        <mat-form-field class="half-width">
+          <mat-label>Latitud</mat-label>
+          <input matInput formControlName="latitud_ifts" readonly />
+        </mat-form-field>
+        <mat-form-field class="half-width">
+          <mat-label>Longitud</mat-label>
+          <input matInput formControlName="longitud_ifts" readonly />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Carreras -->
+    <div class="form-section">
+      <h3>Carreras Ofrecidas *</h3>
+      <div class="carreras-checkboxes">
+        <mat-checkbox
+          *ngFor="let carrera of carrerasDisponibles"
+          [checked]="carrerasSeleccionadas.includes(carrera)"
+          (change)="toggleCarrera(carrera)"
+        >
+          {{ carrera }}
+        </mat-checkbox>
+      </div>
+      <div *ngIf="carrerasSeleccionadas.length === 0" class="error-carreras">
+        Selecciona al menos una carrera
+      </div>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="form-section">
+      <h3>Observaciones</h3>
+      <mat-form-field class="full-width">
+        <mat-label>Observaciones (máx 255 caracteres)</mat-label>
+        <textarea
+          matInput
+          formControlName="observaciones_ifts"
+          rows="4"
+          placeholder="Información adicional sobre la institución..."
+        ></textarea>
+        <mat-hint align="end">
+          {{ (formulario.get('observaciones_ifts')?.value || '').length }}/255
+        </mat-hint>
+      </mat-form-field>
+    </div>
+
+    <!-- Botones -->
+    <div class="formulario-acciones">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="cargando"
+      >
+        <mat-icon *ngIf="!cargando">save</mat-icon>
+        <span *ngIf="!cargando">Guardar Institución</span>
+        <span *ngIf="cargando">Guardando...</span>
+      </button>
+
+      <button mat-stroked-button type="button" (click)="cancelar()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>

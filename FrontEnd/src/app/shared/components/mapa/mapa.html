@@ -8,4 +8,11 @@
   </header>
 
   <div id="mapa-ifts" class="map-container" aria-label="Mapa de Institutos"></div>
+
+  <!-- Componente Buscador de Direcciones - Solo se inicializa cuando el mapa esté listo -->
+  <app-buscador-direccion 
+    *ngIf="map"
+    [map]="map" 
+    (direccionEncontrada)="onDireccionEncontrada($event)">
+  </app-buscador-direccion>
 </section>

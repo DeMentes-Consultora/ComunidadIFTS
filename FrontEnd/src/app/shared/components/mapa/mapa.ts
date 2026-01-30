@@ -1,22 +1,30 @@
-import { Component, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { InstitucionesService } from '../../services/instituciones.service';
 import { Institucion } from '../../models/institucion.model';
+import { BuscadorDireccionComponent } from '../buscador-direccion/buscador-direccion';
+import { FormularioInstitucionComponent } from '../formulario-institucion/formulario-institucion';
 
 @Component({
   selector: 'app-mapa',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, BuscadorDireccionComponent, MatDialogModule],
   templateUrl: './mapa.html',
-  styleUrls: ['./mapa.css']
+  styleUrls: ['./mapa.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
-  private map: L.Map | null = null;
+  map: L.Map | null = null;
   private instituciones: Institucion[] = [];
   private isLoading = true;
 
-  constructor(private institucionesService: InstitucionesService) {}
+  constructor(
+    private institucionesService: InstitucionesService,
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.cargarInstituciones();
@@ -28,6 +36,25 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.map?.remove();
+  }
+
+  onDireccionEncontrada(evento: { coordenadas: L.LatLng; direccion: string }): void {
+    // Abrir formulario de registro de institución
+    const dialogRef = this.dialog.open(FormularioInstitucionComponent, {
+      width: '90%',
+      maxWidth: '600px',
+      data: { coordenadas: evento.coordenadas, direccion: evento.direccion }
+    });
+
+    dialogRef.componentInstance.coordenadas = evento.coordenadas;
+    dialogRef.componentInstance.direccion = evento.direccion;
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        // Recargar instituciones después de guardar
+        this.cargarInstituciones();
+      }
+    });
   }
 
   private cargarInstituciones(): void {
@@ -61,6 +88,9 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
+
+    // Notificar a Angular que el mapa ha sido inicializado
+    this.cdr.markForCheck();
 
     // Si ya hay instituciones cargadas, renderizarlas
     if (this.instituciones.length > 0) {

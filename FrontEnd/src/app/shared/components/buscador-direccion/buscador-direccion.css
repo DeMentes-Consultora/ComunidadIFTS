@@ -1,0 +1,51 @@
+/* Estilos para el control de geocoder */
+:host ::ng-deep .leaflet-control-geocoder {
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+:host ::ng-deep .leaflet-control-geocoder-form {
+  display: flex;
+  gap: 4px;
+}
+
+:host ::ng-deep .leaflet-control-geocoder-form input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  flex: 1;
+}
+
+:host ::ng-deep .leaflet-control-geocoder-form button {
+  background-color: #006633;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+:host ::ng-deep .leaflet-control-geocoder-form button:hover {
+  background-color: #004d26;
+}
+
+:host ::ng-deep .leaflet-control-geocoder-result {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+:host ::ng-deep .leaflet-control-geocoder-result-item {
+  padding: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+:host ::ng-deep .leaflet-control-geocoder-result-item:hover {
+  background-color: #f5f5f5;
+}
