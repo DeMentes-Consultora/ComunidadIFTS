@@ -1,0 +1,43 @@
+================================================================
+         INSTRUCCIONES DE DESPLIEGUE - COMUNIDADIFTS
+================================================================
+
+IMPORTANTE: Antes de subir los archivos, configura tu contraseña
+
+1. Edita el archivo .env en la carpeta deploy-infinityfree:
+   - Busca la linea: DB_PASS=
+   - Agrega tu contraseña de MySQL de InfinityFree
+   - Ejemplo: DB_PASS=tu_contraseña_aqui
+
+2. Conecta via FTP a InfinityFree:
+   Host: ftpupload.net
+   Puerto: 21
+   Usuario: epiz_XXXXXXXX (tu usuario FTP)
+   Contraseña: (tu contraseña FTP)
+
+3. Sube TODO el contenido de deploy-infinityfree/ a htdocs/
+
+4. Importar la base de datos:
+   - Accede a phpMyAdmin desde VistaPanel
+   - Selecciona: if0_41035439_comunidad_ifts
+   - Importa: BackEnd/database/if0_41035439_comunidad_ifts.sql
+
+5. Verifica el despliegue:
+   https://comunidadifts.infinityfree.com/check-server.php
+
+6. Prueba la API:
+   https://comunidadifts.infinityfree.com/api/carreras.php
+
+7. Visita tu sitio:
+   https://comunidadifts.infinityfree.com
+
+8. SEGURIDAD: Elimina check-server.php del servidor
+
+================================================================
+Configuracion actual:
+================================================================
+DB Host: sql113.infinityfree.com
+DB Name: if0_41035439_comunidad_ifts
+DB User: if0_41035439
+Dominio: comunidadifts.infinityfree.com
+================================================================

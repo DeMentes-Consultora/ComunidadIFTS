@@ -1,0 +1,1 @@
+Rename-Item -Path "E:\sminotti\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1" -NewName "Microsoft.PowerShell_profile.ps1.bak"

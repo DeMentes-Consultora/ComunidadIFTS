@@ -1,0 +1,1 @@
+import{Rb as s,db as n,wb as i,xb as p}from"./chunk-FZEBGDWR.js";var o=class t{static \u0275fac=function(e){return new(e||t)};static \u0275cmp=n({type:t,selectors:[["app-sign-up"]],decls:2,vars:0,template:function(e,m){e&1&&(i(0,"p"),s(1,"sign-up works!"),p())},encapsulation:2})};export{o as SignUp};
