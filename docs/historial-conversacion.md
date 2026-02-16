@@ -452,3 +452,234 @@ El archivo `.env` tiene la contraseña actual pero **NO se subirá a GitHub** gr
 
 ## Última Actualización
 29 de enero de 2026 - Footer Angular implementado replicando diseño de IFTS15
+
+---
+
+## Despliegue en InfinityFree - 30 de enero a 15 de febrero de 2026
+
+### 📋 Preparación del Despliegue
+
+**Cuenta InfinityFree:**
+- Usuario BD: `if0_41035439`
+- Base de datos: `if0_41035439_comunidad_ifts`
+- Host BD: `sql113.infinityfree.com`
+- Dominio: `comunidadifts.infinityfreeapp.com`
+
+### ✅ Archivos de Configuración Creados
+
+#### 1. **Backend - Configuración de Producción**
+- **`.env.production`**: Archivo de configuración con credenciales de InfinityFree
+  - Configuración de BD (host, usuario, nombre, contraseña)
+  - APP_ENV=production, APP_DEBUG=false
+  - CORS_ALLOWED_ORIGINS con dominio de producción
+  - Timezone: America/Argentina/Buenos_Aires
+
+- **`.htaccess`**: Configuración Apache
+  - Protección de archivos sensibles (.env, .git, composer.json)
+  - Headers de seguridad (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)
+  - Compresión GZIP para mejorar performance
+  - Cache para archivos estáticos
+  - Rewrite rules para Angular (SPA routing)
+
+- **`check-server.php`**: Script de verificación del servidor
+  - Verifica versión de PHP (>= 7.4)
+  - Verifica extensiones PHP (mysqli, pdo, pdo_mysql, json, mbstring)
+  - Verifica existencia de archivos y carpetas
+  - Prueba conexión a base de datos
+  - Cuenta tablas importadas
+  - Interfaz visual con indicadores de éxito/error
+  - **Nota:** Eliminar después del despliegue por seguridad
+
+#### 2. **Frontend - Configuración de Producción**
+- **`environment.prod.ts`**: URL de API de producción
+  ```typescript
+  apiUrl: 'https://comunidadifts.infinityfreeapp.com/api'
+  ```
+
+- **`angular.json`**: Agregado `fileReplacements`
+  - Reemplaza `environment.ts` con `environment.prod.ts` en build de producción
+  - **Problema resuelto:** Angular no estaba usando las URLs de producción
+
+#### 3. **Scripts de Automatización**
+- **`prepare-deploy.bat`** (Windows): Script automático que:
+  1. Instala dependencias Backend (composer install --no-dev)
+  2. Instala dependencias Frontend (npm install)
+  3. Compila Frontend Angular para producción
+  4. Crea carpeta `deploy-infinityfree/`
+  5. Copia Backend (vendor, config, api, models, .htaccess, .env)
+  6. Copia Frontend compilado (dist/browser)
+  7. Genera archivo INSTRUCCIONES.txt
+
+#### 4. **Documentación**
+- **`DEPLOYMENT.md`**: Guía completa de despliegue
+  - Configuración de cuenta InfinityFree
+  - Pasos para importar base de datos
+  - Instrucciones de FTP con FileZilla
+  - Verificación del servidor
+  - Solución de problemas comunes
+  - Checklist final
+
+### 🐛 Problemas Resueltos
+
+#### Problema 1: Marcadores no aparecían en otros dispositivos
+**Síntoma:** El mapa se veía pero sin marcadores institucionales desde PCs/móviles externos
+
+**Causa raíz:** Error `localhost/.../instituciones.php Failed to load resource: net::ERR_CONNECTION_REFUSED`
+
+**Diagnóstico:**
+1. Intentaba conectar a localhost en lugar de dominio de producción
+2. Angular NO estaba reemplazando archivos de environment en build de producción
+3. Faltaba configuración `fileReplacements` en `angular.json`
+
+**Solución:**
+```json
+// angular.json - configurations.production
+"fileReplacements": [
+  {
+    "replace": "src/environments/environment.ts",
+    "with": "src/environments/environment.prod.ts"
+  }
+]
+```
+
+#### Problema 2: Error ERR_NAME_NOT_RESOLVED
+**Síntoma:** `GET https://comunidadifts.infinityfree.com/api/instituciones.php net::ERR_NAME_NOT_RESOLVED`
+
+**Causa:** Dominio incorrecto (faltaba "app")
+- ❌ `comunidadifts.infinityfree.com`
+- ✅ `comunidadifts.infinityfreeapp.com`
+
+**Solución:** Corregir URLs en todos los archivos de configuración
+
+#### Problema 3: CORS bloqueando peticiones
+**Causa:** Variable incorrecta en `.env`
+- Backend buscaba: `CORS_ALLOWED_ORIGINS`
+- Archivo tenía: `ALLOWED_ORIGINS`
+
+**Solución:**
+1. Renombrar variable a `CORS_ALLOWED_ORIGINS`
+2. Mejorar `cors.php` para ser más permisivo en producción:
+```php
+// Permitir cualquier origen si está vacío o en desarrollo
+// InfinityFree a veces causa problemas con CORS estricto
+header("Access-Control-Allow-Origin: *");
+```
+
+#### Problema 4: Frontend no se copiaba a deploy
+**Síntoma:** `index.html` y archivos JS/CSS no estaban en `deploy-infinityfree/`
+
+**Causa:** Script de preparación no copiaba correctamente desde `dist/ComunidadIFTS/browser/`
+
+**Solución:**
+```bash
+xcopy /E /Y "FrontEnd\dist\ComunidadIFTS\browser\*" "deploy-infinityfree\"
+```
+
+### 🔧 Mejoras de Debugging
+
+**Logs en componente del mapa:**
+```typescript
+console.log('🔄 Iniciando carga de instituciones...');
+console.log('✅ Instituciones recibidas:', instituciones.length);
+console.log('🗺️ Renderizando instituciones en el mapa...');
+console.log('❌ ERROR al cargar instituciones:', error);
+```
+
+**Alert en caso de error:**
+```typescript
+alert('Error al cargar instituciones. Ver consola para más detalles.');
+```
+
+### 📤 Proceso de Despliegue Final
+
+1. **Preparación local:**
+   - Ejecutar `prepare-deploy.bat`
+   - Verificar que `.env` tiene contraseña configurada
+
+2. **Subida vía FTP (FileZilla):**
+   - Host: `ftpupload.net`
+   - Puerto: 21
+   - Subir TODO de `deploy-infinityfree/` a `htdocs/`
+   - Sobrescribir archivos existentes
+
+3. **Base de datos:**
+   - Importar `if0_41035439_comunidad_ifts.sql` en phpMyAdmin
+   - Base de datos ya estaba creada y poblada
+
+4. **Verificación:**
+   - Visitar `https://comunidadifts.infinityfreeapp.com/check-server.php`
+   - Verificar API: `https://comunidadifts.infinityfreeapp.com/api/instituciones.php`
+   - Probar frontend: `https://comunidadifts.infinityfreeapp.com`
+
+5. **Seguridad post-despliegue:**
+   - Eliminar `check-server.php` del servidor
+
+### ✅ Estado Final
+
+**Funcionando correctamente:**
+- ✅ Mapa se visualiza desde cualquier dispositivo
+- ✅ Marcadores de instituciones aparecen correctamente
+- ✅ API responde con datos correctos
+- ✅ CORS configurado correctamente
+- ✅ Frontend y Backend integrados
+- ✅ Accesible desde PCs, móviles y tablets
+- ✅ URLs de producción configuradas
+- ✅ Base de datos conectada
+
+**Estructura en servidor:**
+```
+htdocs/
+├── .env                    # Configuración producción
+├── .htaccess              # Configuración Apache
+├── index.html             # Frontend Angular
+├── main-*.js              # JavaScript compilado
+├── styles-*.css           # Estilos compilados
+├── chunk-*.js             # Lazy loading chunks
+├── vendor/                # Dependencias PHP (Composer)
+├── config/
+│   ├── database.php
+│   └── cors.php
+├── api/
+│   ├── instituciones.php
+│   ├── carreras.php
+│   ├── guardar-institucion.php
+│   └── like-institucion.php
+├── models/
+│   ├── Institucion.php
+│   └── Carrera.php
+└── media/                 # Imágenes Leaflet
+```
+
+### 🎓 Lecciones Aprendidas
+
+1. **fileReplacements en Angular es CRÍTICO** para que use archivos de producción
+2. **Dominio exacto es fundamental** (.infinityfreeapp.com vs .infinityfree.com)
+3. **CORS debe configurarse cuidadosamente** en hosting gratuito
+4. **Logs detallados ayudan enormemente** en debugging remoto
+5. **Scripts de automatización ahorran tiempo** y evitan errores manuales
+6. **Verificación sistemática** (check-server.php) facilita troubleshooting
+
+### 📊 Métricas del Proyecto
+
+**Backend:**
+- PHP 7.4+
+- Base de datos MySQL con tablas de instituciones y carreras
+- API REST con 4 endpoints principales
+- CORS configurado
+- Validación de datos con PDO
+
+**Frontend:**
+- Angular 21
+- Leaflet para mapas interactivos
+- Material Design
+- Build optimizado: ~428 KB (inicial) + chunks lazy (~406 KB)
+- Responsive design
+
+**Hosting:**
+- InfinityFree (gratuito)
+- 5GB almacenamiento
+- 50,000 hits/día
+- Base de datos 400MB
+
+## Última Actualización
+15 de febrero de 2026 - Proyecto desplegado exitosamente en InfinityFree y funcionando desde cualquier dispositivo

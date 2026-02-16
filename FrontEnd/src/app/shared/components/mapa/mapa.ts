@@ -59,25 +59,17 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private cargarInstituciones(): void {
     this.isLoading = true;
-    console.log('🔄 Iniciando carga de instituciones...');
     this.institucionesService.obtenerTodas().subscribe({
       next: (instituciones) => {
-        console.log('✅ Instituciones recibidas:', instituciones.length, instituciones);
         this.instituciones = instituciones;
         this.isLoading = false;
-        // Si el mapa ya está inicializado, renderizar instituciones
         if (this.map) {
-          console.log('🗺️ Renderizando instituciones en el mapa...');
           this.renderInstituciones();
-        } else {
-          console.log('⏳ Mapa no inicializado aún, esperando...');
         }
       },
       error: (error) => {
-        console.error('❌ ERROR al cargar instituciones:', error);
-        console.error('Detalles del error:', JSON.stringify(error, null, 2));
+        console.error('Error al cargar instituciones:', error);
         this.isLoading = false;
-        alert('Error al cargar instituciones. Ver consola para más detalles.');
       }
     });
   }
@@ -105,14 +97,9 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private renderInstituciones(): void {
-    if (!this.map) {
-      console.warn('⚠️ No se puede renderizar: mapa no inicializado');
-      return;
-    }
+    if (!this.map) return;
 
-    console.log(`📍 Renderizando ${this.instituciones.length} instituciones`);
     this.instituciones.forEach((inst) => {
-      console.log(`  - ${inst.nombre} en [${inst.latitud}, ${inst.longitud}]`);
       const marker = L.circleMarker([inst.latitud, inst.longitud], {
         radius: 10,
         color: '#006633',
@@ -123,7 +110,6 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
 
       marker.bindPopup(this.getPopupContent(inst));
     });
-    console.log('✅ Marcadores renderizados correctamente');
   }
 
   private getPopupContent(inst: Institucion): string {
