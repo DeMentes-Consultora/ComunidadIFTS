@@ -3,39 +3,33 @@
  * Configuración de CORS para permitir peticiones desde el frontend Angular
  */
 
-// Cargar variables de entorno si no están cargadas
-if (!isset($_ENV['CORS_ALLOWED_ORIGINS'])) {
-    require_once __DIR__ . '/../vendor/autoload.php';
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-    $dotenv->load();
-}
-
-// Obtener orígenes permitidos desde .env
-$allowedOriginsString = $_ENV['CORS_ALLOWED_ORIGINS'] ?? 'http://localhost:4200';
-$allowedOrigins = array_map('trim', explode(',', $allowedOriginsString));
-
-// Obtener el origen de la petición
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-
-// Verificar si el origen está permitido
-if (in_array($origin, $allowedOrigins)) {
-    header("Access-Control-Allow-Origin: $origin");
-} else {
-    // En producción, permitir cualquier origen si está vacío (para compatibilidad)
-    // Esto es necesario porque algunos navegadores no envían el header HTTP_ORIGIN
-    if (empty($origin) || $_ENV['APP_ENV'] === 'development') {
-        header("Access-Control-Allow-Origin: *");
+// En desarrollo, simplemente permitir CORS desde localhost:4200
+if (getenv('APP_ENV') === 'production') {
+    // En producción, usar configuración estricta del .env
+    if (!isset($_ENV['CORS_ALLOWED_ORIGINS'])) {
+        require_once __DIR__ . '/../vendor/autoload.php';
+        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+        $dotenv->load();
+    }
+    
+    $allowedOriginsString = $_ENV['CORS_ALLOWED_ORIGINS'] ?? 'https://comunidadifts.infinityfreeapp.com';
+    $allowedOrigins = array_map('trim', explode(',', $allowedOriginsString));
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    
+    if (in_array($origin, $allowedOrigins)) {
+        header("Access-Control-Allow-Origin: $origin");
     } else {
-        // Si hay un origin pero no está en la lista, permitirlo igual
-        // InfinityFree a veces causa problemas con CORS estricto
         header("Access-Control-Allow-Origin: *");
     }
+} else {
+    // En desarrollo, permitir todos los orígenes
+    header("Access-Control-Allow-Origin: *");
 }
 
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Access-Control-Allow-Credentials: true");
-header("Access-Control-Max-Age: 86400"); // Cache preflight por 24 horas
+header("Access-Control-Max-Age: 86400");
 
 // Manejar peticiones OPTIONS (preflight)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

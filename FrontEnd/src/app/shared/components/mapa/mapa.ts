@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { InstitucionesService } from '../../services/instituciones.service';
+import { MarkerClusterService } from '../../services/marker-cluster.service';
 import { Institucion } from '../../models/institucion.model';
 import { BuscadorDireccionComponent } from '../buscador-direccion/buscador-direccion';
 import { FormularioInstitucionComponent } from '../formulario-institucion/formulario-institucion';
@@ -22,6 +23,7 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private institucionesService: InstitucionesService,
+    private markerClusterService: MarkerClusterService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {}
@@ -35,6 +37,7 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.markerClusterService.destroy();
     this.map?.remove();
   }
 
@@ -87,6 +90,12 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
 
+    // ✨ INICIALIZAR CLUSTERING DE MARCADORES
+    this.markerClusterService.initClusterGroup(this.map, {
+      maxClusterRadius: 80,
+      disableClusteringAtZoom: 18
+    });
+
     // Notificar a Angular que el mapa ha sido inicializado
     this.cdr.markForCheck();
 
@@ -99,6 +108,7 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
   private renderInstituciones(): void {
     if (!this.map) return;
 
+    // ✨ AGREGAR MARCADORES AL CLUSTER EN LUGAR DE AL MAPA
     this.instituciones.forEach((inst) => {
       const marker = L.circleMarker([inst.latitud, inst.longitud], {
         radius: 10,
@@ -106,10 +116,16 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
         fillColor: '#66bb6a',
         fillOpacity: 0.9,
         weight: 2
-      }).addTo(this.map as L.Map);
+      });
 
       marker.bindPopup(this.getPopupContent(inst));
+
+      // Agregar al cluster en lugar de directamente al mapa
+      this.markerClusterService.addMarker(marker);
     });
+
+    // Log de información
+    console.log(`✨ ${this.markerClusterService.getMarkerCount()} instituciones cargadas en clustering`);
   }
 
   private getPopupContent(inst: Institucion): string {
