@@ -1,11 +1,21 @@
 import { Injectable } from '@angular/core';
 import * as L from 'leaflet';
-import 'leaflet.markercluster';
+
+// leaflet.markercluster se carga desde angular.json (scripts)
+// y extiende el objeto L globalmente con markerClusterGroup
 
 // Declarar tipos para leaflet.markercluster que no exporta TypeScript
 declare global {
   namespace L {
     function markerClusterGroup(options?: any): any;
+    interface MarkerClusterGroupOptions {
+      maxClusterRadius?: number;
+      zoomToBoundsOnClick?: boolean;
+      spiderfyOnMaxZoom?: boolean;
+      disableClusteringAtZoom?: number;
+      iconCreateFunction?: (cluster: any) => L.Icon;
+      [key: string]: any;
+    }
   }
 }
 
@@ -27,14 +37,51 @@ declare global {
 export class MarkerClusterService {
   private clusterGroup: any = null;
   private map: L.Map | null = null;
+  private pluginLoadPromise: Promise<boolean> | null = null;
+
+  private async ensureClusterPluginLoaded(): Promise<boolean> {
+    if (this.isClusterAvailable()) {
+      return true;
+    }
+
+    if (this.pluginLoadPromise) {
+      return this.pluginLoadPromise;
+    }
+
+    this.pluginLoadPromise = (async () => {
+      try {
+        (window as any).L = L;
+        await import('leaflet.markercluster');
+        return this.isClusterAvailable();
+      } catch (error) {
+        console.error('No se pudo cargar leaflet.markercluster dinámicamente', error);
+        return false;
+      }
+    })();
+
+    return this.pluginLoadPromise;
+  }
+
+  isClusterAvailable(): boolean {
+    return typeof (L as any).markerClusterGroup === 'function';
+  }
 
   /**
    * Inicializar el cluster group
    * @param map Instancia del mapa Leaflet
    * @param options Opciones de configuración del cluster
    */
-  initClusterGroup(map: L.Map, options?: any): any {
+  async initClusterGroup(map: L.Map, options?: any): Promise<any> {
     this.map = map;
+
+    const loaded = await this.ensureClusterPluginLoaded();
+
+    // Verificar que L.markerClusterGroup está disponible
+    if (!loaded || !this.isClusterAvailable()) {
+      console.error('ERROR: L.markerClusterGroup no está disponible');
+      console.error('No se pudo inicializar el plugin leaflet.markercluster en runtime');
+      return null;
+    }
 
     // Opciones por defecto del cluster
     const defaultOptions: L.MarkerClusterGroupOptions = {
@@ -84,7 +131,7 @@ export class MarkerClusterService {
     };
 
     // Crear el cluster group
-    this.clusterGroup = L.markerClusterGroup(defaultOptions);
+    this.clusterGroup = (L as any).markerClusterGroup(defaultOptions);
     
     // Agregar a la mapa
     this.map.addLayer(this.clusterGroup);
@@ -98,7 +145,7 @@ export class MarkerClusterService {
    */
   addMarker(marker: L.Layer): void {
     if (!this.clusterGroup) {
-      throw new Error('ClusterGroup no inicializado. Llama a initClusterGroup() primero');
+      return;
     }
     this.clusterGroup.addLayer(marker);
   }
@@ -109,7 +156,7 @@ export class MarkerClusterService {
    */
   addMarkers(markers: L.Layer[]): void {
     if (!this.clusterGroup) {
-      throw new Error('ClusterGroup no inicializado. Llama a initClusterGroup() primero');
+      return;
     }
     markers.forEach(marker => this.clusterGroup!.addLayer(marker));
   }
@@ -142,7 +189,7 @@ export class MarkerClusterService {
   /**
    * Obtener el cluster group actual
    */
-  getClusterGroup(): L.MarkerClusterGroup | null {
+  getClusterGroup(): any {
     return this.clusterGroup;
   }
 

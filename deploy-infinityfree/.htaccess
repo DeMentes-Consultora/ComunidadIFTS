@@ -67,9 +67,20 @@ Options -Indexes
     ExpiresByType image/x-icon "access plus 1 year"
 </IfModule>
 
-# Redireccionar todas las solicitudes no encontradas al index.html (para Angular)
-# Solo si no es un archivo o directorio existente
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} !^/api/
-RewriteRule ^(.*)$ /index.html [L]
+# Angular SPA Routing - Reescribir URLs al index.html
+# Pero NO reescribir archivos, directorios o llamadas a /api/
+
+# NO reescribir si es un archivo existente
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# NO reescribir si es un directorio existente
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# NO reescribir peticiones a /api/
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^ - [L]
+
+# Reescribir todo lo demás a index.html (para Angular SPA)
+RewriteRule ^ /index.html [L]

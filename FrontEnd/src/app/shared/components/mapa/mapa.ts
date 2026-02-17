@@ -20,6 +20,7 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
   map: L.Map | null = null;
   private instituciones: Institucion[] = [];
   private isLoading = true;
+  private useClustering = false;
 
   constructor(
     private institucionesService: InstitucionesService,
@@ -77,7 +78,7 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private initMap(): void {
+  private async initMap(): Promise<void> {
     // En móvil usamos zoom 11, en desktop 13
     const initialZoom = window.innerWidth < 768 ? 11 : 13;
 
@@ -90,11 +91,15 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
 
-    // ✨ INICIALIZAR CLUSTERING DE MARCADORES
-    this.markerClusterService.initClusterGroup(this.map, {
+    // ✨ INICIALIZAR CLUSTERING DE MARCADORES (con fallback)
+    const clusterGroup = await this.markerClusterService.initClusterGroup(this.map, {
       maxClusterRadius: 80,
       disableClusteringAtZoom: 18
     });
+    this.useClustering = !!clusterGroup;
+    if (!this.useClustering) {
+      console.warn('Clustering no disponible: se renderizarán marcadores directos en el mapa');
+    }
 
     // Notificar a Angular que el mapa ha sido inicializado
     this.cdr.markForCheck();
@@ -120,12 +125,19 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
 
       marker.bindPopup(this.getPopupContent(inst));
 
-      // Agregar al cluster en lugar de directamente al mapa
-      this.markerClusterService.addMarker(marker);
+      if (this.useClustering) {
+        this.markerClusterService.addMarker(marker);
+      } else {
+        marker.addTo(this.map!);
+      }
     });
 
     // Log de información
-    console.log(`✨ ${this.markerClusterService.getMarkerCount()} instituciones cargadas en clustering`);
+    if (this.useClustering) {
+      console.log(`✨ ${this.markerClusterService.getMarkerCount()} instituciones cargadas en clustering`);
+    } else {
+      console.log(`📍 ${this.instituciones.length} instituciones cargadas sin clustering`);
+    }
   }
 
   private getPopupContent(inst: Institucion): string {
