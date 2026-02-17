@@ -3,7 +3,7 @@
         'name' => 'dementes/comunidad-ifts-backend',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '8770389214fcf82d672e0de6925db0320d9855cd',
+        'reference' => 'c91636c9e6b60587dafdccc75cd2eb64ef8ade16',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'dementes/comunidad-ifts-backend' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '8770389214fcf82d672e0de6925db0320d9855cd',
+            'reference' => 'c91636c9e6b60587dafdccc75cd2eb64ef8ade16',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

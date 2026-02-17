@@ -71,7 +71,10 @@ copy /Y BackEnd\check-server.php "%DEPLOY_DIR%\" >nul
 copy /Y BackEnd\.env.production "%DEPLOY_DIR%\.env" >nul
 
 echo    - Copiando Frontend compilado...
-xcopy /E /Y FrontEnd\dist\comunidad-ifts\browser\* "%DEPLOY_DIR%\" >nul
+powershell -Command "Copy-Item -Path 'FrontEnd\dist\ComunidadIFTS\browser\*' -Destination '%DEPLOY_DIR%' -Recurse -Force" 2>nul
+if errorlevel 1 (
+    echo WARNING: Error al copiar Frontend
+)
 
 echo OK - Carpeta de despliegue creada
 echo.

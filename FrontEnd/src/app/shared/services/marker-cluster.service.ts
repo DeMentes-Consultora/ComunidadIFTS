@@ -2,6 +2,13 @@ import { Injectable } from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
 
+// Declarar tipos para leaflet.markercluster que no exporta TypeScript
+declare global {
+  namespace L {
+    function markerClusterGroup(options?: any): any;
+  }
+}
+
 /**
  * Servicio para manejar clustering de marcadores en Leaflet
  * 
@@ -18,7 +25,7 @@ import 'leaflet.markercluster';
   providedIn: 'root'
 })
 export class MarkerClusterService {
-  private clusterGroup: L.MarkerClusterGroup | null = null;
+  private clusterGroup: any = null;
   private map: L.Map | null = null;
 
   /**
@@ -26,7 +33,7 @@ export class MarkerClusterService {
    * @param map Instancia del mapa Leaflet
    * @param options Opciones de configuración del cluster
    */
-  initClusterGroup(map: L.Map, options?: L.MarkerClusterGroupOptions): L.MarkerClusterGroup {
+  initClusterGroup(map: L.Map, options?: any): any {
     this.map = map;
 
     // Opciones por defecto del cluster

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 17-02-2026 a las 02:20:31
+-- Tiempo de generación: 17-02-2026 a las 03:06:14
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -250,7 +250,7 @@ INSERT INTO `institucion_carrera` (`id_institucion_carrera`, `id_institucion`, `
 (69, 31, 48, 1, 0, '2026-02-17 01:19:46', '2026-02-17 01:19:46'),
 (70, 32, 49, 1, 0, '2026-02-17 01:19:46', '2026-02-17 01:19:46'),
 (71, 32, 50, 1, 0, '2026-02-17 01:19:46', '2026-02-17 01:19:46'),
-(72, 34, 51, 1, 0, '2026-02-17 01:19:46', '2026-02-17 01:19:46');
+(72, 34, 50, 1, 0, '2026-02-17 01:19:46', '2026-02-17 02:05:46');
 
 -- --------------------------------------------------------
 
@@ -403,6 +403,25 @@ ALTER TABLE `rol`
 --
 ALTER TABLE `usuario`
   MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `institucion_carrera`
+--
+ALTER TABLE `institucion_carrera`
+  ADD CONSTRAINT `institucion_carrera_ibfk_1` FOREIGN KEY (`id_institucion`) REFERENCES `institucion` (`id_institucion`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `institucion_carrera_ibfk_2` FOREIGN KEY (`id_carrera`) REFERENCES `carrera` (`id_carrera`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  ADD CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`id_rol`) REFERENCES `rol` (`id_rol`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `usuario_ibfk_2` FOREIGN KEY (`id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `usuario_ibfk_3` FOREIGN KEY (`id_institucion`) REFERENCES `institucion` (`id_institucion`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

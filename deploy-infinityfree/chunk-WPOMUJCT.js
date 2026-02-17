@@ -1,1 +1,0 @@
-import{Rb as o,db as t,wb as i,xb as s}from"./chunk-FZEBGDWR.js";var a=class n{static \u0275fac=function(e){return new(e||n)};static \u0275cmp=t({type:n,selectors:[["app-sign-in"]],decls:2,vars:0,template:function(e,m){e&1&&(i(0,"p"),o(1,"sign-in works!"),s())},encapsulation:2})};export{a as SignIn};
