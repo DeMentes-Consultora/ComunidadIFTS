@@ -1,0 +1,38 @@
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-form .mdc-text-field,
+.login-form .mat-mdc-raised-button,
+.login-form .mat-mdc-button {
+  border-radius: 0px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.error-message {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  padding-top: 12px;
+}
+
+.form-question {
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  padding-top: 8px;
+  margin-top: 2px;
+}

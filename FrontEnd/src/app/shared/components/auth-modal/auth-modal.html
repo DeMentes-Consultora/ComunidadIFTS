@@ -1,0 +1,22 @@
+<div class="auth-modal-header">
+  <h2>{{ currentView === 'login' ? 'Iniciar sesión' : 'Crear cuenta' }}</h2>
+  <button mat-icon-button type="button" (click)="cerrar()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div class="auth-modal-body">
+  <app-formulario-login
+    *ngIf="currentView === 'login'"
+    (cancel)="cerrar()"
+    (switchToRegister)="mostrarRegistro()"
+    (loginSuccess)="onAuthSuccess($event)">
+  </app-formulario-login>
+
+  <app-formulario-registro
+    *ngIf="currentView === 'register'"
+    (cancel)="cerrar()"
+    (switchToLogin)="mostrarLogin()"
+    (registerSuccess)="onAuthSuccess($event)">
+  </app-formulario-registro>
+</div>

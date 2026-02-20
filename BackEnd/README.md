@@ -22,7 +22,7 @@ cp .env.example .env
 
 3. Editar `.env` con tus credenciales de base de datos.
 
-4. Importar la base de datos desde `database/schema.sql`.
+4. Importar la base de datos desde `database/comunidad_ifts.sql`.
 
 ## Estructura
 
@@ -32,15 +32,20 @@ BackEnd/
 │   ├── instituciones.php
 │   ├── guardar-institucion.php
 │   ├── like-institucion.php
-│   └── carreras.php
+│   ├── carreras.php
+│   ├── login.php
+│   ├── register.php
+│   └── logout.php
 ├── config/                 # Configuración
 │   ├── database.php
 │   └── cors.php
 ├── models/                 # Modelos de datos
 │   ├── Institucion.php
-│   └── Carrera.php
+│   ├── Carrera.php
+│   ├── Persona.php
+│   └── Usuario.php
 ├── database/               # Scripts SQL
-│   └── schema.sql
+│   └── comunidad_ifts.sql
 ├── .env.example           # Template de variables de entorno
 ├── .gitignore
 └── composer.json
@@ -82,6 +87,46 @@ Incrementa el contador de likes de una institución.
 ### GET /api/carreras.php
 Obtiene todas las carreras disponibles.
 
+### POST /api/login.php
+Autentica un usuario habilitado y devuelve sus datos de sesión.
+
+**Body:**
+```json
+{
+  "email": "usuario@correo.com",
+  "clave": "tu_clave"
+}
+```
+
+### POST /api/register.php
+Registra una nueva cuenta de alumno y devuelve la sesión iniciada.
+
+**Body:**
+```json
+{
+  "nombre": "Juan",
+  "apellido": "Pérez",
+  "dni": "12345678",
+  "fecha_nacimiento": "2000-05-10",
+  "telefono": "1112345678",
+  "id_institucion": 3,
+  "email": "juan.perez@correo.com",
+  "clave": "secreto123",
+  "confirmar_clave": "secreto123"
+}
+```
+
+### POST /api/logout.php
+Cierra la sesión activa en servidor.
+
+**Respuesta exitosa:**
+```json
+{
+  "success": true,
+  "message": "Sesión cerrada correctamente"
+}
+```
+
 ## Servidor Local
 
 Para desarrollo con PHP incorporado:
@@ -95,4 +140,4 @@ php -S localhost:8000 -t .
 - ✅ PDO con prepared statements (previene SQL injection)
 - ✅ CORS configurado
 - ✅ Validación de métodos HTTP
-- ⚠️ Pendiente: Autenticación para crear/modificar instituciones
+- ✅ Login, registro y logout implementados

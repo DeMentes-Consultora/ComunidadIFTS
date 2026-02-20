@@ -1,0 +1,26 @@
+.auth-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin-bottom: 12px;
+}
+
+.auth-modal-header h2 {
+  margin: 0;
+}
+
+.auth-modal-body {
+  max-height: 75vh;
+  overflow: auto;
+  padding: 0 8px 8px;
+  border-radius: 0px;
+}
+
+.auth-modal-body .login-card,
+.auth-modal-body .register-card {
+  margin: 0;
+  max-width: 100%;
+  box-shadow: none;
+}

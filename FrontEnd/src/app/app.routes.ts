@@ -10,16 +10,6 @@ export const routes: Routes = [
     path: 'home',
     loadComponent: () => import('./features/home/home').then(m => m.Home)
   },
-    {
-    path: 'auth/sign-in',
-    loadComponent: () => import('./features/auth/sign-in/sign-in').then(m => m.SignIn),
-      // TODO: agregar GuestGuard cuando esté implementado
-  },
-  {
-    path: 'auth/sign-up',
-    loadComponent: () => import('./features/auth/sign-up/sign-up').then(m => m.SignUp),
-      // TODO: agregar GuestGuard cuando esté implementado
-  },
   {
     path: 'mapa',
     loadComponent: () => import('./shared/components/mapa/mapa').then(m => m.MapaComponent)

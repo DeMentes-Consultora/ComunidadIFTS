@@ -10,10 +10,20 @@
   </div>
   
   <div class="navbar-right">
-    <button mat-button type="button">
-      <mat-icon>login</mat-icon>
-      Iniciar Sesión
-    </button>
+    <ng-container *ngIf="currentUser$ | async as user; else loginButton">
+      <span class="user-greeting">Hola {{ user.nombre }} ({{ user.nombre_rol }})</span>
+      <button mat-button type="button" (click)="cerrarSesion()">
+        <mat-icon>logout</mat-icon>
+        Cerrar sesión
+      </button>
+    </ng-container>
+
+    <ng-template #loginButton>
+      <button mat-button type="button" (click)="abrirModalAuth('login')">
+        <mat-icon>login</mat-icon>
+        Iniciar Sesión
+      </button>
+    </ng-template>
   </div>
 </header>
 

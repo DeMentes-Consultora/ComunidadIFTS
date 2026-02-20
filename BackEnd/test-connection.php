@@ -34,12 +34,12 @@ try {
     echo "\n";
     
     // Contar instituciones
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM instituciones");
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM institucion");
     $count = $stmt->fetch();
     echo "🏫 Total de instituciones: " . $count['total'] . "\n";
     
     // Contar carreras
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM carreras");
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM carrera");
     $count = $stmt->fetch();
     echo "📚 Total de carreras: " . $count['total'] . "\n";
     

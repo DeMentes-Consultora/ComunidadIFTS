@@ -1,0 +1,90 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="register-form">
+  <div class="row">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="nombre" title="Nombre" placeholder="Tu nombre" />
+      <mat-error *ngIf="form.get('nombre')?.hasError('required')">El nombre es obligatorio</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Apellido</mat-label>
+      <input matInput formControlName="apellido" title="Apellido" placeholder="Tu apellido" />
+      <mat-error *ngIf="form.get('apellido')?.hasError('required')">El apellido es obligatorio</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="row">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>DNI</mat-label>
+      <input matInput formControlName="dni" title="DNI" placeholder="12345678" />
+      <mat-error *ngIf="form.get('dni')?.hasError('required')">El DNI es obligatorio</mat-error>
+      <mat-error *ngIf="form.get('dni')?.hasError('pattern')">Ingresá solo números (7 a 9 dígitos)</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Fecha de nacimiento</mat-label>
+      <input matInput type="date" formControlName="fecha_nacimiento" title="Fecha de nacimiento" placeholder="AAAA-MM-DD" />
+      <mat-error *ngIf="form.get('fecha_nacimiento')?.hasError('required')">La fecha es obligatoria</mat-error>
+    </mat-form-field>
+  </div>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Teléfono</mat-label>
+    <input matInput formControlName="telefono" title="Teléfono" placeholder="11-1234-5678" />
+    <mat-error *ngIf="form.get('telefono')?.hasError('required')">El teléfono es obligatorio</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Institución</mat-label>
+    <mat-select formControlName="id_institucion">
+      <mat-option *ngIf="cargandoInstituciones" disabled>Cargando instituciones...</mat-option>
+      <mat-option *ngFor="let institucion of instituciones" [value]="institucion.id">
+        {{ institucion.nombre }}
+      </mat-option>
+    </mat-select>
+    <mat-error *ngIf="form.get('id_institucion')?.hasError('required')">Seleccioná una institución</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Email</mat-label>
+    <input matInput type="email" formControlName="email" title="Email" placeholder="tu.email@ejemplo.com" />
+    <mat-icon matSuffix>mail</mat-icon>
+    <mat-error *ngIf="form.get('email')?.hasError('required')">El email es obligatorio</mat-error>
+    <mat-error *ngIf="form.get('email')?.hasError('email')">Ingresá un email válido</mat-error>
+  </mat-form-field>
+
+  <div class="row">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Contraseña</mat-label>
+      <input matInput [type]="ocultarClave ? 'password' : 'text'" formControlName="clave" title="Contraseña" placeholder="Mínimo 6 caracteres" />
+      <button mat-icon-button matSuffix type="button" (click)="ocultarClave = !ocultarClave">
+        <mat-icon>{{ ocultarClave ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="form.get('clave')?.hasError('required')">La contraseña es obligatoria</mat-error>
+      <mat-error *ngIf="form.get('clave')?.hasError('minlength')">Mínimo 6 caracteres</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Confirmar contraseña</mat-label>
+      <input matInput [type]="ocultarConfirmarClave ? 'password' : 'text'" formControlName="confirmar_clave" title="Confirmar contraseña" placeholder="Repetí la contraseña" />
+      <button mat-icon-button matSuffix type="button" (click)="ocultarConfirmarClave = !ocultarConfirmarClave">
+        <mat-icon>{{ ocultarConfirmarClave ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="form.get('confirmar_clave')?.hasError('required')">Confirmá la contraseña</mat-error>
+      <mat-error *ngIf="form.get('confirmar_clave')?.value && !contrasenasCoinciden()">Las contraseñas no coinciden</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <div class="form-actions">
+    <button mat-button type="button" (click)="cancelar()">Cancelar</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="cargando">
+      {{ cargando ? 'Registrando...' : 'Crear cuenta' }}
+    </button>
+  </div>
+
+  <div class="form-question">
+    <button mat-button type="button" (click)="irALogin()">¿Ya tenés cuenta? Iniciá sesión</button>
+  </div>
+</form>

@@ -40,6 +40,11 @@
   gap: 12px;
 }
 
+.user-greeting {
+  color: white;
+  font-weight: 500;
+}
+
 .top-navbar button[mat-button] {
   color: white !important;
   font-weight: 500;
