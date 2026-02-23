@@ -40,6 +40,7 @@ export class Navbar {
 
   abrirModalAuth(view: 'login' | 'register' = 'login'): void {
     this.dialog.open(AuthModalComponent, {
+      disableClose: true,
       width: '92%',
       maxWidth: '600px',
       panelClass: 'auth-dialog-panel',

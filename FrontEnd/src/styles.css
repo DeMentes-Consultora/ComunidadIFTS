@@ -8,9 +8,12 @@
 .auth-dialog-panel .mat-mdc-dialog-surface {
 	border-radius: 1.5%
      !important;
+	 width:min(450px, 90vw) !important;
+	 pointer-events: auto !important;
 }
 
 .auth-dialog-panel .mat-mdc-dialog-container {
 	border-radius: 1.5%
  !important;
+	pointer-events: auto !important;
 }
