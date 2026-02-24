@@ -3,7 +3,7 @@
 ## 📋 Información de la Cuenta
 
 - **Hosting**: InfinityFree
-- **Dominio**: https://comunidadifts.infinityfree.com
+- **Dominio**: https://comunidadifts.infinityfreeapp.com
 - **Base de Datos**: if0_41035439_comunidad_ifts
 - **Usuario BD**: if0_41035439
 - **Host BD**: sql113.infinityfree.com
@@ -108,7 +108,7 @@ htdocs/
 
 Visita en tu navegador:
 ```
-https://comunidadifts.infinityfree.com/check-server.php
+https://comunidadifts.infinityfreeapp.com/check-server.php
 ```
 
 **Verifica que todo esté en verde:**
@@ -122,7 +122,7 @@ https://comunidadifts.infinityfree.com/check-server.php
 
 Visita:
 ```
-https://comunidadifts.infinityfree.com/api/carreras.php
+https://comunidadifts.infinityfreeapp.com/api/carreras.php
 ```
 
 Deberías ver un JSON con las carreras disponibles.
@@ -131,7 +131,7 @@ Deberías ver un JSON con las carreras disponibles.
 
 Visita:
 ```
-https://comunidadifts.infinityfree.com
+https://comunidadifts.infinityfreeapp.com
 ```
 
 Deberías ver:
@@ -152,11 +152,11 @@ Deberías ver:
    - Elimina `htdocs/check-server.php`
 
 2. **Verificar protección del .env**:
-   - Visita: `https://comunidadifts.infinityfree.com/.env`
+   - Visita: `https://comunidadifts.infinityfreeapp.com/.env`
    - Debe mostrar **403 Forbidden** o **404 Not Found**
 
 3. **Verificar protección de vendor/**:
-   - Visita: `https://comunidadifts.infinityfree.com/vendor/`
+   - Visita: `https://comunidadifts.infinityfreeapp.com/vendor/`
    - Debe mostrar **403 Forbidden**
 
 ---

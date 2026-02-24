@@ -1,12 +1,12 @@
 @echo off
 REM Script para preparar ComunidadIFTS para InfinityFree
 REM Cuenta: if0_41035439
-REM Dominio: comunidadifts.infinityfree.com
+REM Dominio: comunidadifts.infinityfreeapp.com
 
 echo.
 echo ================================================
 echo   Preparando ComunidadIFTS para InfinityFree
-echo   Dominio: comunidadifts.infinityfree.com
+echo   Dominio: comunidadifts.infinityfreeapp.com
 echo ================================================
 echo.
 
@@ -106,13 +106,13 @@ echo    - Selecciona: if0_41035439_comunidad_ifts
 echo    - Importa: BackEnd/database/if0_41035439_comunidad_ifts.sql
 echo.
 echo 5. Verifica el despliegue:
-echo    https://comunidadifts.infinityfree.com/check-server.php
+echo    https://comunidadifts.infinityfreeapp.com/check-server.php
 echo.
 echo 6. Prueba la API:
-echo    https://comunidadifts.infinityfree.com/api/carreras.php
+echo    https://comunidadifts.infinityfreeapp.com/api/carreras.php
 echo.
 echo 7. Visita tu sitio:
-echo    https://comunidadifts.infinityfree.com
+echo    https://comunidadifts.infinityfreeapp.com
 echo.
 echo 8. SEGURIDAD: Elimina check-server.php del servidor
 echo.
@@ -122,7 +122,7 @@ echo ================================================================
 echo DB Host: sql113.infinityfree.com
 echo DB Name: if0_41035439_comunidad_ifts
 echo DB User: if0_41035439
-echo Dominio: comunidadifts.infinityfree.com
+echo Dominio: comunidadifts.infinityfreeapp.com
 echo ================================================================
 ) > "%DEPLOY_DIR%\INSTRUCCIONES.txt"
 

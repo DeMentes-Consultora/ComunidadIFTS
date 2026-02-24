@@ -174,13 +174,22 @@ class Institucion {
             'telefono' => $this->telefono,
             'email' => $this->email,
             'sitio_web' => $this->sitio_web,
-            'observaciones' => $this->observaciones,
+            'observaciones' => $this->normalizarTextoNullable($this->observaciones),
             'latitud' => $this->latitud,
             'longitud' => $this->longitud,
             'logo' => $this->logo,
             'likes' => $this->likes,
             'carreras' => $this->carreras
         ];
+    }
+
+    private function normalizarTextoNullable($valor) {
+        if ($valor === null) {
+            return null;
+        }
+
+        $texto = trim((string)$valor);
+        return $texto === '' ? null : $texto;
     }
 
     // ============= MÉTODOS PRIVADOS =============
@@ -225,35 +234,72 @@ class Institucion {
      * Obtener todas las instituciones con sus carreras
      */
     public static function obtenerTodas($pdo) {
-        $sql = "SELECT i.*, GROUP_CONCAT(c.nombre_carrera SEPARATOR '|||') as lista_carreras 
-                FROM institucion i 
-                LEFT JOIN institucion_carrera ic ON i.id_institucion = ic.id_institucion 
-                LEFT JOIN carrera c ON ic.id_carrera = c.id_carrera 
-                GROUP BY i.id_institucion";
-        
+        $sql = "SELECT 
+                    i.id_institucion,
+                    i.nombre_ifts,
+                    i.direccion_ifts,
+                    i.telefono_ifts,
+                    i.email_ifts,
+                    i.sitio_web_ifts,
+                    i.observaciones_ifts,
+                    i.latitud_ifts,
+                    i.longitud_ifts,
+                    i.logo_ifts,
+                    i.likes_ifts,
+                    c.id_carrera,
+                    c.nombre_carrera
+                FROM institucion i
+                LEFT JOIN institucion_carrera ic ON i.id_institucion = ic.id_institucion AND ic.cancelado = 0
+                LEFT JOIN carrera c ON ic.id_carrera = c.id_carrera AND c.cancelado = 0
+                ORDER BY i.id_institucion ASC, c.nombre_carrera ASC";
+
         $stmt = $pdo->query($sql);
         $resultados = $stmt->fetchAll();
 
-        $instituciones = [];
+        $agrupadas = [];
+
         foreach ($resultados as $row) {
-            $carreras = [];
-            if ($row['lista_carreras']) {
-                $carreras = explode('|||', $row['lista_carreras']);
+            $id = (int)$row['id_institucion'];
+
+            if (!isset($agrupadas[$id])) {
+                $agrupadas[$id] = [
+                    'nombre' => $row['nombre_ifts'],
+                    'direccion' => $row['direccion_ifts'],
+                    'telefono' => $row['telefono_ifts'],
+                    'email' => $row['email_ifts'],
+                    'sitio_web' => $row['sitio_web_ifts'],
+                    'observaciones' => $row['observaciones_ifts'],
+                    'latitud' => $row['latitud_ifts'],
+                    'longitud' => $row['longitud_ifts'],
+                    'logo' => $row['logo_ifts'],
+                    'likes' => $row['likes_ifts'] ?? 0,
+                    'carreras' => []
+                ];
             }
 
+            if (!empty($row['id_carrera']) && !empty($row['nombre_carrera'])) {
+                $agrupadas[$id]['carreras'][] = [
+                    'id' => (int)$row['id_carrera'],
+                    'nombre' => $row['nombre_carrera']
+                ];
+            }
+        }
+
+        $instituciones = [];
+        foreach ($agrupadas as $id => $inst) {
             $instituciones[] = new Institucion(
-                $row['nombre_ifts'],
-                $row['direccion_ifts'],
-                $row['telefono_ifts'],
-                $row['email_ifts'],
-                $row['sitio_web_ifts'],
-                $row['observaciones_ifts'],
-                $row['latitud_ifts'],
-                $row['longitud_ifts'],
-                $row['logo_ifts'],
-                $row['id_institucion'],
-                $row['likes_ifts'] ?? 0,
-                $carreras
+                $inst['nombre'],
+                $inst['direccion'],
+                $inst['telefono'],
+                $inst['email'],
+                $inst['sitio_web'],
+                $inst['observaciones'],
+                $inst['latitud'],
+                $inst['longitud'],
+                $inst['logo'],
+                $id,
+                $inst['likes'],
+                $inst['carreras']
             );
         }
 
@@ -272,12 +318,22 @@ class Institucion {
 
         // Obtener carreras
         $stmt = $pdo->prepare(
-            "SELECT c.nombre_carrera FROM carrera c 
+            "SELECT c.id_carrera, c.nombre_carrera
+             FROM carrera c 
              INNER JOIN institucion_carrera ic ON c.id_carrera = ic.id_carrera 
-             WHERE ic.id_institucion = ?"
+             WHERE ic.id_institucion = ?
+               AND ic.cancelado = 0
+               AND c.cancelado = 0
+             ORDER BY c.nombre_carrera ASC"
         );
         $stmt->execute([$id]);
-        $carreras = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $carrerasRows = $stmt->fetchAll();
+        $carreras = array_map(function ($carrera) {
+            return [
+                'id' => (int)$carrera['id_carrera'],
+                'nombre' => $carrera['nombre_carrera']
+            ];
+        }, $carrerasRows);
 
         return new Institucion(
             $row['nombre_ifts'],

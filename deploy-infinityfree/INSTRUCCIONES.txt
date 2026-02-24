@@ -23,13 +23,13 @@ IMPORTANTE: Antes de subir los archivos, configura tu contraseña
    - Importa: BackEnd/database/if0_41035439_comunidad_ifts.sql
 
 5. Verifica el despliegue:
-   https://comunidadifts.infinityfree.com/check-server.php
+   https://comunidadifts.infinityfreeapp.com/check-server.php
 
 6. Prueba la API:
-   https://comunidadifts.infinityfree.com/api/carreras.php
+   https://comunidadifts.infinityfreeapp.com/api/carreras.php
 
 7. Visita tu sitio:
-   https://comunidadifts.infinityfree.com
+   https://comunidadifts.infinityfreeapp.com
 
 8. SEGURIDAD: Elimina check-server.php del servidor
 
@@ -39,5 +39,5 @@ Configuracion actual:
 DB Host: sql113.infinityfree.com
 DB Name: if0_41035439_comunidad_ifts
 DB User: if0_41035439
-Dominio: comunidadifts.infinityfree.com
+Dominio: comunidadifts.infinityfreeapp.com
 ================================================================
