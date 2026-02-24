@@ -13,6 +13,8 @@
   <app-buscador-direccion 
     *ngIf="map"
     [map]="map" 
+    [instituciones]="institucionesParaBusqueda"
+    (institucionSeleccionada)="onInstitucionSeleccionada($event)"
     (direccionEncontrada)="onDireccionEncontrada($event)">
   </app-buscador-direccion>
 </section>

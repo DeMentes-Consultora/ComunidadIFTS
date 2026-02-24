@@ -39,6 +39,17 @@
   margin: 0 0 4px;
 }
 
+:host ::ng-deep .leaflet-popup.ifts-hover-popup .leaflet-popup-content-wrapper {
+  border-radius: 10px;
+}
+
+:host ::ng-deep .leaflet-popup.ifts-hover-popup .leaflet-popup-content {
+  margin: 10px 12px;
+  max-height: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 /* Posicionamiento del buscador sobre el mapa */
 app-buscador-direccion {
   position: absolute;
