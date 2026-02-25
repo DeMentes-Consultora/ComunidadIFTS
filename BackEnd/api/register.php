@@ -166,7 +166,10 @@ try {
         $clave,
         $persona->getIdPersona(),
         $idRolAlumno,
-        $idInstitucion
+        $idInstitucion,
+        null,      // id_usuario
+        0,         // habilitado = 0 (pendiente de aprobación)
+        0          // cancelado = 0
     );
 
     if (!$usuario->guardar($pdo)) {
@@ -178,21 +181,35 @@ try {
 
     $pdo->commit();
 
-    $usuarioCompleto = Usuario::buscarPorEmail($pdo, $email);
+    // Enviar email al administrador notificando el nuevo registro
+    try {
+        require_once __DIR__ . '/../config/Mailer.php';
+        $mailer = new Mailer();
+        
+        // Obtener nombre de la institución
+        $stmtInstNombre = $pdo->prepare("SELECT nombre_institucion FROM institucion WHERE id_institucion = ? LIMIT 1");
+        $stmtInstNombre->execute([$idInstitucion]);
+        $institucion = $stmtInstNombre->fetch();
+        $nombreInstitucion = $institucion ? $institucion['nombre_institucion'] : 'No especificada';
+        
+        $datosUsuario = [
+            'nombre' => $nombre,
+            'apellido' => $apellido,
+            'email' => $email,
+            'institucion' => $nombreInstitucion
+        ];
+        
+        $mailer->notificarNuevoRegistro($datosUsuario);
+    } catch (Exception $e) {
+        // Log error pero no fallar el registro
+        error_log("Error enviando email de notificación: " . $e->getMessage());
+    }
 
-    $_SESSION['logged_in'] = true;
-    $_SESSION['id_usuario'] = $usuarioCompleto->getIdUsuario();
-    $_SESSION['email'] = $usuarioCompleto->getEmail();
-    $_SESSION['id_rol'] = $usuarioCompleto->getIdRol();
-    $_SESSION['id_persona'] = $usuarioCompleto->getIdPersona();
-    $_SESSION['id_institucion'] = $usuarioCompleto->getIdInstitucion();
-    $_SESSION['nombre'] = $usuarioCompleto->getNombre();
-    $_SESSION['apellido'] = $usuarioCompleto->getApellido();
-
+    // NO establecer sesión - usuario debe esperar aprobación
     echo json_encode([
         'success' => true,
-        'message' => 'Registro correcto',
-        'data' => $usuarioCompleto->toArray()
+        'message' => 'Registro exitoso. Tu solicitud está pendiente de aprobación por el administrador. Recibirás un email cuando sea aprobada.',
+        'pendiente_aprobacion' => true
     ]);
 } catch (Exception $e) {
     if (isset($pdo) && $pdo->inTransaction()) {

@@ -1,0 +1,209 @@
+.gestion-usuarios-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+mat-card {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+mat-card-header {
+  background: linear-gradient(135deg, #006633 0%, #008844 100%);
+  color: white;
+  padding: 20px;
+  margin: -16px -16px 20px -16px;
+  border-radius: 4px 4px 0 0;
+}
+
+mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+mat-card-title mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 20px;
+}
+
+.loading-container p {
+  color: #666;
+  font-size: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.empty-state .empty-icon {
+  font-size: 80px;
+  width: 80px;
+  height: 80px;
+  color: #006633;
+  margin-bottom: 20px;
+}
+
+.empty-state h2 {
+  color: #333;
+  margin: 20px 0 10px 0;
+}
+
+.empty-state p {
+  font-size: 16px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.count-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #e8f5e9;
+  border-left: 4px solid #006633;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #333;
+}
+
+.count-info mat-icon {
+  color: #006633;
+}
+
+.usuarios-table {
+  width: 100%;
+  background-color: white;
+}
+
+.usuarios-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+  padding: 16px;
+}
+
+.usuarios-table td {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.usuarios-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.usuario-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-icon {
+  color: #006633;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.info-icon {
+  color: #666;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.acciones-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-aprobar {
+  background-color: #006633 !important;
+  color: white !important;
+  transition: background-color 0.3s;
+}
+
+.btn-aprobar:hover {
+  background-color: #004d26 !important;
+}
+
+.btn-rechazar {
+  background-color: #d32f2f !important;
+  color: white !important;
+  transition: background-color 0.3s;
+}
+
+.btn-rechazar:hover {
+  background-color: #b71c1c !important;
+}
+
+.btn-aprobar mat-icon,
+.btn-rechazar mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+}
+
+/* Snackbar styles */
+::ng-deep .snackbar-success {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+::ng-deep .snackbar-error {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+::ng-deep .snackbar-info {
+  background-color: #2196f3 !important;
+  color: white !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .gestion-usuarios-container {
+    padding: 10px;
+  }
+
+  mat-card-title {
+    font-size: 20px;
+  }
+
+  .usuarios-table th,
+  .usuarios-table td {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+
+  .acciones-buttons {
+    flex-direction: column;
+  }
+
+  .btn-aprobar,
+  .btn-rechazar {
+    width: 100%;
+    min-width: 120px;
+  }
+}

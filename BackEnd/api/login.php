@@ -52,6 +52,17 @@ try {
         exit;
     }
 
+    // Verificar que el usuario esté aprobado (habilitado = 1)
+    if ($usuario->getHabilitado() !== 1) {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Tu cuenta está pendiente de aprobación por el administrador. Recibirás un email cuando sea aprobada.',
+            'pendiente_aprobacion' => true
+        ]);
+        exit;
+    }
+
     $_SESSION['logged_in'] = true;
     $_SESSION['id_usuario'] = $usuario->getIdUsuario();
     $_SESSION['email'] = $usuario->getEmail();

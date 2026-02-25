@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from './shared/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -13,6 +14,11 @@ export const routes: Routes = [
   {
     path: 'mapa',
     loadComponent: () => import('./shared/components/mapa/mapa').then(m => m.MapaComponent)
+  },
+  {
+    path: 'admin/gestion-usuarios',
+    loadComponent: () => import('./features/admin/gestion-usuarios/gestion-usuarios').then(m => m.GestionUsuarios),
+    canActivate: [adminGuard]
   },
   {
     path: '**',

@@ -64,9 +64,15 @@ export class FormularioLoginComponent {
         this.cargando = false;
         this.loginSuccess.emit(user);
       },
-      error: (err: Error) => {
+      error: (err: any) => {
         this.cargando = false;
-        this.error = err.message;
+        
+        // Verificar si el error es por usuario pendiente de aprobación
+        if (err.error?.pendiente_aprobacion) {
+          this.error = '⏳ ' + (err.error.message || 'Tu cuenta está pendiente de aprobación por el administrador. Recibirás un email cuando sea aprobada.');
+        } else {
+          this.error = err.message || err.error?.message || 'Error al iniciar sesión';
+        }
       }
     });
   }

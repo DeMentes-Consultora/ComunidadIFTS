@@ -95,11 +95,21 @@ export class FormularioRegistroComponent implements OnInit {
     };
 
     this.authService.register(payload).subscribe({
-      next: (user) => {
+      next: (response: any) => {
         setTimeout(() => {
           this.cargando = false;
           this.cdr.markForCheck();
-          this.registerSuccess.emit(user);
+          
+          // Verificar si el usuario está pendiente de aprobación
+          if (response.pendiente_aprobacion) {
+            // Mostrar mensaje de pendiente
+            this.error = null;
+            alert('✅ ' + (response.message || 'Registro exitoso. Tu solicitud está pendiente de aprobación por el administrador. Recibirás un email cuando sea aprobada.'));
+            this.cancel.emit(); // Cerrar modal
+          } else {
+            // Usuario aprobado directamente (flujo antiguo por si acaso)
+            this.registerSuccess.emit(response.data || response);
+          }
         }, 0);
       },
       error: (err: Error) => {
