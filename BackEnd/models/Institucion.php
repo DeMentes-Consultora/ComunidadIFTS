@@ -64,6 +64,7 @@ class Institucion {
     public function getCarreras() { return $this->carreras; }
 
     // ============= SETTERS =============
+    public function setId($id) { $this->id = $id; }
     public function setNombre($nombre) { $this->nombre = $nombre; }
     public function setDireccion($direccion) { $this->direccion = $direccion; }
     public function setTelefono($telefono) { $this->telefono = $telefono; }
@@ -122,25 +123,48 @@ class Institucion {
      * Actualizar institución existente
      */
     public function actualizar($pdo) {
-        $stmt = $pdo->prepare(
-            "UPDATE institucion 
-             SET nombre_ifts = ?, direccion_ifts = ?, telefono_ifts = ?, email_ifts = ?, sitio_web_ifts = ?, 
-                 observaciones_ifts = ?, latitud_ifts = ?, longitud_ifts = ?, logo_ifts = ? 
-             WHERE id_institucion = ?"
-        );
-        
-        return $stmt->execute([
-            $this->nombre,
-            $this->direccion,
-            $this->telefono,
-            $this->email,
-            $this->sitio_web,
-            $this->observaciones,
-            $this->latitud,
-            $this->longitud,
-            $this->logo,
-            $this->id
-        ]);
+        $pdo->beginTransaction();
+
+        try {
+            $stmt = $pdo->prepare(
+                "UPDATE institucion 
+                 SET nombre_ifts = ?, direccion_ifts = ?, telefono_ifts = ?, email_ifts = ?, sitio_web_ifts = ?, 
+                     observaciones_ifts = ?, latitud_ifts = ?, longitud_ifts = ?, logo_ifts = ? 
+                 WHERE id_institucion = ?"
+            );
+            
+            $stmt->execute([
+                $this->nombre,
+                $this->direccion,
+                $this->telefono,
+                $this->email,
+                $this->sitio_web,
+                $this->observaciones,
+                $this->latitud,
+                $this->longitud,
+                $this->logo,
+                $this->id
+            ]);
+
+            // Actualizar carreras asociadas si se enviaron
+            if (isset($this->carreras)) {
+                // Eliminar carreras existentes
+                $stmtDelete = $pdo->prepare("DELETE FROM institucion_carrera WHERE id_institucion = ?");
+                $stmtDelete->execute([$this->id]);
+                
+                // Guardar nuevas carreras
+                if (!empty($this->carreras)) {
+                    $this->guardarCarreras($pdo);
+                }
+            }
+
+            $pdo->commit();
+            return true;
+
+        } catch (\Exception $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
     }
 
     /**

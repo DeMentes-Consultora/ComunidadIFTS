@@ -1,13 +1,33 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
 import { Institucion } from '../../models/institucion.model';
+import { InstitucionesService } from '../../services/instituciones.service';
+
+interface Carrera {
+  id: number;
+  nombre: string;
+}
 
 @Component({
   selector: 'app-buscador-direccion',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    MatSelectModule, 
+    MatFormFieldModule, 
+    MatChipsModule, 
+    MatIconModule,
+    MatInputModule
+  ],
   templateUrl: './buscador-direccion.html',
   styleUrls: ['./buscador-direccion.css']
 })
@@ -16,13 +36,26 @@ export class BuscadorDireccionComponent implements OnInit, OnDestroy {
   @Input() instituciones: Institucion[] = [];
   @Output() direccionEncontrada = new EventEmitter<{ coordenadas: L.LatLng; direccion: string }>();
   @Output() institucionSeleccionada = new EventEmitter<number>();
+  @Output() carrerasFiltradas = new EventEmitter<number[]>();
+  
+  @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
+
+  modoBusqueda: 'direccion' | 'carrera' = 'direccion';
+  carrerasDisponibles: Carrera[] = [];
+  carrerasFiltradasList: Carrera[] = []; // Lista filtrada para búsqueda
+  carrerasSeleccionadas: number[] = [];
+  institucionesFiltradas = 0;
+  searchCarreraText = ''; // Texto de búsqueda de carreras
 
   private geocoderControl: any;
 
+  constructor(private institucionesService: InstitucionesService) {}
+
   ngOnInit(): void {
-    if (this.map) {
+    if (this.map && this.modoBusqueda === 'direccion') {
       this.inicializarGeocoder();
     }
+    this.cargarCarreras();
   }
 
   ngOnDestroy(): void {
@@ -178,4 +211,118 @@ export class BuscadorDireccionComponent implements OnInit, OnDestroy {
       })
       .filter((resultado): resultado is { name: string; center: L.LatLng; bbox: L.LatLngBounds; properties: { source: string; id: number } } => resultado !== null);
   }
+
+  /**
+   * Cargar carreras disponibles
+   */
+  private cargarCarreras(): void {
+    this.institucionesService.obtenerCarrerasConId().subscribe({
+      next: (carreras) => {
+        this.carrerasDisponibles = carreras;
+        this.carrerasFiltradasList = carreras; // Inicialmente todas visibles
+      },
+      error: (err) => {
+        console.error('Error cargando carreras:', err);
+      }
+    });
+  }
+
+  /**
+   * Filtrar carreras según texto de búsqueda
+   */
+  filtrarCarreras(): void {
+    const searchText = this.searchCarreraText.toLowerCase().trim();
+    
+    if (!searchText) {
+      this.carrerasFiltradasList = this.carrerasDisponibles;
+      return;
+    }
+
+    this.carrerasFiltradasList = this.carrerasDisponibles.filter(carrera =>
+      carrera.nombre.toLowerCase().includes(searchText)
+    );
+  }
+
+  /**
+   * Obtener nombre de carrera por ID
+   */
+  getNombreCarrera(id: number): string {
+    const carrera = this.carrerasDisponibles.find(c => c.id === id);
+    return carrera ? carrera.nombre : '';
+  }
+
+  /**
+   * Remover carrera seleccionada (desde chip)
+   */
+  removerCarrera(idCarrera: number): void {
+    this.carrerasSeleccionadas = this.carrerasSeleccionadas.filter(id => id !== idCarrera);
+    this.aplicarFiltroCarreras();
+  }
+
+  /**
+   * Manejar cambio de modo de búsqueda
+   */
+  onModoChange(): void {
+    if (this.modoBusqueda === 'direccion') {
+      // Activar geocoder
+      if (this.map && !this.geocoderControl) {
+        this.inicializarGeocoder();
+      }
+      // Limpiar filtro de carreras
+      this.limpiarFiltros();
+    } else {
+      // Desactivar geocoder
+      if (this.map && this.geocoderControl) {
+        this.map.removeControl(this.geocoderControl);
+        this.geocoderControl = null;
+      }
+    }
+  }
+
+  /**
+   * Manejar cambio de selección de carreras
+   */
+  onCarrerasChange(): void {
+    this.aplicarFiltroCarreras();
+  }
+
+  /**
+   * Aplicar filtro de carreras
+   */
+  private aplicarFiltroCarreras(): void {
+    if (this.carrerasSeleccionadas.length === 0) {
+      // Sin filtro, mostrar todas
+      this.institucionesFiltradas = this.instituciones.length;
+      this.carrerasFiltradas.emit([]);
+    } else {
+      // Contar instituciones que tienen al menos una carrera seleccionada
+      const institucionesFiltradas = this.instituciones.filter(inst => {
+        if (!inst.carreras || inst.carreras.length === 0) return false;
+        
+        return inst.carreras.some(carrera => 
+          this.carrerasSeleccionadas.includes(carrera.id)
+        );
+      });
+      
+      this.institucionesFiltradas = institucionesFiltradas.length;
+      this.carrerasFiltradas.emit(this.carrerasSeleccionadas);
+    }
+  }
+
+  /**
+   * Limpiar filtros de carrera
+   */
+  limpiarFiltros(): void {
+    this.carrerasSeleccionadas = [];
+    this.institucionesFiltradas = this.instituciones.length;
+    this.carrerasFiltradas.emit([]);
+  }
+
+  /**
+   * Manejar input de búsqueda (para direcciones)
+   */
+  onSearchInput(event: Event): void {
+    // El geocoder de Leaflet maneja esto automáticamente
+  }
 }
+

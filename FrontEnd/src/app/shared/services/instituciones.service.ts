@@ -12,6 +12,7 @@ export class InstitucionesService {
   private apiUrl = `${environment.apiUrl}/instituciones.php`;
   private apiCarrerasUrl = `${environment.apiUrl}/carreras.php`;
   private apiGuardarUrl = `${environment.apiUrl}/guardar-institucion.php`;
+  private apiActualizarUrl = `${environment.apiUrl}/actualizar-institucion.php`;
   private apiLikeUrl = `${environment.apiUrl}/like-institucion.php`;
 
   constructor(private http: HttpClient) {}
@@ -32,15 +33,27 @@ export class InstitucionesService {
   }
 
   /**
-   * Obtener todas las carreras disponibles
+   * Obtener todas las carreras disponibles (solo nombres, para compatibilidad)
    */
   obtenerCarreras(): Observable<string[]> {
+    return this.obtenerCarrerasConId().pipe(
+      map(carreras => carreras.map(c => c.nombre))
+    );
+  }
+
+  /**
+   * Obtener todas las carreras disponibles con id y nombre
+   */
+  obtenerCarrerasConId(): Observable<Array<{ id: number; nombre: string }>> {
     return this.http.get<ApiResponse<any[]>>(this.apiCarrerasUrl)
       .pipe(
         map(response => {
           if (response.success && response.data) {
-            // Mapear array de objetos a array de nombres
-            return response.data.map((carrera: any) => carrera.nombre);
+            // Mapear array de objetos con id y nombre
+            return response.data.map((carrera: any) => ({
+              id: carrera.id || carrera.id_carrera,
+              nombre: carrera.nombre || carrera.nombre_carrera
+            }));
           }
           throw new Error(response.message || 'Error al obtener carreras');
         })
@@ -66,5 +79,12 @@ export class InstitucionesService {
    */
   guardarInstitucion(datos: any): Observable<any> {
     return this.http.post(this.apiGuardarUrl, datos);
+  }
+
+  /**
+   * Actualizar institución existente
+   */
+  actualizarInstitucion(datos: any): Observable<any> {
+    return this.http.put(this.apiActualizarUrl, datos);
   }
 }

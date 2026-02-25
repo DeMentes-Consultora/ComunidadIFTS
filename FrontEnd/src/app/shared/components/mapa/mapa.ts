@@ -2,7 +2,11 @@ import { Component, AfterViewInit, OnDestroy, OnInit, ChangeDetectionStrategy, C
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatChipsModule } from '@angular/material/chips';
 import { InstitucionesService } from '../../services/instituciones.service';
+import { AuthService } from '../../services/auth.service';
 import { MarkerClusterService } from '../../services/marker-cluster.service';
 import { Institucion } from '../../models/institucion.model';
 import { BuscadorDireccionComponent } from '../buscador-direccion/buscador-direccion';
@@ -11,7 +15,15 @@ import { FormularioInstitucionComponent } from '../formulario-institucion/formul
 @Component({
   selector: 'app-mapa',
   standalone: true,
-  imports: [CommonModule, BuscadorDireccionComponent, MatDialogModule],
+  imports: [
+    CommonModule, 
+    BuscadorDireccionComponent, 
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    FormularioInstitucionComponent
+  ],
   templateUrl: './mapa.html',
   styleUrls: ['./mapa.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -20,18 +32,28 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
   map: L.Map | null = null;
   private instituciones: Institucion[] = [];
   institucionesParaBusqueda: Institucion[] = [];
+  institucionSeleccionada: Institucion | null = null;
   private isLoading = true;
   private useClustering = false;
   private popupCloseTimers = new Map<number, ReturnType<typeof setTimeout>>();
   private markersByInstitucionId = new Map<number, L.CircleMarker>();
   private renderedMarkers: L.CircleMarker[] = [];
+  private carrerasFiltradasIds: number[] = [];
+  
+  // Propiedades para el formulario y permisos
+  mostrarFormulario = false;
+  modoEdicion = false;
+  canEdit = false;
 
   constructor(
     private institucionesService: InstitucionesService,
+    private authService: AuthService,
     private markerClusterService: MarkerClusterService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    this.verificarPermisos();
+  }
 
   ngOnInit(): void {
     this.cargarInstituciones();
@@ -46,6 +68,54 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
     this.popupCloseTimers.clear();
     this.markerClusterService.destroy();
     this.map?.remove();
+  }
+
+  /**
+   * Verificar si el usuario actual tiene permisos para editar IFTS
+   * Sistema de permisos por ID de rol:
+   * - ID 1: AdministradorComunidad (puede editar)
+   * - ID 7: AdministradorIFTS (puede editar)
+   * - Cualquier otro ID: Solo lectura
+   */
+  private verificarPermisos(): void {
+    const usuarioActual = this.authService.getCurrentUser();
+    if (usuarioActual) {
+      // Solo los roles 1 y 7 pueden editar IFTS
+      this.canEdit = [1, 7].includes(usuarioActual.id_rol);
+    }
+  }
+
+  /**
+   * Cambiar modo del formulario (nuevo, editar o cerrar)
+   */
+  toggleFormMode(modo: 'nuevo' | 'editar' | null): void {
+    if (modo === null) {
+      this.mostrarFormulario = false;
+      this.modoEdicion = false;
+    } else {
+      this.mostrarFormulario = true;
+      this.modoEdicion = modo === 'editar';
+    }
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Obtener coordenadas de una institución
+   */
+  getCoordenadasInstitucion(inst: Institucion): L.LatLng {
+    return L.latLng(inst.latitud, inst.longitud);
+  }
+
+  /**
+   * Manejar institución guardada
+   */
+  onInstitucionGuardada(evento: any): void {
+    // Cerrar el formulario
+    this.mostrarFormulario = false;
+    this.modoEdicion = false;
+    // Recargar las instituciones
+    this.cargarInstituciones();
+    this.cdr.markForCheck();
   }
 
   onDireccionEncontrada(evento: { coordenadas: L.LatLng; direccion: string }): void {
@@ -68,26 +138,53 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onInstitucionSeleccionada(idInstitucion: number): void {
+    // Seleccionar la institución en el panel lateral
+    const institucion = this.instituciones.find(i => i.id === idInstitucion);
+    if (institucion) {
+      this.institucionSeleccionada = institucion;
+      this.mostrarFormulario = false;
+      this.cdr.markForCheck();
+    }
+
+    // Animar el marcador en el mapa
     const marker = this.markersByInstitucionId.get(idInstitucion);
     if (!marker || !this.map) {
       return;
     }
 
-    const abrirPopup = () => {
-      this.clearCloseTimer(idInstitucion);
-      marker.openPopup();
-    };
-
     if (this.useClustering) {
       const clusterGroup = this.markerClusterService.getClusterGroup();
       if (clusterGroup && typeof clusterGroup.zoomToShowLayer === 'function') {
-        clusterGroup.zoomToShowLayer(marker, abrirPopup);
+        clusterGroup.zoomToShowLayer(marker, () => {
+          this.map?.panTo(marker.getLatLng());
+          this.highlightMarker(marker);
+        });
         return;
       }
     }
 
     this.map.panTo(marker.getLatLng());
-    abrirPopup();
+    this.highlightMarker(marker);
+  }
+
+  /**
+   * Resaltar un marcador visualmente
+   */
+  private highlightMarker(marker: L.CircleMarker): void {
+    marker.setStyle({
+      radius: 14,
+      fillColor: '#22c55e',
+      weight: 3
+    });
+
+    // Restaurar estilo después de 1 segundo
+    setTimeout(() => {
+      marker.setStyle({
+        radius: 10,
+        fillColor: '#66bb6a',
+        weight: 2
+      });
+    }, 1000);
   }
 
   private cargarInstituciones(): void {
@@ -100,10 +197,12 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.map) {
           this.renderInstituciones();
         }
+        this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Error al cargar instituciones:', error);
         this.isLoading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -143,17 +242,14 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
   private renderInstituciones(): void {
     if (!this.map) return;
 
-    this.markersByInstitucionId.clear();
+    // Limpiar marcadores existentes de manera segura
+    this.limpiarMarcadores();
 
-    if (this.useClustering) {
-      this.markerClusterService.clearAllMarkers();
-    } else {
-      this.renderedMarkers.forEach((marker) => marker.remove());
-    }
-    this.renderedMarkers = [];
+    // Obtener instituciones filtradas según carreras seleccionadas
+    const institucionesMostrar = this.getInstitucionesFiltradas();
 
-    // ✨ AGREGAR MARCADORES AL CLUSTER EN LUGAR DE AL MAPA
-    this.instituciones.forEach((inst) => {
+    // Agregar marcadores solo para las instituciones filtradas
+    institucionesMostrar.forEach((inst) => {
       const marker = L.circleMarker([inst.latitud, inst.longitud], {
         radius: 10,
         color: '#006633',
@@ -162,39 +258,9 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
         weight: 2
       });
 
-      marker.bindPopup(this.getPopupContent(inst), {
-        closeButton: false,
-        autoClose: true,
-        closeOnClick: false,
-        autoPan: true,
-        keepInView: true,
-        maxWidth: 420,
-        minWidth: 320,
-        className: 'ifts-hover-popup'
-      });
-
-      marker.on('mouseover', () => {
-        this.clearCloseTimer(inst.id);
-        marker.openPopup();
-      });
-
-      marker.on('mouseout', () => {
-        this.scheduleClose(inst.id, marker);
-      });
-
-      marker.on('popupopen', () => {
-        const popupElement = marker.getPopup()?.getElement();
-        if (!popupElement) {
-          return;
-        }
-
-        popupElement.addEventListener('mouseenter', () => {
-          this.clearCloseTimer(inst.id);
-        });
-
-        popupElement.addEventListener('mouseleave', () => {
-          this.scheduleClose(inst.id, marker);
-        });
+      // Click en el marcador: seleccionar institución en el panel
+      marker.on('click', () => {
+        this.onInstitucionSeleccionada(inst.id);
       });
 
       if (this.useClustering) {
@@ -211,114 +277,73 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.useClustering) {
       console.log(`✨ ${this.markerClusterService.getMarkerCount()} instituciones cargadas en clustering`);
     } else {
-      console.log(`📍 ${this.instituciones.length} instituciones cargadas sin clustering`);
+      console.log(`📍 ${institucionesMostrar.length} instituciones cargadas sin clustering`);
     }
   }
 
-  private getPopupContent(inst: Institucion): string {
-    const nombre = this.escapeHtml(inst.nombre);
-    const logo = inst.logo
-      ? `<img src="${this.escapeHtml(inst.logo)}" alt="Logo ${nombre}" style="width:56px;height:56px;object-fit:contain;border-radius:8px;border:1px solid #e5e7eb;background:#fff;" />`
-      : '';
+  /**
+   * Limpiar marcadores de manera segura
+   */
+  private limpiarMarcadores(): void {
+    // Limpiar el mapa del elemento _leaflet_id
+    this.markersByInstitucionId.clear();
 
-    const direccion = this.escapeHtml(inst.direccion || 'No informado');
-    const telefono = this.escapeHtml(inst.telefono || 'No informado');
-    const email = inst.email
-      ? `<a href="mailto:${this.escapeHtml(inst.email)}" style="color:#1d4ed8;text-decoration:none;">${this.escapeHtml(inst.email)}</a>`
-      : 'No informado';
-    const web = inst.sitio_web
-      ? `<a href="${this.escapeHtml(inst.sitio_web)}" target="_blank" rel="noopener noreferrer" style="color:#1d4ed8;text-decoration:none;">${this.escapeHtml(inst.sitio_web)}</a>`
-      : 'No informado';
-    const carreras = this.formatCarreras(inst.carreras as unknown[] | undefined);
-    const observaciones = this.formatObservaciones(inst.observaciones);
-
-    const hasLike = Number(inst.likes) === 1;
-    const heartIcon = hasLike ? '♥' : '♡';
-    const heartText = hasLike ? 'Con like' : 'Sin like';
-
-    return `
-      <div style="min-width:300px;max-width:360px;font-family:Arial,sans-serif;color:#111827;line-height:1.35;">
-        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:8px;">
-          <h3 style="margin:0;font-size:18px;color:#111827;">${nombre}</h3>
-          ${logo}
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;margin-bottom:10px;">
-          <div><strong>Dirección:</strong> ${direccion}</div>
-          <div><strong>Teléfono:</strong> ${telefono}</div>
-          <div><strong>Mail:</strong> ${email}</div>
-          <div><strong>Web:</strong> ${web}</div>
-          <div><strong>Carreras:</strong></div>
-          <div style="margin-left:8px;display:flex;flex-direction:column;gap:2px;">${carreras}</div>
-        </div>
-
-        <div style="margin-bottom:10px;font-size:13px;">
-          <strong>Observaciones:</strong> ${observaciones}
-        </div>
-
-        <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:#dc2626;font-weight:600;">
-          <span style="font-size:20px;line-height:1;">${heartIcon}</span>
-          <span>${heartText}</span>
-        </div>
-      </div>
-    `;
-  }
-
-  private scheduleClose(id: number, marker: L.CircleMarker): void {
-    this.clearCloseTimer(id);
-    const timer = setTimeout(() => {
-      marker.closePopup();
-      this.popupCloseTimers.delete(id);
-    }, 220);
-    this.popupCloseTimers.set(id, timer);
-  }
-
-  private clearCloseTimer(id: number): void {
-    const timer = this.popupCloseTimers.get(id);
-    if (timer) {
-      clearTimeout(timer);
-      this.popupCloseTimers.delete(id);
-    }
-  }
-
-  private formatCarreras(carreras: unknown[] | undefined): string {
-    if (!Array.isArray(carreras) || carreras.length === 0) {
-      return '<div>No informado</div>';
-    }
-
-    const nombres = carreras
-      .map((carrera) => {
-        if (typeof carrera === 'string') {
-          return carrera;
+    if (this.useClustering) {
+      // Para clustering: limpiar todos los layers del cluster
+      this.markerClusterService.clearAllMarkers();
+    } else {
+      // Para marcadores individuales: remover cada uno del mapa
+      this.renderedMarkers.forEach((marker) => {
+        if (marker && this.map && this.map.hasLayer(marker)) {
+          marker.remove();
         }
-
-        if (carrera && typeof carrera === 'object' && 'nombre' in carrera) {
-          const nombre = (carrera as { nombre?: unknown }).nombre;
-          return typeof nombre === 'string' ? nombre : '';
-        }
-
-        return '';
-      })
-      .map((nombre) => nombre.trim())
-      .filter((nombre) => nombre.length > 0);
-
-    if (nombres.length === 0) {
-      return '<div>No informado</div>';
+      });
     }
-
-    return nombres
-      .map((nombre) => `<div>• ${this.escapeHtml(nombre)}</div>`)
-      .join('');
+    
+    // Limpiar el array de marcadores renderizados
+    this.renderedMarkers = [];
   }
 
-  private formatObservaciones(observaciones: string | null | undefined): string {
-    const limpio = (observaciones ?? '').replace(/\r\n/g, '\n').trim();
-
-    if (!limpio || limpio.replace(/[\s,]/g, '') === '') {
-      return 'Sin observaciones';
+  /**
+   * Obtener instituciones filtradas por carreras
+   */
+  private getInstitucionesFiltradas(): Institucion[] {
+    // Si no hay filtro de carreras, retornar todas
+    if (this.carrerasFiltradasIds.length === 0) {
+      return this.instituciones;
     }
 
-    return this.escapeHtml(limpio).replace(/\n/g, '<br>');
+    // Filtrar instituciones que tienen al menos una de las carreras seleccionadas
+    return this.instituciones.filter(inst => {
+      if (!inst.carreras || inst.carreras.length === 0) return false;
+      
+      return inst.carreras.some(carrera => 
+        this.carrerasFiltradasIds.includes(carrera.id)
+      );
+    });
+  }
+
+  /**
+   * Manejar filtro de carreras desde el buscador
+   */
+  onCarrerasFiltradas(carrerasIds: number[]): void {
+    this.carrerasFiltradasIds = carrerasIds;
+    
+    // Re-renderizar el mapa con el filtro aplicado
+    this.renderInstituciones();
+    
+    // Si hay carreras filtradas y había una institución seleccionada que ya no está visible, limpiar selección
+    if (carrerasIds.length > 0 && this.institucionSeleccionada) {
+      const sigueVisible = this.getInstitucionesFiltradas()
+        .some(inst => inst.id === this.institucionSeleccionada?.id);
+      
+      if (!sigueVisible) {
+        this.institucionSeleccionada = null;
+        this.cdr.markForCheck();
+      }
+    }
+    
+    this.cdr.markForCheck();
   }
 
   private escapeHtml(value: string): string {

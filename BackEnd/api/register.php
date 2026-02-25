@@ -2,6 +2,15 @@
 /**
  * API: Registro de usuario
  * Endpoint: POST /api/register.php
+ * 
+ * Sistema de Roles (por ID):
+ * - ID 1: AdministradorComunidad (permisos totales)
+ * - ID 2: Alumno regular (solo lectura por defecto)
+ * - ID 3: Alumno no regular
+ * - ID 4: Alumno recibido
+ * - ID 7: AdministradorIFTS (puede editar IFTS)
+ * 
+ * Permisos de edición IFTS: Solo roles ID 1 y 7
  */
 
 require_once __DIR__ . '/../config/cors.php';
@@ -30,16 +39,23 @@ function calcularEdadDesdeFecha($fechaNacimiento) {
     return (int)$hoy->diff($nacimiento)->y;
 }
 
+/**
+ * Obtiene el ID del rol predeterminado para nuevos usuarios (Alumno regular)
+ * ID 2 = Alumno regular
+ */
 function obtenerRolAlumno($pdo) {
+    $idRolAlumno = 2; // ID del rol "Alumno regular"
+    
+    // Verificar que el rol existe y está habilitado
     $sql = "SELECT id_rol
             FROM rol
-            WHERE nombre_rol = 'Alumno'
+            WHERE id_rol = ?
               AND habilitado = 1
               AND cancelado = 0
-            ORDER BY id_rol ASC
             LIMIT 1";
 
-    $stmt = $pdo->query($sql);
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$idRolAlumno]);
     $row = $stmt->fetch();
     return $row ? (int)$row['id_rol'] : null;
 }
@@ -133,7 +149,7 @@ try {
     if ($idRolAlumno === null) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'No existe un rol Alumno habilitado']);
+        echo json_encode(['success' => false, 'message' => 'El rol de usuario predeterminado (ID 2) no está disponible']);
         exit;
     }
 

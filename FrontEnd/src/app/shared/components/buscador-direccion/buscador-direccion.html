@@ -1,1 +1,119 @@
-<!-- El componente no necesita HTML ya que el geocoder se carga directamente en el mapa -->
+<div class="buscador-container">
+  <!-- Input de Búsqueda (solo visible en modo dirección) -->
+  @if (modoBusqueda === 'direccion') {
+    <div class="search-input-wrapper">
+      <input
+        #searchInput
+        type="text"
+        class="search-input"
+        placeholder="Buscar dirección..."
+        (input)="onSearchInput($event)"
+      />
+    </div>
+  }
+
+  <!-- Selectores de Modo en Vertical -->
+  <div class="modo-selector">
+    <label class="radio-option">
+      <input
+        type="radio"
+        name="modoBusqueda"
+        value="direccion"
+        [(ngModel)]="modoBusqueda"
+        (change)="onModoChange()"
+      />
+      <span>📍 Buscar por Dirección</span>
+    </label>
+
+    <label class="radio-option">
+      <input
+        type="radio"
+        name="modoBusqueda"
+        value="carrera"
+        [(ngModel)]="modoBusqueda"
+        (change)="onModoChange()"
+      />
+      <span>🎓 Filtrar por Carrera</span>
+    </label>
+  </div>
+
+  <!-- Selector de Carreras Compacto (visible solo en modo carrera) -->
+  @if (modoBusqueda === 'carrera') {
+    <div class="carreras-selector-compact">
+      <!-- Multiselect Dropdown -->
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>Seleccionar carreras</mat-label>
+        <mat-select 
+          multiple 
+          [(ngModel)]="carrerasSeleccionadas"
+          (selectionChange)="onCarrerasChange()"
+          panelClass="carreras-select-panel">
+          
+          <!-- Input de búsqueda dentro del select -->
+          <mat-option disabled class="search-option">
+            <input
+              matInput
+              type="text"
+              class="search-carreras-input"
+              placeholder="🔍 Buscar carrera..."
+              [(ngModel)]="searchCarreraText"
+              (ngModelChange)="filtrarCarreras()"
+              (click)="$event.stopPropagation()"
+            />
+          </mat-option>
+
+          <!-- Opciones de carreras filtradas -->
+          @for (carrera of carrerasFiltradasList; track carrera.id) {
+            <mat-option [value]="carrera.id">
+              {{ carrera.nombre }}
+            </mat-option>
+          }
+
+          @if (carrerasFiltradasList.length === 0) {
+            <mat-option disabled>
+              No se encontraron carreras
+            </mat-option>
+          }
+        </mat-select>
+        <mat-hint>Puedes seleccionar múltiples carreras</mat-hint>
+      </mat-form-field>
+
+      <!-- Chips de Carreras Seleccionadas -->
+      @if (carrerasSeleccionadas.length > 0) {
+        <div class="carreras-chips-container">
+          <div class="chips-header">
+            <span class="chips-title">Carreras seleccionadas:</span>
+            <button 
+              class="btn-limpiar-chips"
+              (click)="limpiarFiltros()"
+              title="Limpiar todas">
+              Limpiar todas
+            </button>
+          </div>
+          
+          <mat-chip-set class="carreras-chips">
+            @for (idCarrera of carrerasSeleccionadas; track idCarrera) {
+              <mat-chip 
+                class="carrera-chip"
+                [removable]="true"
+                (removed)="removerCarrera(idCarrera)">
+                {{ getNombreCarrera(idCarrera) }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip>
+            }
+          </mat-chip-set>
+
+          <!-- Contador de resultados -->
+          <div class="resultados-info">
+            <mat-icon>location_on</mat-icon>
+            <span>{{ institucionesFiltradas }} IFTS encontrados</span>
+          </div>
+        </div>
+      }
+
+      @if (carrerasDisponibles.length === 0) {
+        <div class="carreras-loading">Cargando carreras...</div>
+      }
+    </div>
+  }
+</div>

@@ -1,8 +1,206 @@
-/* Estilos para el control de geocoder */
+/* Container principal del buscador */
+.buscador-container {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+}
+
+/* Input de búsqueda */
+.search-input-wrapper {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #006633;
+}
+
+/* Selector de modo vertical */
+.modo-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.radio-option:hover {
+  background: #e8e8e8;
+}
+
+.radio-option input[type="radio"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: #006633;
+}
+
+.radio-option span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Selector de carreras compacto con Material Design */
+.carreras-selector-compact {
+  margin-top: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Input de búsqueda dentro del select */
+.search-option {
+  pointer-events: none;
+  padding: 8px 16px !important;
+  background: #f5f5f5 !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.search-carreras-input {
+  pointer-events: auto;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.search-carreras-input:focus {
+  outline: none;
+  border-color: #006633;
+}
+
+/* Container de chips */
+.carreras-chips-container {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+
+.chips-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.chips-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+.btn-limpiar-chips {
+  background: transparent;
+  border: 1px solid #ff5252;
+  color: #ff5252;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-limpiar-chips:hover {
+  background: #ff5252;
+  color: white;
+}
+
+/* Chips de Material Design */
+.carreras-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.carrera-chip {
+  background: #006633 !important;
+  color: white !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+.carrera-chip mat-icon {
+  color: white !important;
+  cursor: pointer;
+}
+
+.carrera-chip:hover {
+  background: #004d26 !important;
+}
+
+/* Resultados */
+.resultados-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: #e8f5e9;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+.resultados-info mat-icon {
+  color: #006633;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.resultados-info span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #006633;
+}
+
+.carreras-loading {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 13px;
+}
+
+/* Estilos para el control de geocoder de Leaflet (cuando está en modo dirección) */
 :host ::ng-deep .leaflet-control-geocoder {
   background: white;
   border-radius: 4px;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+  margin-bottom: 8px;
 }
 
 :host ::ng-deep .leaflet-control-geocoder-form {
@@ -48,4 +246,13 @@
 
 :host ::ng-deep .leaflet-control-geocoder-result-item:hover {
   background-color: #f5f5f5;
+}
+
+/* Estilos del panel del select */
+:host ::ng-deep .carreras-select-panel {
+  max-height: 400px !important;
+}
+
+:host ::ng-deep .mat-mdc-option {
+  font-size: 14px !important;
 }

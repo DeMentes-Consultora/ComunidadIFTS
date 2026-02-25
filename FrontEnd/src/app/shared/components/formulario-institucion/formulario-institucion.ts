@@ -11,6 +11,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import * as L from 'leaflet';
 import { InstitucionesService } from '../../services/instituciones.service';
+import { Institucion } from '../../models/institucion.model';
 
 @Component({
   selector: 'app-formulario-institucion',
@@ -35,6 +36,7 @@ import { InstitucionesService } from '../../services/instituciones.service';
 export class FormularioInstitucionComponent implements OnInit {
   @Input() coordenadas: L.LatLng | null = null;
   @Input() direccion: string = '';
+  @Input() institucionParaEditar: Institucion | null = null;
   @Output() institucionGuardada = new EventEmitter<any>();
 
   formulario!: FormGroup;
@@ -43,6 +45,7 @@ export class FormularioInstitucionComponent implements OnInit {
   logoPreview: string | null = null;
   cargando = false;
   error: string | null = null;
+  esEdicion = false;
 
   constructor(
     private fb: FormBuilder,
@@ -55,16 +58,25 @@ export class FormularioInstitucionComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarCarreras();
-    if (this.coordenadas) {
-      this.formulario.patchValue({
-        latitud_ifts: this.coordenadas.lat,
-        longitud_ifts: this.coordenadas.lng
-      });
-    }
-    if (this.direccion) {
-      this.formulario.patchValue({
-        direccion_ifts: this.direccion
-      });
+    
+    if (this.institucionParaEditar) {
+      // Modo edición
+      this.esEdicion = true;
+      this.prellenarFormularioEdicion();
+    } else {
+      // Modo nuevo
+      this.esEdicion = false;
+      if (this.coordenadas) {
+        this.formulario.patchValue({
+          latitud_ifts: this.coordenadas.lat,
+          longitud_ifts: this.coordenadas.lng
+        });
+      }
+      if (this.direccion) {
+        this.formulario.patchValue({
+          direccion_ifts: this.direccion
+        });
+      }
     }
   }
 
@@ -80,6 +92,38 @@ export class FormularioInstitucionComponent implements OnInit {
       longitud_ifts: [{ value: '', disabled: true }],
       logo_ifts: ['']
     });
+  }
+
+  /**
+   * Prellenar el formulario con datos de la institución para editar
+   */
+  private prellenarFormularioEdicion(): void {
+    if (!this.institucionParaEditar) return;
+
+    const inst = this.institucionParaEditar;
+    this.formulario.patchValue({
+      nombre_ifts: inst.nombre,
+      direccion_ifts: inst.direccion,
+      telefono_ifts: inst.telefono,
+      email_ifts: inst.email,
+      sitio_web_ifts: inst.sitio_web,
+      observaciones_ifts: inst.observaciones,
+      latitud_ifts: inst.latitud,
+      longitud_ifts: inst.longitud
+    });
+
+    if (inst.logo) {
+      this.logoPreview = inst.logo;
+    }
+
+    // Cargar carreras seleccionadas
+    if (Array.isArray(inst.carreras)) {
+      this.carrerasSeleccionadas = inst.carreras.map(c => 
+        typeof c === 'string' ? c : (c as any)?.nombre || ''
+      );
+    }
+
+    this.cdr.markForCheck();
   }
 
   private cargarCarreras(): void {
@@ -140,7 +184,6 @@ export class FormularioInstitucionComponent implements OnInit {
       });
     }
 
-    // Logging para debug
     console.log('Formulario válido:', this.formulario.valid);
     console.log('Errores del formulario:', this.formulario.errors);
     Object.keys(this.formulario.controls).forEach(key => {
@@ -150,7 +193,7 @@ export class FormularioInstitucionComponent implements OnInit {
       }
     });
 
-    if (this.formulario.invalid || !this.coordenadas) {
+    if (this.formulario.invalid) {
       this.error = 'Por favor completa todos los campos requeridos';
       this.cdr.markForCheck();
       return;
@@ -162,13 +205,19 @@ export class FormularioInstitucionComponent implements OnInit {
       return;
     }
 
+    // En modo edición, las coordenadas ya están fijas
+    if (!this.esEdicion && !this.coordenadas) {
+      this.error = 'Las coordenadas son requeridas para crear una nueva institución';
+      this.cdr.markForCheck();
+      return;
+    }
+
     this.cargando = true;
     this.error = null;
 
     const datosFormulario = this.formulario.getRawValue();
     const datos = {
       ...datosFormulario,
-      // Campos con y sin sufijo para compatibilidad
       nombre: datosFormulario.nombre_ifts,
       direccion: datosFormulario.direccion_ifts,
       telefono: datosFormulario.telefono_ifts,
@@ -176,16 +225,25 @@ export class FormularioInstitucionComponent implements OnInit {
       sitio_web: datosFormulario.sitio_web_ifts,
       observaciones: datosFormulario.observaciones_ifts,
       logo: datosFormulario.logo_ifts,
-      latitud: this.coordenadas.lat,
-      longitud: this.coordenadas.lng,
-      latitud_ifts: this.coordenadas.lat,
-      longitud_ifts: this.coordenadas.lng,
+      latitud: this.esEdicion ? this.institucionParaEditar!.latitud : this.coordenadas!.lat,
+      longitud: this.esEdicion ? this.institucionParaEditar!.longitud : this.coordenadas!.lng,
+      latitud_ifts: this.esEdicion ? this.institucionParaEditar!.latitud : this.coordenadas!.lat,
+      longitud_ifts: this.esEdicion ? this.institucionParaEditar!.longitud : this.coordenadas!.lng,
       carreras: this.carrerasSeleccionadas
     };
 
+    // Si es edición, agregar el ID
+    if (this.esEdicion && this.institucionParaEditar) {
+      datos.id_institucion = this.institucionParaEditar.id;
+    }
+
     console.log('Datos a enviar:', datos);
 
-    this.institucionesService.guardarInstitucion(datos).subscribe({
+    const requestService = this.esEdicion 
+      ? this.institucionesService.actualizarInstitucion(datos)
+      : this.institucionesService.guardarInstitucion(datos);
+
+    requestService.subscribe({
       next: (respuesta) => {
         console.log('Respuesta del backend:', respuesta);
         this.cargando = false;
@@ -194,8 +252,8 @@ export class FormularioInstitucionComponent implements OnInit {
       },
       error: (err) => {
         this.cargando = false;
-        this.error = err.error?.message || 'Error al guardar la institución';
-        console.error('Error guardando institución:', err);
+        this.error = err.error?.message || `Error al ${this.esEdicion ? 'actualizar' : 'guardar'} la institución`;
+        console.error(`Error ${this.esEdicion ? 'actualizando' : 'guardando'} institución:`, err);
         this.cdr.markForCheck();
       }
     });

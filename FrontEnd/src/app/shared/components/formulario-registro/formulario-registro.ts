@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -45,7 +45,8 @@ export class FormularioRegistroComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private institucionesService: InstitucionesService
+    private institucionesService: InstitucionesService,
+    private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
@@ -71,7 +72,10 @@ export class FormularioRegistroComponent implements OnInit {
     }
 
     if (!this.contrasenasCoinciden()) {
-      this.error = 'Las contraseñas no coinciden';
+      setTimeout(() => {
+        this.error = 'Las contraseñas no coinciden';
+        this.cdr.markForCheck();
+      }, 0);
       return;
     }
 
@@ -92,12 +96,18 @@ export class FormularioRegistroComponent implements OnInit {
 
     this.authService.register(payload).subscribe({
       next: (user) => {
-        this.cargando = false;
-        this.registerSuccess.emit(user);
+        setTimeout(() => {
+          this.cargando = false;
+          this.cdr.markForCheck();
+          this.registerSuccess.emit(user);
+        }, 0);
       },
       error: (err: Error) => {
-        this.cargando = false;
-        this.error = err.message;
+        setTimeout(() => {
+          this.cargando = false;
+          this.error = err.message;
+          this.cdr.markForCheck();
+        }, 0);
       }
     });
   }
@@ -113,12 +123,18 @@ export class FormularioRegistroComponent implements OnInit {
 
     this.institucionesService.obtenerTodas().subscribe({
       next: (instituciones) => {
-        this.instituciones = instituciones;
-        this.cargandoInstituciones = false;
+        setTimeout(() => {
+          this.instituciones = instituciones;
+          this.cargandoInstituciones = false;
+          this.cdr.markForCheck();
+        }, 0);
       },
       error: () => {
-        this.cargandoInstituciones = false;
-        this.error = 'No fue posible cargar las instituciones';
+        setTimeout(() => {
+          this.cargandoInstituciones = false;
+          this.error = 'No fue posible cargar las instituciones';
+          this.cdr.markForCheck();
+        }, 0);
       }
     });
   }

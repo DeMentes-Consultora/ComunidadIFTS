@@ -20,6 +20,11 @@ export interface Carrera {
   descripcion?: string;
 }
 
+export interface CarreraSimple {
+  id: number;
+  nombre: string;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;

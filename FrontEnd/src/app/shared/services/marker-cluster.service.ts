@@ -171,11 +171,32 @@ export class MarkerClusterService {
   }
 
   /**
-   * Limpiar todos los marcadores del cluster
+   * Limpiar todos los marcadores del cluster de manera segura
    */
   clearAllMarkers(): void {
     if (!this.clusterGroup) return;
-    this.clusterGroup.clearLayers();
+    
+    try {
+      // Obtener todos los layers antes de limpiar
+      const layers = this.clusterGroup.getLayers();
+      
+      // Remover cada layer individualmente
+      layers.forEach((layer: any) => {
+        if (layer) {
+          this.clusterGroup.removeLayer(layer);
+        }
+      });
+      
+      // Luego hacer clearLayers por si quedó algo
+      this.clusterGroup.clearLayers();
+    } catch (error) {
+      console.error('Error al limpiar marcadores del cluster:', error);
+      // Si falla, intentar recrear el cluster group
+      if (this.map) {
+        this.map.removeLayer(this.clusterGroup);
+        this.initClusterGroup(this.map);
+      }
+    }
   }
 
   /**

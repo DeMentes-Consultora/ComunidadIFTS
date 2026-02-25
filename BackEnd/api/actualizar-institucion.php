@@ -1,7 +1,7 @@
 <?php
 /**
- * API: Crear nueva institución
- * Endpoint: POST /api/guardar-institucion.php
+ * API: Actualizar institución existente
+ * Endpoint: PUT /api/actualizar-institucion.php
  * 
  * Permisos: Solo roles ID 1 (AdministradorComunidad) y ID 7 (AdministradorIFTS)
  */
@@ -14,8 +14,8 @@ session_start();
 
 header('Content-Type: application/json');
 
-// Solo permitir POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+// Solo permitir PUT
+if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Método no permitido']);
     exit;
@@ -28,11 +28,11 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
     exit;
 }
 
-// Verificar permisos: solo roles 1 y 7 pueden crear IFTS
+// Verificar permisos: solo roles 1 y 7 pueden actualizar IFTS
 $rolesPermitidos = [1, 7];
 if (!in_array($_SESSION['id_rol'], $rolesPermitidos)) {
     http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'No tiene permisos para crear instituciones']);
+    echo json_encode(['success' => false, 'message' => 'No tiene permisos para modificar instituciones']);
     exit;
 }
 
@@ -46,6 +46,13 @@ try {
         exit;
     }
 
+    // Validar que se envíe el ID
+    if (empty($input['id']) && empty($input['id_institucion'])) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'El ID de la institución es requerido']);
+        exit;
+    }
+
     // Validar campos requeridos
     if (empty($input['nombre']) && empty($input['nombre_ifts'])) {
         http_response_code(400);
@@ -56,24 +63,37 @@ try {
     $db = Database::getInstance();
     $pdo = $db->getConnection();
     
+    // Obtener el ID (puede venir como 'id' o 'id_institucion')
+    $idInstitucion = $input['id'] ?? $input['id_institucion'];
+    
+    // Verificar que la institución existe
+    $stmt = $pdo->prepare("SELECT id_institucion FROM institucion WHERE id_institucion = ? LIMIT 1");
+    $stmt->execute([$idInstitucion]);
+    if (!$stmt->fetch()) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Institución no encontrada']);
+        exit;
+    }
+    
     // Crear objeto Institución desde los datos
     $institucion = Institucion::desdeArray($input);
+    $institucion->setId($idInstitucion);
     
-    // Guardar en la base de datos
-    $institucion->guardar($pdo);
+    // Actualizar en la base de datos
+    $institucion->actualizar($pdo);
 
     echo json_encode([
         'success' => true,
-        'message' => 'Institución guardada correctamente',
+        'message' => 'Institución actualizada correctamente',
         'id' => $institucion->getId(),
         'data' => $institucion->toArray()
     ]);
-
-} catch (\Exception $e) {
+    
+} catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'message' => 'Error al guardar institución',
-        'error' => $_ENV['APP_DEBUG'] ? $e->getMessage() : null
+        'message' => 'Error al actualizar la institución',
+        'error' => ($_ENV['APP_DEBUG'] ?? false) ? $e->getMessage() : null
     ]);
 }
