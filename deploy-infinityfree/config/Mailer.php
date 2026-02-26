@@ -228,6 +228,28 @@ class Mailer {
         return $this->enviar($email, $nombre, $asunto, $cuerpoHTML, $cuerpoTexto);
     }
 
+    public function notificarRegistroPendiente($email, $nombre, $apellido, $institucion = null) {
+        $nombreSeguro = htmlspecialchars((string)$nombre);
+        $apellidoSeguro = htmlspecialchars((string)$apellido);
+        $institucionSegura = htmlspecialchars((string)($institucion ?? 'No especificada'));
+
+        $asunto = "Recibimos tu registro - ComunidadIFTS";
+        $cuerpoHTML = $this->plantillaRegistroPendiente($nombreSeguro, $apellidoSeguro, $institucionSegura);
+        $cuerpoTexto = "Hola $nombre $apellido,\n\n"
+                     . "Recibimos tu solicitud de registro en ComunidadIFTS.\n"
+                     . "Estado actual: pendiente de aprobación por el administrador.\n"
+                     . "Institución: " . ($institucion ?? 'No especificada') . "\n\n"
+                     . "Te avisaremos por este medio cuando tu cuenta sea aprobada o rechazada.\n\n"
+                     . "Saludos,\nEquipo de ComunidadIFTS";
+
+        $nombreDestinatario = trim($nombre . ' ' . $apellido);
+        if ($nombreDestinatario === '') {
+            $nombreDestinatario = (string)$email;
+        }
+
+        return $this->enviar($email, $nombreDestinatario, $asunto, $cuerpoHTML, $cuerpoTexto);
+    }
+
     /**
      * Plantilla HTML para notificación de nuevo registro al admin
      */
@@ -332,6 +354,51 @@ HTML;
         <div class="footer">
             <p>Este es un correo automático de ComunidadIFTS. Por favor no respondas a este mensaje.</p>
             <p>Si tienes alguna pregunta, contacta al administrador.</p>
+        </div>
+    </div>
+</body>
+</html>
+HTML;
+    }
+
+    private function plantillaRegistroPendiente($nombre, $apellido, $institucion) {
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Recibido</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #006633 0%, #008844 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .content { padding: 30px; }
+        .status-box { background-color: #f9f9f9; border-left: 4px solid #006633; padding: 15px; margin: 20px 0; }
+        .status-box p { margin: 8px 0; color: #333; }
+        .status-box strong { color: #006633; }
+        .footer { background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✅ Registro Recibido</h1>
+        </div>
+        <div class="content">
+            <p>Hola <strong>$nombre $apellido</strong>,</p>
+            <p>Recibimos tu solicitud de registro en <strong>ComunidadIFTS</strong>.</p>
+
+            <div class="status-box">
+                <p><strong>Estado:</strong> Pendiente de aprobación</p>
+                <p><strong>Institución:</strong> $institucion</p>
+            </div>
+
+            <p>Un administrador revisará tu solicitud y te enviaremos otro correo con el resultado.</p>
+        </div>
+        <div class="footer">
+            <p>Este es un correo automático de ComunidadIFTS. Por favor no respondas a este mensaje.</p>
         </div>
     </div>
 </body>

@@ -91,6 +91,9 @@ echo 1. Edita el archivo .env en la carpeta deploy-infinityfree:
 echo    - Busca la linea: DB_PASS=
 echo    - Agrega tu contraseña de MySQL de InfinityFree
 echo    - Ejemplo: DB_PASS=tu_contraseña_aqui
+echo    - Completa tambien SMTP real ^(NO dejes placeholders^):
+echo      MAIL_USERNAME, MAIL_PASSWORD, MAIL_FROM_ADDRESS, ADMIN_EMAIL
+echo    - No usar valores como: tu-email@gmail.com o tu-contraseña-de-aplicacion
 echo.
 echo 2. Conecta via FTP a InfinityFree:
 echo    Host: ftpupload.net
@@ -137,6 +140,7 @@ echo SIGUIENTE PASO:
 echo.
 echo 1. Edita: deploy-infinityfree\.env
 echo    Agrega tu contraseña de MySQL en la linea DB_PASS=
+echo    Completa MAIL_USERNAME, MAIL_PASSWORD, MAIL_FROM_ADDRESS y ADMIN_EMAIL reales
 echo.
 echo 2. Lee: deploy-infinityfree\INSTRUCCIONES.txt
 echo.
