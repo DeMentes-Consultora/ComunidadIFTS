@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Output, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { AuthUser } from '../../models/auth.model';
 
@@ -29,6 +30,7 @@ export class FormularioLoginComponent {
   @Output() switchToRegister = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
   private readonly formBuilder = inject(FormBuilder);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   cargando = false;
   error: string | null = null;
@@ -61,18 +63,24 @@ export class FormularioLoginComponent {
 
     this.authService.login(payload).subscribe({
       next: (user) => {
-        this.cargando = false;
-        this.loginSuccess.emit(user);
+        setTimeout(() => {
+          this.cargando = false;
+          this.loginSuccess.emit(user);
+          this.cdr.markForCheck();
+        }, 0);
       },
-      error: (err: any) => {
-        this.cargando = false;
-        
-        // Verificar si el error es por usuario pendiente de aprobación
-        if (err.error?.pendiente_aprobacion) {
-          this.error = '⏳ ' + (err.error.message || 'Tu cuenta está pendiente de aprobación por el administrador. Recibirás un email cuando sea aprobada.');
-        } else {
-          this.error = err.message || err.error?.message || 'Error al iniciar sesión';
-        }
+      error: (err: HttpErrorResponse) => {
+        setTimeout(() => {
+          this.cargando = false;
+
+          if (err?.error?.pendiente_aprobacion) {
+            this.error = err.error.message || 'Tu cuenta está pendiente de aprobación por el administrador. Recibirás un email cuando sea aprobada.';
+          } else {
+            this.error = err?.error?.message || err?.message || 'Error al iniciar sesión';
+          }
+
+          this.cdr.markForCheck();
+        }, 0);
       }
     });
   }

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { AuthResponse, AuthUser, BasicAuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
+import { AuthResponse, AuthUser, BasicAuthResponse, LoginRequest, RegisterRequest, RegisterResponse } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +20,7 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(credentials: LoginRequest): Observable<AuthUser> {
-    return this.http.post<AuthResponse>(this.apiLoginUrl, credentials)
+    return this.http.post<AuthResponse>(this.apiLoginUrl, credentials, { withCredentials: true })
       .pipe(
         map(response => {
           if (!response.success || !response.data) {
@@ -33,24 +33,25 @@ export class AuthService {
           this.currentUserSubject.next(user);
         }),
         catchError(err => {
-          const message = err?.error?.message || err?.message || 'Error de autenticación';
-          return throwError(() => new Error(message));
+          return throwError(() => err);
         })
       );
   }
 
-  register(payload: RegisterRequest): Observable<AuthUser> {
-    return this.http.post<AuthResponse>(this.apiRegisterUrl, payload)
+  register(payload: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(this.apiRegisterUrl, payload, { withCredentials: true })
       .pipe(
         map(response => {
-          if (!response.success || !response.data) {
+          if (!response.success) {
             throw new Error(response.message || 'No fue posible registrarse');
           }
-          return response.data;
+          return response;
         }),
-        tap(user => {
-          localStorage.setItem(this.storageKey, JSON.stringify(user));
-          this.currentUserSubject.next(user);
+        tap(response => {
+          if (response.data && !response.pendiente_aprobacion) {
+            localStorage.setItem(this.storageKey, JSON.stringify(response.data));
+            this.currentUserSubject.next(response.data);
+          }
         }),
         catchError(err => {
           const message = err?.error?.message || err?.message || 'Error de registro';
@@ -60,7 +61,7 @@ export class AuthService {
   }
 
   logout(): Observable<boolean> {
-    return this.http.post<BasicAuthResponse>(this.apiLogoutUrl, {})
+    return this.http.post<BasicAuthResponse>(this.apiLogoutUrl, {}, { withCredentials: true })
       .pipe(
         map(response => !!response.success),
         tap(() => this.clearLocalSession()),

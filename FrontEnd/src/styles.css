@@ -17,3 +17,37 @@
  !important;
 	pointer-events: auto !important;
 }
+
+/* Snackbars globales */
+.mat-mdc-snack-bar-container.snackbar-success,
+.mat-mdc-snack-bar-container.snackbar-error,
+.mat-mdc-snack-bar-container.snackbar-info {
+	--mdc-snackbar-supporting-text-size: 0.95rem;
+	--mdc-snackbar-supporting-text-line-height: 1.35;
+}
+
+.mat-mdc-snack-bar-container.snackbar-success .mdc-snackbar__surface,
+.mat-mdc-snack-bar-container.snackbar-error .mdc-snackbar__surface,
+.mat-mdc-snack-bar-container.snackbar-info .mdc-snackbar__surface {
+	border-radius: 12px !important;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+.mat-mdc-snack-bar-container.snackbar-success .mdc-snackbar__surface {
+	background-color: #2e7d32 !important;
+}
+
+.mat-mdc-snack-bar-container.snackbar-error .mdc-snackbar__surface {
+	background-color: #c62828 !important;
+}
+
+.mat-mdc-snack-bar-container.snackbar-info .mdc-snackbar__surface {
+	background-color: #1565c0 !important;
+}
+
+.mat-mdc-snack-bar-container.snackbar-success .mat-mdc-button,
+.mat-mdc-snack-bar-container.snackbar-error .mat-mdc-button,
+.mat-mdc-snack-bar-container.snackbar-info .mat-mdc-button {
+	color: #ffffff !important;
+	font-weight: 600;
+}

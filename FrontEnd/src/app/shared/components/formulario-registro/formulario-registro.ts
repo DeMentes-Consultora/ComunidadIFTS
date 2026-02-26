@@ -7,6 +7,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { AuthUser } from '../../models/auth.model';
 import { Institucion } from '../../models/institucion.model';
@@ -23,7 +25,8 @@ import { InstitucionesService } from '../../services/instituciones.service';
     MatInputModule,
     MatButtonModule,
     MatSelectModule,
-    MatIconModule
+    MatIconModule,
+    MatSnackBarModule
   ],
   templateUrl: './formulario-registro.html',
   styleUrl: './formulario-registro.css'
@@ -46,7 +49,8 @@ export class FormularioRegistroComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private institucionesService: InstitucionesService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private snackBar: MatSnackBar
   ) {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
@@ -102,20 +106,23 @@ export class FormularioRegistroComponent implements OnInit {
           
           // Verificar si el usuario está pendiente de aprobación
           if (response.pendiente_aprobacion) {
-            // Mostrar mensaje de pendiente
             this.error = null;
-            alert('✅ ' + (response.message || 'Registro exitoso. Tu solicitud está pendiente de aprobación por el administrador. Recibirás un email cuando sea aprobada.'));
-            this.cancel.emit(); // Cerrar modal
+            this.mostrarMensaje(
+              response.message || 'Registro exitoso. Tu solicitud está pendiente de aprobación por el administrador. Recibirás un email cuando sea aprobada.',
+              'success'
+            );
+            this.cancel.emit();
           } else {
-            // Usuario aprobado directamente (flujo antiguo por si acaso)
+            this.mostrarMensaje('Registro exitoso. Bienvenido.', 'success');
             this.registerSuccess.emit(response.data || response);
           }
         }, 0);
       },
-      error: (err: Error) => {
+      error: (err: HttpErrorResponse | Error) => {
         setTimeout(() => {
           this.cargando = false;
-          this.error = err.message;
+          const backendMessage = (err as HttpErrorResponse)?.error?.message;
+          this.error = backendMessage || err.message || 'Error al registrar usuario';
           this.cdr.markForCheck();
         }, 0);
       }
@@ -155,5 +162,19 @@ export class FormularioRegistroComponent implements OnInit {
 
   cancelar(): void {
     this.cancel.emit();
+  }
+
+  private mostrarMensaje(mensaje: string, tipo: 'success' | 'error' | 'info'): void {
+    const panelClass =
+      tipo === 'success' ? 'snackbar-success' :
+      tipo === 'error' ? 'snackbar-error' :
+      'snackbar-info';
+
+    this.snackBar.open(mensaje, 'Cerrar', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass
+    });
   }
 }

@@ -39,6 +39,15 @@ export interface AuthResponse {
   data?: AuthUser;
 }
 
+export interface RegisterResponse {
+  success: boolean;
+  message?: string;
+  data?: AuthUser;
+  pendiente_aprobacion?: boolean;
+  email_admin_notificado?: boolean;
+  warning?: string | null;
+}
+
 export interface BasicAuthResponse {
   success: boolean;
   message?: string;

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatSlideToggleModule, MatSlideToggle } from '@angular/material/slide-toggle';
@@ -44,6 +44,7 @@ interface UsuarioPendiente {
 export class GestionUsuarios implements OnInit {
   private http = inject(HttpClient);
   private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef);
 
   usuarios: UsuarioPendiente[] = [];
   displayedColumns: string[] = ['nombre', 'email', 'dni', 'institucion', 'fecha_registro', 'acciones'];
@@ -57,28 +58,34 @@ export class GestionUsuarios implements OnInit {
     this.cargando = true;
     
     this.http.get<{success: boolean, data: UsuarioPendiente[], total: number}>(
-      `${environment.apiUrl}/api/usuarios-pendientes.php`,
+      `${environment.apiUrl}/usuarios-pendientes.php`,
       { withCredentials: true }
     ).subscribe({
       next: (response) => {
-        if (response.success) {
-          this.usuarios = response.data;
-        } else {
-          this.mostrarMensaje('Error al cargar usuarios pendientes', 'error');
-        }
-        this.cargando = false;
+        setTimeout(() => {
+          if (response.success) {
+            this.usuarios = response.data;
+          } else {
+            this.mostrarMensaje('Error al cargar usuarios pendientes', 'error');
+          }
+          this.cargando = false;
+          this.cdr.markForCheck();
+        }, 0);
       },
       error: (error) => {
         console.error('Error cargando usuarios:', error);
-        this.mostrarMensaje('Error al cargar usuarios pendientes', 'error');
-        this.cargando = false;
+        setTimeout(() => {
+          this.mostrarMensaje('Error al cargar usuarios pendientes', 'error');
+          this.cargando = false;
+          this.cdr.markForCheck();
+        }, 0);
       }
     });
   }
 
   aprobarUsuario(usuario: UsuarioPendiente): void {
     this.http.put(
-      `${environment.apiUrl}/api/aprobar-usuario.php`,
+      `${environment.apiUrl}/aprobar-usuario.php`,
       {
         id_usuario: usuario.id_usuario,
         aprobar: true
@@ -87,16 +94,19 @@ export class GestionUsuarios implements OnInit {
     ).subscribe({
       next: (response: any) => {
         if (response.success) {
-          this.mostrarMensaje(`Usuario ${usuario.nombre} ${usuario.apellido} aprobado exitosamente`, 'success');
-          // Remover de la lista
-          this.usuarios = this.usuarios.filter(u => u.id_usuario !== usuario.id_usuario);
+          setTimeout(() => {
+            this.mostrarMensaje(`Usuario ${usuario.nombre} ${usuario.apellido} aprobado exitosamente`, 'success');
+            this.usuarios = this.usuarios.filter(u => u.id_usuario !== usuario.id_usuario);
+            this.cdr.markForCheck();
+          }, 0);
         } else {
           this.mostrarMensaje(response.message || 'Error al aprobar usuario', 'error');
         }
       },
       error: (error) => {
         console.error('Error:', error);
-        this.mostrarMensaje('Error al aprobar usuario', 'error');
+        const mensaje = error?.error?.message || 'Error al aprobar usuario';
+        this.mostrarMensaje(mensaje, 'error');
       }
     });
   }
@@ -107,7 +117,7 @@ export class GestionUsuarios implements OnInit {
     }
 
     this.http.put(
-      `${environment.apiUrl}/api/aprobar-usuario.php`,
+      `${environment.apiUrl}/aprobar-usuario.php`,
       {
         id_usuario: usuario.id_usuario,
         aprobar: false,
@@ -117,16 +127,19 @@ export class GestionUsuarios implements OnInit {
     ).subscribe({
       next: (response: any) => {
         if (response.success) {
-          this.mostrarMensaje(`Usuario ${usuario.nombre} ${usuario.apellido} rechazado`, 'info');
-          // Remover de la lista
-          this.usuarios = this.usuarios.filter(u => u.id_usuario !== usuario.id_usuario);
+          setTimeout(() => {
+            this.mostrarMensaje(`Usuario ${usuario.nombre} ${usuario.apellido} rechazado`, 'info');
+            this.usuarios = this.usuarios.filter(u => u.id_usuario !== usuario.id_usuario);
+            this.cdr.markForCheck();
+          }, 0);
         } else {
           this.mostrarMensaje(response.message || 'Error al rechazar usuario', 'error');
         }
       },
       error: (error) => {
         console.error('Error:', error);
-        this.mostrarMensaje('Error al rechazar usuario', 'error');
+        const mensaje = error?.error?.message || 'Error al rechazar usuario';
+        this.mostrarMensaje(mensaje, 'error');
       }
     });
   }
