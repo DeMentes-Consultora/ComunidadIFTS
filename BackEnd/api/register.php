@@ -201,6 +201,7 @@ try {
 
     // Enviar email al administrador notificando el nuevo registro
     $emailAdminNotificado = false;
+    $emailUsuarioNotificado = false;
     $emailWarning = null;
     try {
         require_once __DIR__ . '/../config/Mailer.php';
@@ -224,6 +225,13 @@ try {
             $emailWarning = $mailer->getLastError() ?: 'No se pudo enviar la notificación por email al administrador.';
             error_log('Registro exitoso sin email de notificación: ' . $emailWarning);
         }
+
+        $emailUsuarioNotificado = $mailer->notificarRegistroPendiente($email, $nombre, $apellido, $nombreInstitucion);
+        if (!$emailUsuarioNotificado) {
+            $warningUsuario = $mailer->getLastError() ?: 'No se pudo enviar la confirmación al usuario registrado.';
+            $emailWarning = $emailWarning ? ($emailWarning . ' | ' . $warningUsuario) : $warningUsuario;
+            error_log('Registro exitoso sin email al usuario: ' . $warningUsuario);
+        }
     } catch (\Throwable $e) {
         // Log error pero no fallar el registro
         $emailWarning = 'Excepción enviando notificación: ' . $e->getMessage();
@@ -236,6 +244,7 @@ try {
         'message' => 'Registro exitoso. Tu solicitud está pendiente de aprobación por el administrador. Recibirás un email cuando sea aprobada.',
         'pendiente_aprobacion' => true,
         'email_admin_notificado' => $emailAdminNotificado,
+        'email_usuario_notificado' => $emailUsuarioNotificado,
         'warning' => $emailWarning
     ]);
 } catch (\Throwable $e) {

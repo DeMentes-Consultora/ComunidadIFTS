@@ -260,6 +260,11 @@ Antes de dar por finalizado un despliegue, verificar:
    - [ ] `MAIL_ENCRYPTION`
    - [ ] `ADMIN_EMAIL`
 - [ ] Registro de usuario notifica al admin por email
+- [ ] Registro de usuario envía comprobante al usuario registrado
+- [ ] Al registrar, la respuesta de `/api/register.php` devuelve:
+   - [ ] `email_admin_notificado: true`
+   - [ ] `email_usuario_notificado: true`
+   - [ ] `warning: null`
 - [ ] Aprobación/rechazo de usuario funciona y devuelve mensaje claro en frontend
 
 ---
