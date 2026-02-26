@@ -2,6 +2,15 @@
 /**
  * API: Registro de usuario
  * Endpoint: POST /api/register.php
+ * 
+ * Sistema de Roles (por ID):
+ * - ID 1: AdministradorComunidad (permisos totales)
+ * - ID 2: Alumno regular (solo lectura por defecto)
+ * - ID 3: Alumno no regular
+ * - ID 4: Alumno recibido
+ * - ID 7: AdministradorIFTS (puede editar IFTS)
+ * 
+ * Permisos de edición IFTS: Solo roles ID 1 y 7
  */
 
 require_once __DIR__ . '/../config/cors.php';
@@ -9,6 +18,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/Persona.php';
 require_once __DIR__ . '/../models/Usuario.php';
 
+ini_set('display_errors', '0');
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -30,16 +40,23 @@ function calcularEdadDesdeFecha($fechaNacimiento) {
     return (int)$hoy->diff($nacimiento)->y;
 }
 
+/**
+ * Obtiene el ID del rol predeterminado para nuevos usuarios (Alumno regular)
+ * ID 2 = Alumno regular
+ */
 function obtenerRolAlumno($pdo) {
+    $idRolAlumno = 2; // ID del rol "Alumno regular"
+    
+    // Verificar que el rol existe y está habilitado
     $sql = "SELECT id_rol
             FROM rol
-            WHERE nombre_rol = 'Alumno'
+            WHERE id_rol = ?
               AND habilitado = 1
               AND cancelado = 0
-            ORDER BY id_rol ASC
             LIMIT 1";
 
-    $stmt = $pdo->query($sql);
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$idRolAlumno]);
     $row = $stmt->fetch();
     return $row ? (int)$row['id_rol'] : null;
 }
@@ -49,7 +66,24 @@ try {
         session_start();
     }
 
-    $payload = json_decode(file_get_contents('php://input'), true);
+    $rawBody = file_get_contents('php://input');
+    $payload = json_decode($rawBody, true);
+
+    if (!is_array($payload)) {
+        if (!empty($_POST)) {
+            $payload = $_POST;
+        } else {
+            $formPayload = [];
+            parse_str((string)$rawBody, $formPayload);
+            $payload = is_array($formPayload) ? $formPayload : null;
+        }
+    }
+
+    if (!is_array($payload) || empty($payload)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Datos de registro inválidos']);
+        exit;
+    }
 
     $nombre = trim($payload['nombre'] ?? '');
     $apellido = trim($payload['apellido'] ?? '');
@@ -133,7 +167,7 @@ try {
     if ($idRolAlumno === null) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'No existe un rol Alumno habilitado']);
+        echo json_encode(['success' => false, 'message' => 'El rol de usuario predeterminado (ID 2) no está disponible']);
         exit;
     }
 
@@ -150,7 +184,10 @@ try {
         $clave,
         $persona->getIdPersona(),
         $idRolAlumno,
-        $idInstitucion
+        $idInstitucion,
+        null,      // id_usuario
+        0,         // habilitado = 0 (pendiente de aprobación)
+        0          // cancelado = 0
     );
 
     if (!$usuario->guardar($pdo)) {
@@ -162,23 +199,46 @@ try {
 
     $pdo->commit();
 
-    $usuarioCompleto = Usuario::buscarPorEmail($pdo, $email);
+    // Enviar email al administrador notificando el nuevo registro
+    $emailAdminNotificado = false;
+    $emailWarning = null;
+    try {
+        require_once __DIR__ . '/../config/Mailer.php';
+        $mailer = new Mailer();
+        
+        // Obtener nombre de la institución
+        $stmtInstNombre = $pdo->prepare("SELECT nombre_ifts FROM institucion WHERE id_institucion = ? LIMIT 1");
+        $stmtInstNombre->execute([$idInstitucion]);
+        $institucion = $stmtInstNombre->fetch();
+        $nombreInstitucion = $institucion ? $institucion['nombre_ifts'] : 'No especificada';
+        
+        $datosUsuario = [
+            'nombre' => $nombre,
+            'apellido' => $apellido,
+            'email' => $email,
+            'institucion' => $nombreInstitucion
+        ];
 
-    $_SESSION['logged_in'] = true;
-    $_SESSION['id_usuario'] = $usuarioCompleto->getIdUsuario();
-    $_SESSION['email'] = $usuarioCompleto->getEmail();
-    $_SESSION['id_rol'] = $usuarioCompleto->getIdRol();
-    $_SESSION['id_persona'] = $usuarioCompleto->getIdPersona();
-    $_SESSION['id_institucion'] = $usuarioCompleto->getIdInstitucion();
-    $_SESSION['nombre'] = $usuarioCompleto->getNombre();
-    $_SESSION['apellido'] = $usuarioCompleto->getApellido();
+        $emailAdminNotificado = $mailer->notificarNuevoRegistro($datosUsuario);
+        if (!$emailAdminNotificado) {
+            $emailWarning = $mailer->getLastError() ?: 'No se pudo enviar la notificación por email al administrador.';
+            error_log('Registro exitoso sin email de notificación: ' . $emailWarning);
+        }
+    } catch (\Throwable $e) {
+        // Log error pero no fallar el registro
+        $emailWarning = 'Excepción enviando notificación: ' . $e->getMessage();
+        error_log($emailWarning);
+    }
 
+    // NO establecer sesión - usuario debe esperar aprobación
     echo json_encode([
         'success' => true,
-        'message' => 'Registro correcto',
-        'data' => $usuarioCompleto->toArray()
+        'message' => 'Registro exitoso. Tu solicitud está pendiente de aprobación por el administrador. Recibirás un email cuando sea aprobada.',
+        'pendiente_aprobacion' => true,
+        'email_admin_notificado' => $emailAdminNotificado,
+        'warning' => $emailWarning
     ]);
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }

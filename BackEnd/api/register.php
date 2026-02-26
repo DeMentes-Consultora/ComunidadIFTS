@@ -18,6 +18,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/Persona.php';
 require_once __DIR__ . '/../models/Usuario.php';
 
+ini_set('display_errors', '0');
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -65,7 +66,24 @@ try {
         session_start();
     }
 
-    $payload = json_decode(file_get_contents('php://input'), true);
+    $rawBody = file_get_contents('php://input');
+    $payload = json_decode($rawBody, true);
+
+    if (!is_array($payload)) {
+        if (!empty($_POST)) {
+            $payload = $_POST;
+        } else {
+            $formPayload = [];
+            parse_str((string)$rawBody, $formPayload);
+            $payload = is_array($formPayload) ? $formPayload : null;
+        }
+    }
+
+    if (!is_array($payload) || empty($payload)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Datos de registro inválidos']);
+        exit;
+    }
 
     $nombre = trim($payload['nombre'] ?? '');
     $apellido = trim($payload['apellido'] ?? '');
@@ -182,15 +200,17 @@ try {
     $pdo->commit();
 
     // Enviar email al administrador notificando el nuevo registro
+    $emailAdminNotificado = false;
+    $emailWarning = null;
     try {
         require_once __DIR__ . '/../config/Mailer.php';
         $mailer = new Mailer();
         
         // Obtener nombre de la institución
-        $stmtInstNombre = $pdo->prepare("SELECT nombre_institucion FROM institucion WHERE id_institucion = ? LIMIT 1");
+        $stmtInstNombre = $pdo->prepare("SELECT nombre_ifts FROM institucion WHERE id_institucion = ? LIMIT 1");
         $stmtInstNombre->execute([$idInstitucion]);
         $institucion = $stmtInstNombre->fetch();
-        $nombreInstitucion = $institucion ? $institucion['nombre_institucion'] : 'No especificada';
+        $nombreInstitucion = $institucion ? $institucion['nombre_ifts'] : 'No especificada';
         
         $datosUsuario = [
             'nombre' => $nombre,
@@ -198,20 +218,27 @@ try {
             'email' => $email,
             'institucion' => $nombreInstitucion
         ];
-        
-        $mailer->notificarNuevoRegistro($datosUsuario);
-    } catch (Exception $e) {
+
+        $emailAdminNotificado = $mailer->notificarNuevoRegistro($datosUsuario);
+        if (!$emailAdminNotificado) {
+            $emailWarning = $mailer->getLastError() ?: 'No se pudo enviar la notificación por email al administrador.';
+            error_log('Registro exitoso sin email de notificación: ' . $emailWarning);
+        }
+    } catch (\Throwable $e) {
         // Log error pero no fallar el registro
-        error_log("Error enviando email de notificación: " . $e->getMessage());
+        $emailWarning = 'Excepción enviando notificación: ' . $e->getMessage();
+        error_log($emailWarning);
     }
 
     // NO establecer sesión - usuario debe esperar aprobación
     echo json_encode([
         'success' => true,
         'message' => 'Registro exitoso. Tu solicitud está pendiente de aprobación por el administrador. Recibirás un email cuando sea aprobada.',
-        'pendiente_aprobacion' => true
+        'pendiente_aprobacion' => true,
+        'email_admin_notificado' => $emailAdminNotificado,
+        'warning' => $emailWarning
     ]);
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }

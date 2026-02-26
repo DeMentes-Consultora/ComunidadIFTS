@@ -242,6 +242,28 @@ Para hacer cambios después del despliegue inicial:
 
 ---
 
+## ✅ Checklist Operativo (Auth + CORS + Mail)
+
+Antes de dar por finalizado un despliegue, verificar:
+
+- [ ] `environment.prod.ts` apunta a `https://comunidadifts.infinityfreeapp.com/api`
+- [ ] `CORS_ALLOWED_ORIGINS` incluye el dominio del frontend (sin espacios extra)
+- [ ] Login funciona y crea sesión (`/api/login.php` responde `success: true`)
+- [ ] Endpoints protegidos responden con sesión activa (`/api/usuarios-pendientes.php`)
+- [ ] Variables SMTP completas en `.env`:
+   - [ ] `MAIL_HOST`
+   - [ ] `MAIL_PORT`
+   - [ ] `MAIL_USERNAME`
+   - [ ] `MAIL_PASSWORD`
+   - [ ] `MAIL_FROM_ADDRESS`
+   - [ ] `MAIL_FROM_NAME`
+   - [ ] `MAIL_ENCRYPTION`
+   - [ ] `ADMIN_EMAIL`
+- [ ] Registro de usuario notifica al admin por email
+- [ ] Aprobación/rechazo de usuario funciona y devuelve mensaje claro en frontend
+
+---
+
 ## 📞 Recursos Adicionales
 
 - **Panel de Control**: https://app.infinityfree.com

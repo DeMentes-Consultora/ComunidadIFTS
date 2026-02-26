@@ -2,11 +2,15 @@
 /**
  * API: Crear nueva institución
  * Endpoint: POST /api/guardar-institucion.php
+ * 
+ * Permisos: Solo roles ID 1 (AdministradorComunidad) y ID 7 (AdministradorIFTS)
  */
 
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/Institucion.php';
+
+session_start();
 
 header('Content-Type: application/json');
 
@@ -14,6 +18,21 @@ header('Content-Type: application/json');
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+    exit;
+}
+
+// Verificar que el usuario esté autenticado
+if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'No autorizado']);
+    exit;
+}
+
+// Verificar permisos: solo roles 1 y 7 pueden crear IFTS
+$rolesPermitidos = [1, 7];
+if (!in_array($_SESSION['id_rol'], $rolesPermitidos)) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'No tiene permisos para crear instituciones']);
     exit;
 }
 
