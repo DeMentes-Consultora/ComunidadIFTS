@@ -61,6 +61,13 @@ if exist "%DEPLOY_DIR%" (
 )
 mkdir "%DEPLOY_DIR%"
 
+if not exist "BackEnd\.env.production" (
+    echo ERROR: No existe BackEnd\.env.production
+    echo Crea ese archivo antes de preparar el deploy.
+    pause
+    exit /b 1
+)
+
 echo    - Copiando Backend...
 xcopy /E /I /Y BackEnd\vendor "%DEPLOY_DIR%\vendor" >nul
 xcopy /E /I /Y BackEnd\config "%DEPLOY_DIR%\config" >nul
@@ -71,9 +78,12 @@ copy /Y BackEnd\check-server.php "%DEPLOY_DIR%\" >nul
 copy /Y BackEnd\.env.production "%DEPLOY_DIR%\.env" >nul
 
 echo    - Copiando Frontend compilado...
-powershell -Command "Copy-Item -Path 'FrontEnd\dist\ComunidadIFTS\browser\*' -Destination '%DEPLOY_DIR%' -Recurse -Force" 2>nul
+powershell -Command "$browser='FrontEnd\dist\ComunidadIFTS\browser'; $root='FrontEnd\dist\ComunidadIFTS'; if (Test-Path $browser) { Copy-Item -Path ($browser + '\*') -Destination '%DEPLOY_DIR%' -Recurse -Force } elseif (Test-Path $root) { Copy-Item -Path ($root + '\*') -Destination '%DEPLOY_DIR%' -Recurse -Force; Remove-Item -Path '%DEPLOY_DIR%\browser' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path '%DEPLOY_DIR%\prerendered-routes.json' -Force -ErrorAction SilentlyContinue; Remove-Item -Path '%DEPLOY_DIR%\3rdpartylicenses.txt' -Force -ErrorAction SilentlyContinue } else { exit 1 }" 2>nul
 if errorlevel 1 (
-    echo WARNING: Error al copiar Frontend
+    echo ERROR: No se pudo copiar el Frontend compilado
+    echo Verifica que exista FrontEnd\dist\ComunidadIFTS\ o FrontEnd\dist\ComunidadIFTS\browser\
+    pause
+    exit /b 1
 )
 
 echo OK - Carpeta de despliegue creada

@@ -50,6 +50,14 @@ mat-divider {
   gap: 4px;
 }
 
+.section-title {
+  margin: 0.5rem 0 0.25rem;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #006633;
+}
+
 /* Enlaces de navegación */
 .nav-link {
   width: 100%;

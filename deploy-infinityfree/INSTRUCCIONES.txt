@@ -8,6 +8,9 @@ IMPORTANTE: Antes de subir los archivos, configura tu contraseña
    - Busca la linea: DB_PASS=
    - Agrega tu contraseña de MySQL de InfinityFree
    - Ejemplo: DB_PASS=tu_contraseña_aqui
+   - Completa tambien SMTP real (NO dejes placeholders):
+     MAIL_USERNAME, MAIL_PASSWORD, MAIL_FROM_ADDRESS, ADMIN_EMAIL
+   - No usar valores como: tu-email@gmail.com o tu-contraseña-de-aplicacion
 
 2. Conecta via FTP a InfinityFree:
    Host: ftpupload.net

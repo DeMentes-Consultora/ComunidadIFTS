@@ -26,6 +26,17 @@
     </a>
     
     <mat-divider></mat-divider>
+
+    <ng-container *ngIf="(currentUser$ | async)?.id_rol === 1">
+      <h3 class="section-title">Gestion</h3>
+
+      <a mat-button routerLink="/admin/gestion-usuarios" (click)="closeSidenavPanel()" class="nav-link">
+        <mat-icon>admin_panel_settings</mat-icon>
+        Gestión de usuarios
+      </a>
+
+      <mat-divider></mat-divider>
+    </ng-container>
     
     <a mat-button routerLink="/acerca-de" (click)="closeSidenavPanel()" class="nav-link">
       <mat-icon>info</mat-icon>

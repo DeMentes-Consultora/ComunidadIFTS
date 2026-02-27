@@ -11,17 +11,6 @@
   
   <div class="navbar-right">
     <ng-container *ngIf="currentUser$ | async as user; else loginButton">
-      <!-- Botón de Gestión de Usuarios solo para Administrador (rol ID 1) -->
-      <button 
-        *ngIf="user.id_rol === 1" 
-        mat-button 
-        type="button" 
-        routerLink="/admin/gestion-usuarios"
-        class="admin-button">
-        <mat-icon>admin_panel_settings</mat-icon>
-        Gestión de Usuarios
-      </button>
-      
       <span class="user-greeting">Hola {{ user.nombre }} ({{ user.nombre_rol }})</span>
       <button mat-button type="button" (click)="cerrarSesion()">
         <mat-icon>logout</mat-icon>

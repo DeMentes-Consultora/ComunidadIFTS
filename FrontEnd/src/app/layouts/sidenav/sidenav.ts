@@ -5,6 +5,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SidenavService } from '../../shared/services/sidenav.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-sidenav',
@@ -14,10 +15,14 @@ import { SidenavService } from '../../shared/services/sidenav.service';
   styleUrl: './sidenav.css',
 })
 export class Sidenav {
+  currentUser$;
 
   constructor(
-    private sidenavService: SidenavService
-  ) {}
+    private sidenavService: SidenavService,
+    private authService: AuthService
+  ) {
+    this.currentUser$ = this.authService.currentUser$;
+  }
 
   closeSidenavPanel() {
     this.sidenavService.close();

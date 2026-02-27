@@ -25,6 +25,8 @@ El script automáticamente:
 - ✅ Instalará dependencias del Frontend (npm)
 - ✅ Compilará el Frontend para producción
 - ✅ Creará la carpeta `deploy-infinityfree/` con todo listo
+- ✅ Validará que exista `BackEnd/.env.production`
+- ✅ Fallará si no puede copiar el Frontend compilado
 
 ### 2. Configurar Contraseña
 
