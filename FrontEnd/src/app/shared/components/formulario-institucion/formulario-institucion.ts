@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Optional } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -37,6 +37,7 @@ export class FormularioInstitucionComponent implements OnInit {
   @Input() coordenadas: L.LatLng | null = null;
   @Input() direccion: string = '';
   @Input() institucionParaEditar: Institucion | null = null;
+  @Input() bloquearNombreYCarrerasEnEdicion = false;
   @Output() institucionGuardada = new EventEmitter<any>();
 
   formulario!: FormGroup;
@@ -51,7 +52,7 @@ export class FormularioInstitucionComponent implements OnInit {
     private fb: FormBuilder,
     private institucionesService: InstitucionesService,
     private cdr: ChangeDetectorRef,
-    public dialogRef: MatDialogRef<FormularioInstitucionComponent>
+    @Optional() public dialogRef: MatDialogRef<FormularioInstitucionComponent>
   ) {
     this.inicializarFormulario();
   }
@@ -123,6 +124,10 @@ export class FormularioInstitucionComponent implements OnInit {
       );
     }
 
+    if (this.bloquearNombreYCarrerasEnEdicion) {
+      this.formulario.get('nombre_ifts')?.disable({ emitEvent: false });
+    }
+
     this.cdr.markForCheck();
   }
 
@@ -166,6 +171,10 @@ export class FormularioInstitucionComponent implements OnInit {
   }
 
   toggleCarrera(carrera: string): void {
+    if (this.esEdicion && this.bloquearNombreYCarrerasEnEdicion) {
+      return;
+    }
+
     const index = this.carrerasSeleccionadas.indexOf(carrera);
     if (index > -1) {
       this.carrerasSeleccionadas.splice(index, 1);
@@ -199,7 +208,8 @@ export class FormularioInstitucionComponent implements OnInit {
       return;
     }
 
-    if (this.carrerasSeleccionadas.length === 0) {
+    const requiereCarreras = !(this.esEdicion && this.bloquearNombreYCarrerasEnEdicion);
+    if (requiereCarreras && this.carrerasSeleccionadas.length === 0) {
       this.error = 'Selecciona al menos una carrera';
       this.cdr.markForCheck();
       return;
@@ -248,7 +258,7 @@ export class FormularioInstitucionComponent implements OnInit {
         console.log('Respuesta del backend:', respuesta);
         this.cargando = false;
         this.institucionGuardada.emit(respuesta);
-        this.dialogRef.close(respuesta);
+        this.dialogRef?.close(respuesta);
       },
       error: (err) => {
         this.cargando = false;
@@ -260,6 +270,6 @@ export class FormularioInstitucionComponent implements OnInit {
   }
 
   cancelar(): void {
-    this.dialogRef.close();
+    this.dialogRef?.close();
   }
 }

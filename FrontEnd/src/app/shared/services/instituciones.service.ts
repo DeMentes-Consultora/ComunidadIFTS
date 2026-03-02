@@ -13,6 +13,7 @@ export class InstitucionesService {
   private apiCarrerasUrl = `${environment.apiUrl}/carreras.php`;
   private apiGuardarUrl = `${environment.apiUrl}/guardar-institucion.php`;
   private apiActualizarUrl = `${environment.apiUrl}/actualizar-institucion.php`;
+  private apiEliminarUrl = `${environment.apiUrl}/eliminar-institucion.php`;
   private apiLikeUrl = `${environment.apiUrl}/like-institucion.php`;
 
   constructor(private http: HttpClient) {}
@@ -71,20 +72,27 @@ export class InstitucionesService {
    * Guardar nueva institución
    */
   guardar(institucion: Partial<Institucion>): Observable<any> {
-    return this.http.post(this.apiGuardarUrl, institucion);
+    return this.http.post(this.apiGuardarUrl, institucion, { withCredentials: true });
   }
 
   /**
    * Guardar institución con todos los datos (incluyendo carreras)
    */
   guardarInstitucion(datos: any): Observable<any> {
-    return this.http.post(this.apiGuardarUrl, datos);
+    return this.http.post(this.apiGuardarUrl, datos, { withCredentials: true });
   }
 
   /**
    * Actualizar institución existente
    */
   actualizarInstitucion(datos: any): Observable<any> {
-    return this.http.put(this.apiActualizarUrl, datos);
+    return this.http.put(this.apiActualizarUrl, datos, { withCredentials: true });
+  }
+
+  /**
+   * Eliminar institución
+   */
+  eliminarInstitucion(id_institucion: number): Observable<any> {
+    return this.http.post(this.apiEliminarUrl, { id_institucion }, { withCredentials: true });
   }
 }

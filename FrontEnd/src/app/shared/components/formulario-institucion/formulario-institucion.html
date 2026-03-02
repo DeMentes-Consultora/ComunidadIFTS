@@ -1,5 +1,5 @@
 <div class="formulario-container">
-  <h2 class="titulo">Registrar Nueva Institución</h2>
+  <h2 class="titulo">{{ esEdicion ? 'Modificar Institución' : 'Registrar Nueva Institución' }}</h2>
 
   <form [formGroup]="formulario" (ngSubmit)="onSubmit()" class="formulario-form">
     <!-- Sección de Error -->
@@ -45,6 +45,7 @@
           matInput
           formControlName="nombre_ifts"
           placeholder="ej: IFTS 12"
+          [readonly]="esEdicion && bloquearNombreYCarrerasEnEdicion"
         />
         <mat-error *ngIf="formulario.get('nombre_ifts')?.hasError('required')">
           Este campo es obligatorio
@@ -146,11 +147,12 @@
           *ngFor="let carrera of carrerasDisponibles"
           [checked]="carrerasSeleccionadas.includes(carrera)"
           (change)="toggleCarrera(carrera)"
+          [disabled]="esEdicion && bloquearNombreYCarrerasEnEdicion"
         >
           {{ carrera }}
         </mat-checkbox>
       </div>
-      <div *ngIf="carrerasSeleccionadas.length === 0" class="error-carreras">
+      <div *ngIf="carrerasSeleccionadas.length === 0 && !(esEdicion && bloquearNombreYCarrerasEnEdicion)" class="error-carreras">
         Selecciona al menos una carrera
       </div>
     </div>

@@ -1,0 +1,73 @@
+<div class="gestion-carreras-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>account_tree</mat-icon>
+        Gestión de Carreras y Materias
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (cargando()) {
+        <div class="loading-container">
+          <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+          <p>Cargando datos de carreras y materias...</p>
+        </div>
+      } @else {
+        <div class="layout">
+          <section class="panel panel-materias">
+            <h3>Materias</h3>
+            <div
+              cdkDropList
+              id="materias-disponibles"
+              [cdkDropListData]="materiasDisponibles()"
+              [cdkDropListConnectedTo]="dropListIds()"
+              class="drop-list"
+              (cdkDropListDropped)="dropMateria($event)"
+            >
+              @if (materiasDisponibles().length === 0) {
+                <p class="placeholder">No hay materias disponibles</p>
+              }
+
+              @for (materia of materiasDisponibles(); track materia.id_materia) {
+                <div cdkDrag class="drag-item">{{ materia.nombre_materia }}</div>
+              }
+            </div>
+          </section>
+
+          <section class="panel panel-carreras">
+            <h3>Carreras</h3>
+            <div class="carreras-grid">
+              @for (carrera of carreras(); track carrera.id_carrera) {
+                <mat-card class="carrera-card">
+                  <mat-card-header>
+                    <mat-card-title>{{ carrera.nombre_carrera }}</mat-card-title>
+                  </mat-card-header>
+
+                  <mat-card-content>
+                    <div
+                      cdkDropList
+                      [id]="'carrera-' + carrera.id_carrera"
+                      [cdkDropListData]="carrera.materias"
+                      [cdkDropListConnectedTo]="dropListIds()"
+                      class="drop-list"
+                      (cdkDropListDropped)="dropMateria($event, carrera)"
+                    >
+                      @if (carrera.materias.length === 0) {
+                        <p class="placeholder">Arrastrá materias aquí</p>
+                      }
+
+                      @for (materia of carrera.materias; track materia.id_materia) {
+                        <div cdkDrag class="drag-item">{{ materia.nombre_materia }}</div>
+                      }
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              }
+            </div>
+          </section>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

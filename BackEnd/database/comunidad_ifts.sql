@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 17-02-2026 a las 03:06:14
+-- Tiempo de generación: 02-03-2026 a las 21:58:03
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -272,6 +272,25 @@ CREATE TABLE `persona` (
   `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `persona`
+--
+
+INSERT INTO `persona` (`id_persona`, `apellido`, `nombre`, `edad`, `dni`, `fecha_nacimiento`, `telefono`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, 'Minotti', 'Sebastian', 47, '26582365', '1978-10-16', '1158965236', 1, 0, '2026-02-25 23:53:22', '2026-02-25 23:53:22'),
+(2, 'B', 'A', 26, '12345678', '2000-01-01', '1111111111', 1, 0, '2026-02-25 23:54:32', '2026-02-25 23:54:32'),
+(3, 'Prueba', 'Ana', 26, '12345679', '2000-01-01', '1111111111', 1, 0, '2026-02-25 23:58:22', '2026-02-25 23:58:22'),
+(4, 'Prueba', 'Ana', 26, '12345671', '2000-01-01', '1111111111', 1, 0, '2026-02-25 23:59:25', '2026-02-25 23:59:25'),
+(5, 'Prueba', 'Ana', 26, '12345672', '2000-01-01', '1111111111', 1, 0, '2026-02-26 00:00:07', '2026-02-26 00:00:07'),
+(6, 'Prueba', 'Ana', 26, '44290499', '2000-01-01', '1111111111', 1, 0, '2026-02-26 00:02:44', '2026-02-26 00:02:44'),
+(7, 'prueba', 'prueba', 47, '26523654', '1978-05-16', '1156523654', 1, 0, '2026-02-26 00:19:47', '2026-02-26 00:19:47'),
+(8, 'Nuevo', 'Test', 25, '64533288', '2000-05-10', '1112345678', 1, 0, '2026-02-26 00:22:28', '2026-02-26 00:22:28'),
+(9, 'Test', 'Form', 25, '58800111', '2000-05-10', '1112345678', 1, 0, '2026-02-26 00:23:36', '2026-02-26 00:23:36'),
+(10, 'nuevo', 'nuevo', 26, '23654256', '2000-02-02', '1152365478', 1, 0, '2026-02-26 00:26:05', '2026-02-26 00:26:05'),
+(11, 'nuevo', 'otroNuevo', 47, '12532569', '1978-10-16', '115236987', 1, 0, '2026-02-26 02:50:46', '2026-02-26 02:50:46'),
+(12, 'Pendiente', 'Mail', 25, '49254786', '2000-05-10', '1112345678', 1, 0, '2026-02-26 02:55:08', '2026-02-26 02:55:08'),
+(13, 'registro', 'registro', 47, '12523654', '1978-10-16', '1123654789', 1, 0, '2026-02-26 03:00:33', '2026-02-26 03:00:33');
+
 -- --------------------------------------------------------
 
 --
@@ -292,12 +311,9 @@ CREATE TABLE `rol` (
 --
 
 INSERT INTO `rol` (`id_rol`, `nombre_rol`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, 'Administrador', 1, 0, '2026-01-25 20:29:40', '2026-01-25 20:29:40'),
-(2, 'Alumno', 1, 0, '2026-01-25 20:29:40', '2026-01-25 20:29:40'),
-(3, 'Administrador', 1, 0, '2026-01-25 20:31:00', '2026-01-25 20:31:00'),
-(4, 'Alumno', 1, 0, '2026-01-25 20:31:00', '2026-01-25 20:31:00'),
-(5, 'Administrador', 1, 0, '2026-01-25 20:31:55', '2026-01-25 20:31:55'),
-(6, 'Alumno', 1, 0, '2026-01-25 20:31:55', '2026-01-25 20:31:55');
+(1, 'Administrador', 1, 0, '2026-02-25 23:16:00', '2026-02-25 23:16:00'),
+(2, 'Alumno', 1, 0, '2026-02-25 23:16:00', '2026-02-25 23:16:00'),
+(3, 'AdministradorIFTS', 1, 0, '2026-02-25 23:16:00', '2026-02-25 23:16:00');
 
 -- --------------------------------------------------------
 
@@ -317,6 +333,25 @@ CREATE TABLE `usuario` (
   `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
   `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `usuario`
+--
+
+INSERT INTO `usuario` (`id_usuario`, `email`, `clave`, `id_rol`, `id_persona`, `id_institucion`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, 'seba@gmail.com', '$2y$10$Tb.mgWSOKMVKkQM4hpt.kuqZwNRy/wYgY4WIJzPbUCuNDCDGJTnTC', 1, 1, 1, 1, 0, '2026-02-25 23:53:22', '2026-02-26 03:03:10'),
+(2, 'test507238115@mail.com', '$2y$10$ZbO25iUGI7.4wfZOjKbv5Osag0DGvr9t4rRw9oy.X1CTHpP6fMKGC', 2, 2, 1, 1, 0, '2026-02-25 23:54:32', '2026-02-26 00:16:11'),
+(3, 'test1864180326@mail.com', '$2y$10$f/nEWTe0RvjsEH7MQaN3ZesPM88yGpcqtrS36OyUtKbQUhUxVH1km', 2, 3, 1, 1, 0, '2026-02-25 23:58:22', '2026-02-26 00:16:04'),
+(4, 'test1364295098@mail.com', '$2y$10$NpGAF9WJHAUqd/SSO/EMZuOa9dIVUBCqqbHQXTZoykgQSDFWXDgKi', 2, 4, 1, 1, 0, '2026-02-25 23:59:25', '2026-02-26 00:15:56'),
+(5, 'test1181805928@mail.com', '$2y$10$GFCawr7umar8fmW1pjWoueTBnM8SXwusQ.7E6S1IHdy1uol0hBnri', 2, 5, 1, 1, 0, '2026-02-26 00:00:07', '2026-02-26 00:15:50'),
+(6, 'test1508581466@mail.com', '$2y$10$GapybKH7bnfAFI2fWaBoEuKvxBkNQmgCSwwqVY7nSEfmAudZQ9D6u', 2, 6, 1, 1, 0, '2026-02-26 00:02:44', '2026-02-26 00:15:45'),
+(7, 'prueba@gmail.com', '$2y$10$sMLI7OocA0YLOByvaPS5bu49GTzPMaGaoAC4AU/QYr5q81RWS1W8i', 2, 7, 1, 1, 0, '2026-02-26 00:19:47', '2026-02-26 00:20:39'),
+(8, 'nuevo1342950043@mail.com', '$2y$10$rex5SJ0czhrKkObKCDABBeiJJebihjYfSsh/HuSuxt31rKsrz/q8i', 2, 8, 1, 0, 1, '2026-02-26 00:22:28', '2026-02-26 00:24:44'),
+(9, 'form650866515@mail.com', '$2y$10$wZe1dl0jYNX7DQFUDHYMNubd94Zw4FWQEmBxX4Cl9Zpjh/P83TdEi', 2, 9, 1, 1, 0, '2026-02-26 00:23:36', '2026-02-26 00:24:35'),
+(10, 'nuevo@hotmail.com', '$2y$10$Eig3F9EaRK6LhLRGnBuOeO.9uZHyn2sMD7A5N418gIsfJtKKIOuHy', 2, 10, 1, 1, 0, '2026-02-26 00:26:05', '2026-02-26 00:26:36'),
+(11, 'sebastianminotti@gmail.com_', '$2y$10$OW/BzlwyUIUIwRyC39iOr.xCAwsiJ8/Vpmjb3imURM3eG874ZsPRm', 2, 11, 3, 1, 0, '2026-02-26 02:50:46', '2026-02-26 03:04:24'),
+(12, 'confirmacion30020726@mail.com', '$2y$10$BW0.iaiOusJyyysqekJAned/q5NXL0yx7aepaeUVnk5dq4crfbG2m', 2, 12, 1, 0, 1, '2026-02-26 02:55:08', '2026-02-26 03:04:19'),
+(13, 'sebastianminotti@gmail.com', '$2y$10$yrb7XSIm1FISbp0eEzDc0OhY9OYm9YxpIvUJIU73YawHRmBVeVu6y', 2, 13, 3, 1, 0, '2026-02-26 03:00:33', '2026-02-26 03:04:09');
 
 --
 -- Índices para tablas volcadas
@@ -390,19 +425,19 @@ ALTER TABLE `institucion_carrera`
 -- AUTO_INCREMENT de la tabla `persona`
 --
 ALTER TABLE `persona`
-  MODIFY `id_persona` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_persona` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`
 --
 ALTER TABLE `rol`
-  MODIFY `id_rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Restricciones para tablas volcadas
@@ -412,8 +447,8 @@ ALTER TABLE `usuario`
 -- Filtros para la tabla `institucion_carrera`
 --
 ALTER TABLE `institucion_carrera`
-  ADD CONSTRAINT `institucion_carrera_ibfk_1` FOREIGN KEY (`id_institucion`) REFERENCES `institucion` (`id_institucion`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `institucion_carrera_ibfk_2` FOREIGN KEY (`id_carrera`) REFERENCES `carrera` (`id_carrera`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `institucion_carrera_ibfk_1` FOREIGN KEY (`id_carrera`) REFERENCES `carrera` (`id_carrera`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `institucion_carrera_ibfk_2` FOREIGN KEY (`id_institucion`) REFERENCES `institucion` (`id_institucion`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `usuario`

@@ -25,6 +25,14 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/gestion-usuarios/gestion-usuarios').then(m => m.GestionUsuarios)
       },
       {
+        path: 'gestion-instituciones',
+        loadComponent: () => import('./features/admin/gestion-instituciones/gestion-instituciones').then(m => m.GestionInstituciones)
+      },
+      {
+        path: 'gestion-carreras',
+        loadComponent: () => import('./features/admin/gestion-carreras/gestion-carreras').then(m => m.GestionCarreras)
+      },
+      {
         path: '',
         redirectTo: 'gestion-usuarios',
         pathMatch: 'full'
