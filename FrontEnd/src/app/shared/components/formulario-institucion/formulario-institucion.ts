@@ -171,10 +171,6 @@ export class FormularioInstitucionComponent implements OnInit {
   }
 
   toggleCarrera(carrera: string): void {
-    if (this.esEdicion && this.bloquearNombreYCarrerasEnEdicion) {
-      return;
-    }
-
     const index = this.carrerasSeleccionadas.indexOf(carrera);
     if (index > -1) {
       this.carrerasSeleccionadas.splice(index, 1);
@@ -208,8 +204,7 @@ export class FormularioInstitucionComponent implements OnInit {
       return;
     }
 
-    const requiereCarreras = !(this.esEdicion && this.bloquearNombreYCarrerasEnEdicion);
-    if (requiereCarreras && this.carrerasSeleccionadas.length === 0) {
+    if (this.carrerasSeleccionadas.length === 0) {
       this.error = 'Selecciona al menos una carrera';
       this.cdr.markForCheck();
       return;

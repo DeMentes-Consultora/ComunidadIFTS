@@ -80,6 +80,10 @@
   color: #006633;
 }
 
+.visually-hidden-input {
+  display: none;
+}
+
 .logo-preview {
   position: relative;
   display: flex;
