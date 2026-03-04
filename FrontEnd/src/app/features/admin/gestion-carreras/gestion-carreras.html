@@ -1,13 +1,30 @@
 <div class="gestion-carreras-container">
   <mat-card>
     <mat-card-header>
-      <mat-card-title>
-        <mat-icon>account_tree</mat-icon>
-        Gestión de Carreras y Materias
-      </mat-card-title>
+      <div class="header-row">
+        <mat-card-title>
+          <mat-icon>account_tree</mat-icon>
+          Gestión de Carreras y Materias
+        </mat-card-title>
+
+        <button mat-mini-fab color="primary" (click)="toggleFormularioCarrera()" aria-label="Agregar carrera">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
     </mat-card-header>
 
     <mat-card-content>
+      @if (mostrarFormularioCarrera()) {
+        <div class="inline-form">
+          <mat-form-field appearance="outline" class="form-field-grow">
+            <mat-label>Nueva carrera</mat-label>
+            <input matInput [(ngModel)]="nuevaCarreraNombre" placeholder="Nombre de la carrera" />
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="crearCarrera()">Guardar</button>
+          <button mat-stroked-button (click)="toggleFormularioCarrera()">Cancelar</button>
+        </div>
+      }
+
       @if (cargando()) {
         <div class="loading-container">
           <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
@@ -16,7 +33,23 @@
       } @else {
         <div class="layout">
           <section class="panel panel-materias">
-            <h3>Materias</h3>
+            <div class="panel-title-row">
+              <h3>Materias</h3>
+              <button mat-icon-button color="primary" (click)="toggleFormularioMateria()" aria-label="Agregar materia">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+
+            @if (mostrarFormularioMateria()) {
+              <div class="inline-form panel-inline-form">
+                <mat-form-field appearance="outline" class="form-field-grow">
+                  <mat-label>Nueva materia</mat-label>
+                  <input matInput [(ngModel)]="nuevaMateriaNombre" placeholder="Nombre de la materia" />
+                </mat-form-field>
+                <button mat-raised-button color="primary" (click)="crearMateria()">Guardar</button>
+              </div>
+            }
+
             <div
               cdkDropList
               id="materias-disponibles"
@@ -30,7 +63,34 @@
               }
 
               @for (materia of materiasDisponibles(); track materia.id_materia) {
-                <div cdkDrag class="drag-item">{{ materia.nombre_materia }}</div>
+                @if (materiaEnEdicion()?.id_materia === materia.id_materia) {
+                  <div class="drag-item editing-item">
+                    <mat-form-field appearance="outline" class="form-field-grow compact-field">
+                      <mat-label>Nombre materia</mat-label>
+                      <input matInput [(ngModel)]="materiaEditadaNombre" placeholder="Nombre de la materia" title="Nombre de la materia" />
+                    </mat-form-field>
+                    <div class="acciones-item">
+                      <button mat-icon-button color="primary" (click)="guardarEdicionMateria()" aria-label="Guardar materia">
+                        <mat-icon>check</mat-icon>
+                      </button>
+                      <button mat-icon-button (click)="cancelarEdicionMateria()" aria-label="Cancelar edición materia">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                } @else {
+                  <div cdkDrag class="drag-item drag-item-row">
+                    <span>{{ materia.nombre_materia }}</span>
+                    <div class="acciones-item">
+                      <button mat-icon-button color="primary" (click)="iniciarEdicionMateria(materia)" aria-label="Editar materia">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button mat-icon-button color="warn" (click)="eliminarMateria(materia)" aria-label="Eliminar materia">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                }
               }
             </div>
           </section>
@@ -41,7 +101,32 @@
               @for (carrera of carreras(); track carrera.id_carrera) {
                 <mat-card class="carrera-card">
                   <mat-card-header>
-                    <mat-card-title>{{ carrera.nombre_carrera }}</mat-card-title>
+                    @if (carreraEnEdicion()?.id_carrera === carrera.id_carrera) {
+                      <div class="inline-form panel-inline-form">
+                        <mat-form-field appearance="outline" class="form-field-grow">
+                          <mat-label>Nombre carrera</mat-label>
+                          <input matInput [(ngModel)]="carreraEditadaNombre" placeholder="Nombre de la carrera" title="Nombre de la carrera" />
+                        </mat-form-field>
+                        <button mat-icon-button color="primary" (click)="guardarEdicionCarrera()" aria-label="Guardar carrera">
+                          <mat-icon>check</mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="cancelarEdicionCarrera()" aria-label="Cancelar edición">
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      </div>
+                    } @else {
+                      <div class="panel-title-row carrera-title-row">
+                        <mat-card-title>{{ carrera.nombre_carrera }}</mat-card-title>
+                        <div class="acciones-carrera">
+                          <button mat-icon-button color="primary" (click)="iniciarEdicionCarrera(carrera)" aria-label="Editar carrera">
+                            <mat-icon>edit</mat-icon>
+                          </button>
+                          <button mat-icon-button color="warn" (click)="eliminarCarrera(carrera)" aria-label="Eliminar carrera">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </div>
+                      </div>
+                    }
                   </mat-card-header>
 
                   <mat-card-content>
@@ -58,7 +143,34 @@
                       }
 
                       @for (materia of carrera.materias; track materia.id_materia) {
-                        <div cdkDrag class="drag-item">{{ materia.nombre_materia }}</div>
+                        @if (materiaEnEdicion()?.id_materia === materia.id_materia) {
+                          <div class="drag-item editing-item">
+                            <mat-form-field appearance="outline" class="form-field-grow compact-field">
+                              <mat-label>Nombre materia</mat-label>
+                              <input matInput [(ngModel)]="materiaEditadaNombre" placeholder="Nombre de la materia" title="Nombre de la materia" />
+                            </mat-form-field>
+                            <div class="acciones-item">
+                              <button mat-icon-button color="primary" (click)="guardarEdicionMateria()" aria-label="Guardar materia">
+                                <mat-icon>check</mat-icon>
+                              </button>
+                              <button mat-icon-button (click)="cancelarEdicionMateria()" aria-label="Cancelar edición materia">
+                                <mat-icon>close</mat-icon>
+                              </button>
+                            </div>
+                          </div>
+                        } @else {
+                          <div cdkDrag class="drag-item drag-item-row">
+                            <span>{{ materia.nombre_materia }}</span>
+                            <div class="acciones-item">
+                              <button mat-icon-button color="primary" (click)="iniciarEdicionMateria(materia)" aria-label="Editar materia">
+                                <mat-icon>edit</mat-icon>
+                              </button>
+                              <button mat-icon-button color="warn" (click)="eliminarMateria(materia)" aria-label="Eliminar materia">
+                                <mat-icon>delete</mat-icon>
+                              </button>
+                            </div>
+                          </div>
+                        }
                       }
                     </div>
                   </mat-card-content>

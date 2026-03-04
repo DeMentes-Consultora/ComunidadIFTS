@@ -2,12 +2,91 @@
   padding: 16px;
 }
 
+.header-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: linear-gradient(135deg, #006633 0%, #004d26 100%);
+}
+
+.mat-mdc-card-header {
+  background: linear-gradient(135deg, #006633 0%, #004d26 100%);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding-bottom: 2px;
+}
+
+.mat-mdc-card-content {
+  padding-top: 2px;
+}
+
+.mat-mdc-card-header .mat-mdc-card-title,
+.mat-mdc-card-header .mat-icon {
+  color: #ffffff;
+}
+
 .table-container {
   overflow-x: auto;
+  margin-top: 0;
 }
 
 .instituciones-table {
   width: 100%;
+  table-layout: auto; /*al colocar "auto " y no "fixed" la tabla se ajusta automáticamente al contenido */
+}
+
+.instituciones-table th,
+.instituciones-table td {
+  font-size: 13px;
+  vertical-align: middle;
+  word-break: break-word;
+}
+
+.mat-column-id_institucion {
+  width: 56px;
+  white-space: nowrap;
+}
+
+.mat-column-logo_institucion {
+  width: 72px;
+  white-space: nowrap;
+}
+
+.mat-column-nombre_institucion {
+  width: 150px;
+}
+
+.mat-column-direccion_institucion {
+  min-width: 260px;
+}
+
+.mat-column-telefono_institucion {
+  width: 130px;
+  white-space: nowrap;
+}
+
+.mat-column-email_institucion {
+  min-width: 180px;
+}
+
+.mat-column-sitio_web_institucion {
+  width: 88px;
+  white-space: nowrap;
+}
+
+.mat-column-acciones {
+  width: 112px;
+}
+
+.filtro-field {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.filtro-field .mat-mdc-form-field-subscript-wrapper {
+  display: none;
 }
 
 .logo {
@@ -18,8 +97,27 @@
 }
 
 .acciones-cell {
+  vertical-align: middle;
+}
+
+.acciones-content {
   display: flex;
+  align-items: center;
   gap: 8px;
+}
+
+.sitio-cell a {
+  color: inherit;
+}
+
+.mat-column-direccion_institucion {
+  white-space: normal;
+}
+
+.mat-column-nombre_institucion {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .loading-container,

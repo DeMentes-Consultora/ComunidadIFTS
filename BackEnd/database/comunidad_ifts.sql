@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 02-03-2026 a las 21:58:03
+-- Tiempo de generación: 03-03-2026 a las 22:47:13
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -91,6 +91,22 @@ INSERT INTO `carrera` (`id_carrera`, `nombre_carrera`, `habilitado`, `cancelado`
 (48, 'Técnico Superior en Administración Pública con Orientación Municipal', 1, 0, '2026-02-16 23:46:01', '2026-02-16 23:46:01'),
 (49, 'Técnico Superior en Higiene y Seguridad en el Trabajo', 1, 0, '2026-02-16 23:46:01', '2026-02-16 23:46:01'),
 (50, 'Trayecto Facilitador Tecnológico Digital', 1, 0, '2026-02-16 23:46:01', '2026-02-16 23:46:01');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `carrera_materia`
+--
+
+CREATE TABLE `carrera_materia` (
+  `id_carreraMateria` int(11) NOT NULL,
+  `id_carrera` int(11) NOT NULL,
+  `id_materia` int(11) NOT NULL,
+  `habiltado` int(11) NOT NULL DEFAULT 1,
+  `cancelado` int(11) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -255,6 +271,21 @@ INSERT INTO `institucion_carrera` (`id_institucion_carrera`, `id_institucion`, `
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `materia`
+--
+
+CREATE TABLE `materia` (
+  `id_materia` int(11) NOT NULL,
+  `nombre_materia` varchar(250) NOT NULL,
+  `habilitado` int(11) NOT NULL DEFAULT 1,
+  `cancelado` int(11) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `persona`
 --
 
@@ -364,6 +395,14 @@ ALTER TABLE `carrera`
   ADD PRIMARY KEY (`id_carrera`);
 
 --
+-- Indices de la tabla `carrera_materia`
+--
+ALTER TABLE `carrera_materia`
+  ADD PRIMARY KEY (`id_carreraMateria`),
+  ADD KEY `id_carrera` (`id_carrera`,`id_materia`),
+  ADD KEY `id_materia` (`id_materia`);
+
+--
 -- Indices de la tabla `institucion`
 --
 ALTER TABLE `institucion`
@@ -376,6 +415,12 @@ ALTER TABLE `institucion_carrera`
   ADD PRIMARY KEY (`id_institucion_carrera`),
   ADD KEY `id_ifts` (`id_institucion`),
   ADD KEY `id_carrera` (`id_carrera`);
+
+--
+-- Indices de la tabla `materia`
+--
+ALTER TABLE `materia`
+  ADD PRIMARY KEY (`id_materia`);
 
 --
 -- Indices de la tabla `persona`
@@ -410,6 +455,12 @@ ALTER TABLE `carrera`
   MODIFY `id_carrera` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
+-- AUTO_INCREMENT de la tabla `carrera_materia`
+--
+ALTER TABLE `carrera_materia`
+  MODIFY `id_carreraMateria` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `institucion`
 --
 ALTER TABLE `institucion`
@@ -420,6 +471,12 @@ ALTER TABLE `institucion`
 --
 ALTER TABLE `institucion_carrera`
   MODIFY `id_institucion_carrera` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+
+--
+-- AUTO_INCREMENT de la tabla `materia`
+--
+ALTER TABLE `materia`
+  MODIFY `id_materia` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `persona`
@@ -442,6 +499,13 @@ ALTER TABLE `usuario`
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `carrera_materia`
+--
+ALTER TABLE `carrera_materia`
+  ADD CONSTRAINT `carrera_materia_ibfk_1` FOREIGN KEY (`id_carrera`) REFERENCES `carrera` (`id_carrera`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `carrera_materia_ibfk_2` FOREIGN KEY (`id_materia`) REFERENCES `materia` (`id_materia`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `institucion_carrera`

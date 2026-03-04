@@ -1,16 +1,12 @@
 import { Component, AfterViewInit, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { InstitucionesService } from '../../services/instituciones.service';
-import { AuthService } from '../../services/auth.service';
 import { MarkerClusterService } from '../../services/marker-cluster.service';
 import { Institucion } from '../../models/institucion.model';
 import { BuscadorDireccionComponent } from '../buscador-direccion/buscador-direccion';
-import { FormularioInstitucionComponent } from '../formulario-institucion/formulario-institucion';
 
 @Component({
   selector: 'app-mapa',
@@ -18,11 +14,8 @@ import { FormularioInstitucionComponent } from '../formulario-institucion/formul
   imports: [
     CommonModule, 
     BuscadorDireccionComponent, 
-    MatDialogModule,
-    MatButtonModule,
     MatIconModule,
-    MatChipsModule,
-    FormularioInstitucionComponent
+    MatChipsModule
   ],
   templateUrl: './mapa.html',
   styleUrls: ['./mapa.css'],
@@ -39,21 +32,12 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
   private markersByInstitucionId = new Map<number, L.CircleMarker>();
   private renderedMarkers: L.CircleMarker[] = [];
   private carrerasFiltradasIds: number[] = [];
-  
-  // Propiedades para el formulario y permisos
-  mostrarFormulario = false;
-  modoEdicion = false;
-  canEdit = false;
 
   constructor(
     private institucionesService: InstitucionesService,
-    private authService: AuthService,
     private markerClusterService: MarkerClusterService,
-    private dialog: MatDialog,
     private cdr: ChangeDetectorRef
-  ) {
-    this.verificarPermisos();
-  }
+  ) {}
 
   ngOnInit(): void {
     this.cargarInstituciones();
@@ -70,79 +54,11 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
     this.map?.remove();
   }
 
-  /**
-   * Verificar si el usuario actual tiene permisos para editar IFTS
-   * Sistema de permisos por ID de rol:
-   * - ID 1: AdministradorComunidad (puede editar)
-   * - ID 7: AdministradorIFTS (puede editar)
-   * - Cualquier otro ID: Solo lectura
-   */
-  private verificarPermisos(): void {
-    const usuarioActual = this.authService.getCurrentUser();
-    if (usuarioActual) {
-      // Solo los roles 1 y 7 pueden editar IFTS
-      this.canEdit = [1, 7].includes(usuarioActual.id_rol);
-    }
-  }
-
-  /**
-   * Cambiar modo del formulario (nuevo, editar o cerrar)
-   */
-  toggleFormMode(modo: 'nuevo' | 'editar' | null): void {
-    if (modo === null) {
-      this.mostrarFormulario = false;
-      this.modoEdicion = false;
-    } else {
-      this.mostrarFormulario = true;
-      this.modoEdicion = modo === 'editar';
-    }
-    this.cdr.markForCheck();
-  }
-
-  /**
-   * Obtener coordenadas de una institución
-   */
-  getCoordenadasInstitucion(inst: Institucion): L.LatLng {
-    return L.latLng(inst.latitud, inst.longitud);
-  }
-
-  /**
-   * Manejar institución guardada
-   */
-  onInstitucionGuardada(evento: any): void {
-    // Cerrar el formulario
-    this.mostrarFormulario = false;
-    this.modoEdicion = false;
-    // Recargar las instituciones
-    this.cargarInstituciones();
-    this.cdr.markForCheck();
-  }
-
-  onDireccionEncontrada(evento: { coordenadas: L.LatLng; direccion: string }): void {
-    // Abrir formulario de registro de institución
-    const dialogRef = this.dialog.open(FormularioInstitucionComponent, {
-      width: '90%',
-      maxWidth: '600px',
-      data: { coordenadas: evento.coordenadas, direccion: evento.direccion }
-    });
-
-    dialogRef.componentInstance.coordenadas = evento.coordenadas;
-    dialogRef.componentInstance.direccion = evento.direccion;
-
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        // Recargar instituciones después de guardar
-        this.cargarInstituciones();
-      }
-    });
-  }
-
   onInstitucionSeleccionada(idInstitucion: number): void {
     // Seleccionar la institución en el panel lateral
     const institucion = this.instituciones.find(i => i.id === idInstitucion);
     if (institucion) {
       this.institucionSeleccionada = institucion;
-      this.mostrarFormulario = false;
       this.cdr.markForCheck();
     }
 

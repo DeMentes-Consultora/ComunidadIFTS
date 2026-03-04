@@ -16,7 +16,6 @@
         [map]="map"
         [instituciones]="institucionesParaBusqueda"
         (institucionSeleccionada)="onInstitucionSeleccionada($event)"
-        (direccionEncontrada)="onDireccionEncontrada($event)"
         (carrerasFiltradas)="onCarrerasFiltradas($event)">
       </app-buscador-direccion>
 
@@ -24,89 +23,48 @@
       <div *ngIf="institucionSeleccionada" class="institucion-info">
         <h3>{{ institucionSeleccionada.nombre }}</h3>
 
-        <!-- Botones de Acción (solo para roles 1 y 7) -->
-        @if (canEdit) {
-          <div class="action-buttons">
-            <button 
-              mat-raised-button 
-              color="primary" 
-              class="half-width"
-              (click)="toggleFormMode('nuevo')">
-              <mat-icon>add</mat-icon>
-              Ingresar
-            </button>
-            <button 
-              mat-raised-button 
-              color="accent" 
-              class="half-width"
-              (click)="toggleFormMode('editar')">
-              <mat-icon>edit</mat-icon>
-              Modificar
-            </button>
-          </div>
-        }
-
         <!-- Información en modo lectura -->
-        @if (!mostrarFormulario) {
-          <div class="info-details">
-            <div class="info-item">
-              <label>Dirección:</label>
-              <p>{{ institucionSeleccionada.direccion }}</p>
-            </div>
-            <div class="info-item">
-              <label>Teléfono:</label>
-              <p>{{ institucionSeleccionada.telefono }}</p>
-            </div>
-            <div class="info-item">
-              <label>Email:</label>
-              <p>{{ institucionSeleccionada.email }}</p>
-            </div>
-            <div class="info-item">
-              <label>Sitio Web:</label>
-              <a [href]="institucionSeleccionada.sitio_web" target="_blank">
-                {{ institucionSeleccionada.sitio_web }}
-              </a>
-            </div>
-            @if (institucionSeleccionada.observaciones) {
-              <div class="info-item">
-                <label>Observaciones:</label>
-                <p>{{ institucionSeleccionada.observaciones }}</p>
-              </div>
-            }
-            @if (institucionSeleccionada.carreras && institucionSeleccionada.carreras.length > 0) {
-              <div class="info-item">
-                <label>Carreras:</label>
-                <div class="carreras-list">
-                  @for (carrera of institucionSeleccionada.carreras; track carrera.nombre) {
-                    <mat-chip-option>{{ carrera.nombre }}</mat-chip-option>
-                  }
-                </div>
-              </div>
-            }
-            @if (institucionSeleccionada.logo) {
-              <div class="info-item">
-                <img [src]="institucionSeleccionada.logo" alt="Logo" class="institucion-logo" />
-              </div>
-            }
+        <div class="info-details">
+          <div class="info-item">
+            <label>Dirección:</label>
+            <p>{{ institucionSeleccionada.direccion }}</p>
           </div>
-        }
-
-        <!-- Formulario en modo edición -->
-        @if (mostrarFormulario) {
-          <div class="formulario-wrapper">
-            <button 
-              class="close-form-btn"
-              (click)="toggleFormMode(null)"
-              mat-icon-button>
-              <mat-icon>close</mat-icon>
-            </button>
-            <app-formulario-institucion 
-              [institucionParaEditar]="modoEdicion ? institucionSeleccionada : null"
-              [coordenadas]="modoEdicion ? getCoordenadasInstitucion(institucionSeleccionada) : null"
-              (institucionGuardada)="onInstitucionGuardada($event)">
-            </app-formulario-institucion>
+          <div class="info-item">
+            <label>Teléfono:</label>
+            <p>{{ institucionSeleccionada.telefono }}</p>
           </div>
-        }
+          <div class="info-item">
+            <label>Email:</label>
+            <p>{{ institucionSeleccionada.email }}</p>
+          </div>
+          <div class="info-item">
+            <label>Sitio Web:</label>
+            <a [href]="institucionSeleccionada.sitio_web" target="_blank">
+              {{ institucionSeleccionada.sitio_web }}
+            </a>
+          </div>
+          @if (institucionSeleccionada.observaciones) {
+            <div class="info-item">
+              <label>Observaciones:</label>
+              <p>{{ institucionSeleccionada.observaciones }}</p>
+            </div>
+          }
+          @if (institucionSeleccionada.carreras && institucionSeleccionada.carreras.length > 0) {
+            <div class="info-item">
+              <label>Carreras:</label>
+              <div class="carreras-list">
+                @for (carrera of institucionSeleccionada.carreras; track carrera.nombre) {
+                  <mat-chip-option>{{ carrera.nombre }}</mat-chip-option>
+                }
+              </div>
+            </div>
+          }
+          @if (institucionSeleccionada.logo) {
+            <div class="info-item">
+              <img [src]="institucionSeleccionada.logo" alt="Logo" class="institucion-logo" />
+            </div>
+          }
+        </div>
       </div>
 
       <!-- Mensaje cuando no hay institución seleccionada -->

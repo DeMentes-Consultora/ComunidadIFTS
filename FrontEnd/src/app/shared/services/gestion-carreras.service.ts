@@ -47,4 +47,52 @@ export class GestionCarrerasService {
       { withCredentials: true }
     );
   }
+
+  crearCarrera(nombre_carrera: string): Observable<{ success: boolean; message?: string }> {
+    return this.http.post<{ success: boolean; message?: string }>(
+      this.endpoint,
+      { accion: 'crear_carrera', nombre_carrera },
+      { withCredentials: true }
+    );
+  }
+
+  editarCarrera(id_carrera: number, nombre_carrera: string): Observable<{ success: boolean; message?: string }> {
+    return this.http.post<{ success: boolean; message?: string }>(
+      this.endpoint,
+      { accion: 'editar_carrera', id_carrera, nombre_carrera },
+      { withCredentials: true }
+    );
+  }
+
+  eliminarCarrera(id_carrera: number): Observable<{ success: boolean; message?: string }> {
+    return this.http.post<{ success: boolean; message?: string }>(
+      this.endpoint,
+      { accion: 'eliminar_carrera', id_carrera },
+      { withCredentials: true }
+    );
+  }
+
+  crearMateria(nombre_materia: string): Observable<{ success: boolean; message?: string }> {
+    return this.http.post<{ success: boolean; message?: string }>(
+      this.endpoint,
+      { accion: 'crear_materia', nombre_materia },
+      { withCredentials: true }
+    );
+  }
+
+  editarMateria(id_materia: number, nombre_materia: string): Observable<{ success: boolean; message?: string }> {
+    return this.http.post<{ success: boolean; message?: string }>(
+      this.endpoint,
+      { accion: 'editar_materia', id_materia, nombre_materia },
+      { withCredentials: true }
+    );
+  }
+
+  eliminarMateria(id_materia: number): Observable<{ success: boolean; message?: string }> {
+    return this.http.post<{ success: boolean; message?: string }>(
+      this.endpoint,
+      { accion: 'eliminar_materia', id_materia },
+      { withCredentials: true }
+    );
+  }
 }
