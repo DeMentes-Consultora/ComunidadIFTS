@@ -86,6 +86,9 @@ export class InstitucionesService {
    * Actualizar institución existente
    */
   actualizarInstitucion(datos: any): Observable<any> {
+    if (datos instanceof FormData) {
+      return this.http.post(this.apiActualizarUrl, datos, { withCredentials: true });
+    }
     return this.http.put(this.apiActualizarUrl, datos, { withCredentials: true });
   }
 

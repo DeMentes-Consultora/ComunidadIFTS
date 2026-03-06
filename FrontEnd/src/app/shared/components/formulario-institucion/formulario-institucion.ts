@@ -44,6 +44,7 @@ export class FormularioInstitucionComponent implements OnInit {
   carrerasDisponibles: string[] = [];
   carrerasSeleccionadas: string[] = [];
   logoPreview: string | null = null;
+  logoFile: File | null = null;
   cargando = false;
   error: string | null = null;
   esEdicion = false;
@@ -146,15 +147,9 @@ export class FormularioInstitucionComponent implements OnInit {
   onLogoSeleccionado(event: any): void {
     const archivo = event.target.files[0];
     if (archivo) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.logoPreview = e.target.result;
-        this.formulario.patchValue({
-          logo_ifts: e.target.result
-        });
-        this.cdr.markForCheck();
-      };
-      reader.readAsDataURL(archivo);
+      this.logoFile = archivo;
+      this.logoPreview = URL.createObjectURL(archivo);
+      this.cdr.markForCheck();
     }
   }
 
@@ -221,32 +216,53 @@ export class FormularioInstitucionComponent implements OnInit {
     this.error = null;
 
     const datosFormulario = this.formulario.getRawValue();
-    const datos = {
-      ...datosFormulario,
-      nombre: datosFormulario.nombre_ifts,
-      direccion: datosFormulario.direccion_ifts,
-      telefono: datosFormulario.telefono_ifts,
-      email: datosFormulario.email_ifts,
-      sitio_web: datosFormulario.sitio_web_ifts,
-      observaciones: datosFormulario.observaciones_ifts,
-      logo: datosFormulario.logo_ifts,
-      latitud: this.esEdicion ? this.institucionParaEditar!.latitud : this.coordenadas!.lat,
-      longitud: this.esEdicion ? this.institucionParaEditar!.longitud : this.coordenadas!.lng,
-      latitud_ifts: this.esEdicion ? this.institucionParaEditar!.latitud : this.coordenadas!.lat,
-      longitud_ifts: this.esEdicion ? this.institucionParaEditar!.longitud : this.coordenadas!.lng,
-      carreras: this.carrerasSeleccionadas
-    };
+    const latitud = this.esEdicion ? this.institucionParaEditar!.latitud : this.coordenadas!.lat;
+    const longitud = this.esEdicion ? this.institucionParaEditar!.longitud : this.coordenadas!.lng;
 
-    // Si es edición, agregar el ID
-    if (this.esEdicion && this.institucionParaEditar) {
-      datos.id_institucion = this.institucionParaEditar.id;
+    const formData = new FormData();
+    formData.append('nombre_ifts', datosFormulario.nombre_ifts || '');
+    formData.append('direccion_ifts', datosFormulario.direccion_ifts || '');
+    formData.append('telefono_ifts', datosFormulario.telefono_ifts || '');
+    formData.append('email_ifts', datosFormulario.email_ifts || '');
+    formData.append('sitio_web_ifts', datosFormulario.sitio_web_ifts || '');
+    formData.append('observaciones_ifts', datosFormulario.observaciones_ifts || '');
+    formData.append('latitud_ifts', String(latitud));
+    formData.append('longitud_ifts', String(longitud));
+    formData.append('carreras', JSON.stringify(this.carrerasSeleccionadas));
+
+    // Mantener compatibilidad con back legacy
+    formData.append('nombre', datosFormulario.nombre_ifts || '');
+    formData.append('direccion', datosFormulario.direccion_ifts || '');
+    formData.append('telefono', datosFormulario.telefono_ifts || '');
+    formData.append('email', datosFormulario.email_ifts || '');
+    formData.append('sitio_web', datosFormulario.sitio_web_ifts || '');
+    formData.append('observaciones', datosFormulario.observaciones_ifts || '');
+    formData.append('latitud', String(latitud));
+    formData.append('longitud', String(longitud));
+
+    if (this.logoFile) {
+      formData.append('logo_file', this.logoFile);
+    } else if (this.esEdicion && this.institucionParaEditar?.logo) {
+      formData.append('logo_ifts', this.institucionParaEditar.logo);
+      formData.append('logo', this.institucionParaEditar.logo);
     }
 
-    console.log('Datos a enviar:', datos);
+    // Si es edición, agregar el ID y bandera de metodo
+    if (this.esEdicion && this.institucionParaEditar) {
+      formData.append('id_institucion', String(this.institucionParaEditar.id));
+      formData.append('_method', 'PUT');
+    }
+
+    console.log('Datos a enviar (FormData):', {
+      esEdicion: this.esEdicion,
+      nombre_ifts: datosFormulario.nombre_ifts,
+      tieneLogoFile: !!this.logoFile,
+      carreras: this.carrerasSeleccionadas.length
+    });
 
     const requestService = this.esEdicion 
-      ? this.institucionesService.actualizarInstitucion(datos)
-      : this.institucionesService.guardarInstitucion(datos);
+      ? this.institucionesService.actualizarInstitucion(formData)
+      : this.institucionesService.guardarInstitucion(formData);
 
     requestService.subscribe({
       next: (respuesta) => {
