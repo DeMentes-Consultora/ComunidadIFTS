@@ -134,6 +134,23 @@ Para desarrollo con PHP incorporado:
 php -S localhost:8000 -t .
 ```
 
+## Scripts de Mantenimiento
+
+### Limpiar logos huerfanos en Cloudinary
+
+Compara los logos de la carpeta Cloudinary de instituciones contra los logos en uso en tabla `institucion` y elimina solo los no referenciados.
+
+```bash
+# Simulacion sin borrar
+php scripts/limpiar_logos_huerfanos_cloudinary.php --dry-run
+
+# Produccion con .env especifico (simulacion)
+php scripts/limpiar_logos_huerfanos_cloudinary.php --env-file=.env.production --dry-run
+
+# Limpieza real (borra en Cloudinary)
+php scripts/limpiar_logos_huerfanos_cloudinary.php --env-file=.env.production
+```
+
 ## Seguridad
 
 - ✅ Credenciales en `.env` (no en código)

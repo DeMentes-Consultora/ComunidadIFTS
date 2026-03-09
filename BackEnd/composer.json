@@ -6,7 +6,7 @@
         "php": ">=7.4",
         "vlucas/phpdotenv": "^5.5",
         "phpmailer/phpmailer": "6.9",
-        "cloudinary/cloudinary_php": "3.0"
+        "cloudinary/cloudinary_php": "^3.1"
     },
     "autoload": {
         "psr-4": {
