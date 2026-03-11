@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://comunidadifts.infinityfreeapp.com/api',
+  apiUrl: '/api',
   firebase: {
     apiKey: "AIzaSyCP0DGVHLfLfWRI6pbUpzAkCeQ0VVWR9K0",
     authDomain: "comunidadifts.firebaseapp.com",

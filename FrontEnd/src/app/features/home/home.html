@@ -4,8 +4,12 @@
     <app-carrusel></app-carrusel>
   </section>
 
-  <!-- Sección del mapa -->
+  <!-- Sección del mapa (cargado lazily al entrar en viewport) -->
   <section class="mapa-section">
-    <app-mapa></app-mapa>
+    @defer (on viewport) { <!-- Carga el componente del mapa solo cuando entra en el viewport/ lo carga a medida que el usuario hace scroll/ se acerca a la ubicacion -->
+      <app-mapa></app-mapa>
+    } @placeholder {
+      <div class="mapa-placeholder">Cargando mapa...</div>
+    }
   </section>
 </main>
