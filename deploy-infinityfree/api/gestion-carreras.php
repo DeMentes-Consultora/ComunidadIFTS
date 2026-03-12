@@ -31,82 +31,6 @@ function validarAccesoAdmin()
     }
 }
 
-function obtenerEstadoGestion($pdo)
-{
-    $stmtCarreras = $pdo->query(
-        "SELECT id_carrera, nombre_carrera
-         FROM carrera
-         WHERE cancelado = 0
-         ORDER BY nombre_carrera ASC"
-    );
-    $carrerasRows = $stmtCarreras->fetchAll();
-
-    $stmtMaterias = $pdo->query(
-        "SELECT id_materia, nombre_materia
-         FROM materia
-         WHERE cancelado = 0
-         ORDER BY nombre_materia ASC"
-    );
-    $materiasRows = $stmtMaterias->fetchAll();
-
-    $stmtRelacion = $pdo->query(
-        "SELECT
-            cm.id_carrera,
-            cm.id_materia,
-            m.nombre_materia
-         FROM carrera_materia cm
-         INNER JOIN materia m ON m.id_materia = cm.id_materia
-         WHERE cm.cancelado = 0
-           AND m.cancelado = 0"
-    );
-    $relaciones = $stmtRelacion->fetchAll();
-
-    $materiasPorCarrera = [];
-    $materiasAsignadas = [];
-
-    foreach ($relaciones as $relacion) {
-        $idCarrera = (int)$relacion['id_carrera'];
-        $idMateria = (int)$relacion['id_materia'];
-
-        if (!isset($materiasPorCarrera[$idCarrera])) {
-            $materiasPorCarrera[$idCarrera] = [];
-        }
-
-        $materiasPorCarrera[$idCarrera][] = [
-            'id_materia' => $idMateria,
-            'nombre_materia' => $relacion['nombre_materia'],
-        ];
-
-        $materiasAsignadas[$idMateria] = true;
-    }
-
-    $carreras = [];
-    foreach ($carrerasRows as $carrera) {
-        $idCarrera = (int)$carrera['id_carrera'];
-        $carreras[] = [
-            'id_carrera' => $idCarrera,
-            'nombre_carrera' => $carrera['nombre_carrera'],
-            'materias' => $materiasPorCarrera[$idCarrera] ?? [],
-        ];
-    }
-
-    $materiasDisponibles = [];
-    foreach ($materiasRows as $materia) {
-        $idMateria = (int)$materia['id_materia'];
-        if (!isset($materiasAsignadas[$idMateria])) {
-            $materiasDisponibles[] = [
-                'id_materia' => $idMateria,
-                'nombre_materia' => $materia['nombre_materia'],
-            ];
-        }
-    }
-
-    return [
-        'materias' => $materiasDisponibles,
-        'carreras' => $carreras,
-    ];
-}
-
 function obtenerNombreNormalizado(array $input, string $clave): string
 {
     $valor = trim((string)($input[$clave] ?? ''));
@@ -122,7 +46,7 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode([
             'success' => true,
-            'data' => obtenerEstadoGestion($pdo),
+            'data' => Materia::obtenerEstadoGestion($pdo),
         ]);
         exit;
     }
@@ -170,14 +94,7 @@ try {
             exit;
         }
 
-        $stmtExiste = $pdo->prepare(
-            "SELECT id_carrera, cancelado
-             FROM carrera
-             WHERE LOWER(TRIM(nombre_carrera)) = LOWER(TRIM(?))
-             LIMIT 1"
-        );
-        $stmtExiste->execute([$nombreCarrera]);
-        $rowExiste = $stmtExiste->fetch();
+        $rowExiste = Carrera::existePorNombreIncluyendoCanceladas($pdo, $nombreCarrera);
 
         if ($rowExiste && (int)$rowExiste['cancelado'] === 0) {
             http_response_code(409);
@@ -186,12 +103,7 @@ try {
         }
 
         if ($rowExiste) {
-            $stmtReactivar = $pdo->prepare(
-                "UPDATE carrera
-                 SET nombre_carrera = ?, cancelado = 0, habilitado = 1
-                 WHERE id_carrera = ?"
-            );
-            $stmtReactivar->execute([$nombreCarrera, (int)$rowExiste['id_carrera']]);
+            Carrera::reactivarPorNombre($pdo, (int)$rowExiste['id_carrera'], $nombreCarrera);
         } else {
             $nuevaCarrera = new Carrera($nombreCarrera);
             $nuevaCarrera->guardar($pdo);
@@ -215,29 +127,15 @@ try {
             exit;
         }
 
-        $stmtExiste = $pdo->prepare(
-            "SELECT id_carrera
-             FROM carrera
-             WHERE id_carrera <> ?
-               AND cancelado = 0
-               AND LOWER(TRIM(nombre_carrera)) = LOWER(TRIM(?))
-             LIMIT 1"
-        );
-        $stmtExiste->execute([$idCarrera, $nombreCarrera]);
-        if ($stmtExiste->fetch()) {
+        $rowExiste = Carrera::existeActivaPorNombre($pdo, $nombreCarrera);
+        if ($rowExiste && (int)$rowExiste['id_carrera'] !== $idCarrera) {
             http_response_code(409);
             echo json_encode(['success' => false, 'message' => 'Ya existe una carrera con ese nombre']);
             exit;
         }
 
-        $stmtActualizar = $pdo->prepare(
-            "UPDATE carrera
-             SET nombre_carrera = ?
-             WHERE id_carrera = ? AND cancelado = 0"
-        );
-        $stmtActualizar->execute([$nombreCarrera, $idCarrera]);
-
-        if ($stmtActualizar->rowCount() === 0) {
+        $rowCount = Carrera::actualizarNombre($pdo, $idCarrera, $nombreCarrera);
+        if ($rowCount === 0) {
             http_response_code(404);
             echo json_encode(['success' => false, 'message' => 'No se encontró la carrera']);
             exit;
@@ -254,43 +152,15 @@ try {
             exit;
         }
 
-        $pdo->beginTransaction();
-        try {
-            $stmtRelacion = $pdo->prepare(
-                "UPDATE carrera_materia
-                 SET cancelado = 1
-                 WHERE id_carrera = ?"
-            );
-            $stmtRelacion->execute([$idCarrera]);
-
-            $stmtInstitucion = $pdo->prepare(
-                "UPDATE institucion_carrera
-                 SET cancelado = 1
-                 WHERE id_carrera = ?"
-            );
-            $stmtInstitucion->execute([$idCarrera]);
-
-            $stmtCarrera = $pdo->prepare(
-                "UPDATE carrera
-                 SET cancelado = 1, habilitado = 0
-                 WHERE id_carrera = ? AND cancelado = 0"
-            );
-            $stmtCarrera->execute([$idCarrera]);
-
-            if ($stmtCarrera->rowCount() === 0) {
-                $pdo->rollBack();
-                http_response_code(404);
-                echo json_encode(['success' => false, 'message' => 'No se encontró la carrera']);
-                exit;
-            }
-
-            $pdo->commit();
-            echo json_encode(['success' => true, 'message' => 'Carrera eliminada correctamente']);
+        $ok = Carrera::softDeleteConRelaciones($pdo, $idCarrera);
+        if ($ok === 0) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'No se encontró la carrera']);
             exit;
-        } catch (\Throwable $txe) {
-            $pdo->rollBack();
-            throw $txe;
         }
+
+        echo json_encode(['success' => true, 'message' => 'Carrera eliminada correctamente']);
+        exit;
     }
 
     if ($accion === 'crear_materia') {
@@ -301,14 +171,7 @@ try {
             exit;
         }
 
-        $stmtExiste = $pdo->prepare(
-            "SELECT id_materia, cancelado
-             FROM materia
-             WHERE LOWER(TRIM(nombre_materia)) = LOWER(TRIM(?))
-             LIMIT 1"
-        );
-        $stmtExiste->execute([$nombreMateria]);
-        $rowExiste = $stmtExiste->fetch();
+        $rowExiste = Materia::existePorNombreIncluyendoCanceladas($pdo, $nombreMateria);
 
         if ($rowExiste && (int)$rowExiste['cancelado'] === 0) {
             http_response_code(409);
@@ -317,18 +180,9 @@ try {
         }
 
         if ($rowExiste) {
-            $stmtReactivar = $pdo->prepare(
-                "UPDATE materia
-                 SET nombre_materia = ?, cancelado = 0, habilitado = 1
-                 WHERE id_materia = ?"
-            );
-            $stmtReactivar->execute([$nombreMateria, (int)$rowExiste['id_materia']]);
+            Materia::reactivarPorNombre($pdo, (int)$rowExiste['id_materia'], $nombreMateria);
         } else {
-            $stmtInsert = $pdo->prepare(
-                "INSERT INTO materia (nombre_materia, habilitado, cancelado)
-                 VALUES (?, 1, 0)"
-            );
-            $stmtInsert->execute([$nombreMateria]);
+            Materia::crear($pdo, $nombreMateria);
         }
 
         echo json_encode(['success' => true, 'message' => 'Materia creada correctamente']);
@@ -349,29 +203,15 @@ try {
             exit;
         }
 
-        $stmtExiste = $pdo->prepare(
-            "SELECT id_materia
-             FROM materia
-             WHERE id_materia <> ?
-               AND cancelado = 0
-               AND LOWER(TRIM(nombre_materia)) = LOWER(TRIM(?))
-             LIMIT 1"
-        );
-        $stmtExiste->execute([$idMateria, $nombreMateria]);
-        if ($stmtExiste->fetch()) {
+        $rowExiste = Materia::existeActivaPorNombre($pdo, $nombreMateria);
+        if ($rowExiste && (int)$rowExiste['id_materia'] !== $idMateria) {
             http_response_code(409);
             echo json_encode(['success' => false, 'message' => 'Ya existe una materia con ese nombre']);
             exit;
         }
 
-        $stmtActualizar = $pdo->prepare(
-            "UPDATE materia
-             SET nombre_materia = ?
-             WHERE id_materia = ? AND cancelado = 0"
-        );
-        $stmtActualizar->execute([$nombreMateria, $idMateria]);
-
-        if ($stmtActualizar->rowCount() === 0) {
+        $rowCount = Materia::actualizarNombre($pdo, $idMateria, $nombreMateria);
+        if ($rowCount === 0) {
             http_response_code(404);
             echo json_encode(['success' => false, 'message' => 'No se encontró la materia']);
             exit;
@@ -388,36 +228,15 @@ try {
             exit;
         }
 
-        $pdo->beginTransaction();
-        try {
-            $stmtRelacion = $pdo->prepare(
-                "UPDATE carrera_materia
-                 SET cancelado = 1
-                 WHERE id_materia = ?"
-            );
-            $stmtRelacion->execute([$idMateria]);
-
-            $stmtMateria = $pdo->prepare(
-                "UPDATE materia
-                 SET cancelado = 1, habilitado = 0
-                 WHERE id_materia = ? AND cancelado = 0"
-            );
-            $stmtMateria->execute([$idMateria]);
-
-            if ($stmtMateria->rowCount() === 0) {
-                $pdo->rollBack();
-                http_response_code(404);
-                echo json_encode(['success' => false, 'message' => 'No se encontró la materia']);
-                exit;
-            }
-
-            $pdo->commit();
-            echo json_encode(['success' => true, 'message' => 'Materia eliminada correctamente']);
+        $ok = Materia::softDeleteConRelaciones($pdo, $idMateria);
+        if ($ok === 0) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'No se encontró la materia']);
             exit;
-        } catch (\Throwable $txe) {
-            $pdo->rollBack();
-            throw $txe;
         }
+
+        echo json_encode(['success' => true, 'message' => 'Materia eliminada correctamente']);
+        exit;
     }
 
     http_response_code(400);

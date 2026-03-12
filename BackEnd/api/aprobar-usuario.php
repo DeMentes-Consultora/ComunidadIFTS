@@ -15,6 +15,7 @@
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/Mailer.php';
+require_once __DIR__ . '/../models/Usuario.php';
 
 header('Content-Type: application/json');
 
@@ -84,22 +85,7 @@ try {
     $db = Database::getInstance();
     $pdo = $db->getConnection();
 
-    // Verificar que el usuario existe y está pendiente
-    $sqlCheck = "SELECT 
-                    u.id_usuario,
-                    u.email,
-                    u.habilitado,
-                    p.nombre,
-                    p.apellido
-                FROM usuario u
-                INNER JOIN persona p ON u.id_persona = p.id_persona
-                WHERE u.id_usuario = ?
-                  AND u.cancelado = 0
-                LIMIT 1";
-
-    $stmtCheck = $pdo->prepare($sqlCheck);
-    $stmtCheck->execute([$idUsuario]);
-    $usuario = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        $usuario = Usuario::obtenerPendientePorId($pdo, $idUsuario);
 
     if (!$usuario) {
         http_response_code(404);
@@ -122,10 +108,7 @@ try {
     $pdo->beginTransaction();
 
     if ($aprobar === true) {
-        // APROBAR: habilitado = 1
-        $sqlUpdate = "UPDATE usuario SET habilitado = 1 WHERE id_usuario = ?";
-        $stmtUpdate = $pdo->prepare($sqlUpdate);
-        $stmtUpdate->execute([$idUsuario]);
+        Usuario::aprobarPorId($pdo, $idUsuario);
 
         $pdo->commit();
 
@@ -143,11 +126,7 @@ try {
             'aprobado' => true
         ]);
     } else {
-        // RECHAZAR: cancelado = 1 (o se puede eliminar, según preferencia)
-        // Por seguridad, mejor marcar como cancelado que eliminar
-        $sqlUpdate = "UPDATE usuario SET cancelado = 1 WHERE id_usuario = ?";
-        $stmtUpdate = $pdo->prepare($sqlUpdate);
-        $stmtUpdate->execute([$idUsuario]);
+        Usuario::rechazarPorId($pdo, $idUsuario);
 
         $pdo->commit();
 

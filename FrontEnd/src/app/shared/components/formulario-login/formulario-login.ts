@@ -85,6 +85,55 @@ export class FormularioLoginComponent {
     });
   }
 
+  onGoogleLogin(): void {
+    if (this.cargando) {
+      return;
+    }
+
+    this.cargando = true;
+    this.error = null;
+
+    this.authService.getGoogleIdentity().subscribe({
+      next: (identity) => {
+        this.authService.loginWithGoogleToken(identity.idToken).subscribe({
+          next: (user) => {
+            setTimeout(() => {
+              this.cargando = false;
+              this.loginSuccess.emit(user);
+              this.cdr.markForCheck();
+            }, 0);
+          },
+          error: (err: HttpErrorResponse | Error) => {
+            setTimeout(() => {
+              const httpErr = err as HttpErrorResponse;
+              const backendMessage = httpErr?.error?.message || err.message || '';
+
+              if (httpErr?.status === 404 || backendMessage.includes('No existe una cuenta registrada con este Google')) {
+                this.authService.setPendingGoogleIdentity(identity);
+                this.cargando = false;
+                this.error = null;
+                this.switchToRegister.emit();
+                this.cdr.markForCheck();
+                return;
+              }
+
+              this.cargando = false;
+              this.error = backendMessage || 'Error al iniciar sesión con Google';
+              this.cdr.markForCheck();
+            }, 0);
+          }
+        });
+      },
+      error: (err: Error) => {
+        setTimeout(() => {
+          this.cargando = false;
+          this.error = err.message || 'No fue posible autenticar con Google';
+          this.cdr.markForCheck();
+        }, 0);
+      }
+    });
+  }
+
   irARegistro(): void {
     this.switchToRegister.emit();
   }

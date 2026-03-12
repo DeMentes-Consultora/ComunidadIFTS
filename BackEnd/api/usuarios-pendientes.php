@@ -7,6 +7,7 @@
 
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../models/Usuario.php';
 
 header('Content-Type: application/json');
 
@@ -48,31 +49,7 @@ try {
     $db = Database::getInstance();
     $pdo = $db->getConnection();
 
-    // Obtener usuarios con habilitado = 0 (pendientes)
-    $sql = "SELECT 
-                u.id_usuario,
-                u.email,
-                u.habilitado,
-                u.idCreate as fecha_registro,
-                p.nombre,
-                p.apellido,
-                p.dni,
-                p.telefono,
-                i.nombre_ifts as nombre_institucion,
-                i.id_institucion,
-                r.nombre_rol,
-                r.id_rol
-            FROM usuario u
-            INNER JOIN persona p ON u.id_persona = p.id_persona
-            INNER JOIN institucion i ON u.id_institucion = i.id_institucion
-            INNER JOIN rol r ON u.id_rol = r.id_rol
-            WHERE u.habilitado = 0
-              AND u.cancelado = 0
-            ORDER BY u.idCreate DESC";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $usuarios = Usuario::obtenerPendientesAprobacion($pdo);
 
     // Formatear fechas
     foreach ($usuarios as &$usuario) {

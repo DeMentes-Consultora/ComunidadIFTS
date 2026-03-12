@@ -24,6 +24,8 @@ IMPORTANTE: Antes de subir los archivos, configura tu contraseña
    - Accede a phpMyAdmin desde VistaPanel
    - Selecciona: if0_41035439_comunidad_ifts
    - Importa: BackEnd/database/if0_41035439_comunidad_ifts.sql
+   - Si la BD ya existe en produccion y no queres reimportar completa,
+     ejecuta ademas: deploy-infinityfree/database/migrations/20260311_foto_perfil_persona.sql
 
 5. Verifica el despliegue:
    https://comunidadifts.infinityfreeapp.com/check-server.php

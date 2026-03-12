@@ -22,6 +22,8 @@ class Usuario {
     private $telefono;
     private $edad;
     private $fechaNacimiento;
+    private $fotoPerfilUrl;
+    private $fotoPerfilPublicId;
     private $nombreInstitucion;
 
     public function __construct(
@@ -67,6 +69,8 @@ class Usuario {
     public function getTelefono() { return $this->telefono; }
     public function getEdad() { return $this->edad; }
     public function getFechaNacimiento() { return $this->fechaNacimiento; }
+    public function getFotoPerfilUrl() { return $this->fotoPerfilUrl; }
+    public function getFotoPerfilPublicId() { return $this->fotoPerfilPublicId; }
     public function getNombreInstitucion() { return $this->nombreInstitucion; }
 
     public function setEmail($email) { $this->email = $email; }
@@ -118,6 +122,8 @@ class Usuario {
             'telefono' => $this->telefono,
             'edad' => $this->edad,
             'fecha_nacimiento' => $this->fechaNacimiento,
+            'foto_perfil_url' => $this->fotoPerfilUrl,
+            'foto_perfil_public_id' => $this->fotoPerfilPublicId,
             'habilitado' => $this->habilitado,
             'cancelado' => $this->cancelado
         ];
@@ -133,6 +139,8 @@ class Usuario {
                     p.telefono,
                     p.edad,
                     p.fecha_nacimiento,
+                    p.foto_perfil_url,
+                    p.foto_perfil_public_id,
                     i.nombre_ifts
                 FROM usuario u
                 INNER JOIN rol r ON u.id_rol = r.id_rol
@@ -174,6 +182,8 @@ class Usuario {
         $usuario->telefono = $row['telefono'] ?? null;
         $usuario->edad = $row['edad'] ?? null;
         $usuario->fechaNacimiento = $row['fecha_nacimiento'] ?? null;
+        $usuario->fotoPerfilUrl = $row['foto_perfil_url'] ?? null;
+        $usuario->fotoPerfilPublicId = $row['foto_perfil_public_id'] ?? null;
         $usuario->nombreInstitucion = $row['nombre_ifts'] ?? null;
 
         return $usuario;
@@ -185,6 +195,19 @@ class Usuario {
         return (bool)$stmt->fetch();
     }
 
+    public static function obtenerEstadoPorEmail($pdo, $email) {
+        $sql = "SELECT id_usuario, habilitado, cancelado
+                FROM usuario
+                WHERE email = ?
+                LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$email]);
+
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
     public static function autenticar($pdo, $email, $clavePlano) {
         $usuario = self::buscarPorEmail($pdo, $email);
 
@@ -193,5 +216,123 @@ class Usuario {
         }
 
         return $usuario->verificarClave($clavePlano) ? $usuario : null;
+    }
+
+    public static function obtenerPendientesAprobacion($pdo) {
+        $sql = "SELECT
+                    u.id_usuario,
+                    u.email,
+                    u.habilitado,
+                    u.idCreate as fecha_registro,
+                    p.nombre,
+                    p.apellido,
+                    p.dni,
+                    p.telefono,
+                    i.nombre_ifts as nombre_institucion,
+                    i.id_institucion,
+                    r.nombre_rol,
+                    r.id_rol
+                FROM usuario u
+                INNER JOIN persona p ON u.id_persona = p.id_persona
+                INNER JOIN institucion i ON u.id_institucion = i.id_institucion
+                INNER JOIN rol r ON u.id_rol = r.id_rol
+                WHERE u.habilitado = 0
+                  AND u.cancelado = 0
+                ORDER BY u.idCreate DESC";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function obtenerPendientePorId($pdo, $idUsuario) {
+        $sql = "SELECT
+                    u.id_usuario,
+                    u.email,
+                    u.habilitado,
+                    p.nombre,
+                    p.apellido
+                FROM usuario u
+                INNER JOIN persona p ON u.id_persona = p.id_persona
+                WHERE u.id_usuario = ?
+                  AND u.cancelado = 0
+                LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$idUsuario]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    public static function buscarPorId($pdo, $idUsuario) {
+        $sql = "SELECT
+                    u.*,
+                    r.nombre_rol,
+                    p.nombre,
+                    p.apellido,
+                    p.dni,
+                    p.telefono,
+                    p.edad,
+                    p.fecha_nacimiento,
+                    p.foto_perfil_url,
+                    p.foto_perfil_public_id,
+                    i.nombre_ifts
+                FROM usuario u
+                INNER JOIN rol r ON u.id_rol = r.id_rol
+                INNER JOIN persona p ON u.id_persona = p.id_persona
+                INNER JOIN institucion i ON u.id_institucion = i.id_institucion
+                WHERE u.id_usuario = ?
+                  AND u.habilitado = 1
+                  AND u.cancelado = 0
+                  AND r.habilitado = 1
+                  AND r.cancelado = 0
+                LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$idUsuario]);
+        $row = $stmt->fetch();
+
+        if (!$row) {
+            return null;
+        }
+
+        $usuario = new self(
+            $row['email'],
+            $row['clave'],
+            $row['id_persona'],
+            $row['id_rol'],
+            $row['id_institucion'],
+            $row['id_usuario'],
+            $row['habilitado'],
+            $row['cancelado'],
+            $row['idCreate'] ?? null,
+            $row['idUpdate'] ?? null,
+            false
+        );
+
+        $usuario->nombreRol = $row['nombre_rol'] ?? null;
+        $usuario->nombre = $row['nombre'] ?? null;
+        $usuario->apellido = $row['apellido'] ?? null;
+        $usuario->dni = $row['dni'] ?? null;
+        $usuario->telefono = $row['telefono'] ?? null;
+        $usuario->edad = $row['edad'] ?? null;
+        $usuario->fechaNacimiento = $row['fecha_nacimiento'] ?? null;
+        $usuario->fotoPerfilUrl = $row['foto_perfil_url'] ?? null;
+        $usuario->fotoPerfilPublicId = $row['foto_perfil_public_id'] ?? null;
+        $usuario->nombreInstitucion = $row['nombre_ifts'] ?? null;
+
+        return $usuario;
+    }
+
+    public static function aprobarPorId($pdo, $idUsuario) {
+        $stmt = $pdo->prepare("UPDATE usuario SET habilitado = 1 WHERE id_usuario = ?");
+        return $stmt->execute([$idUsuario]);
+    }
+
+    public static function rechazarPorId($pdo, $idUsuario) {
+        $stmt = $pdo->prepare("UPDATE usuario SET cancelado = 1 WHERE id_usuario = ?");
+        return $stmt->execute([$idUsuario]);
     }
 }

@@ -85,9 +85,7 @@ try {
     $idInstitucion = $input['id'] ?? $input['id_institucion'];
     
     // Verificar que la institución existe y obtener logo actual
-    $stmt = $pdo->prepare("SELECT id_institucion, logo_ifts FROM institucion WHERE id_institucion = ? LIMIT 1");
-    $stmt->execute([$idInstitucion]);
-    $institucionActual = $stmt->fetch();
+    $institucionActual = Institucion::obtenerConLogoPorId($pdo, $idInstitucion);
     if (!$institucionActual) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Institución no encontrada']);
@@ -132,15 +130,7 @@ try {
 
     // Actualizar metadata de Cloudinary si hubo reemplazo de archivo
     if (!empty($logoFinalUrl)) {
-        $stmtMeta = $pdo->prepare(
-            "UPDATE institucion
-             SET logo_cloudinary_public_id = ?
-             WHERE id_institucion = ?"
-        );
-        $stmtMeta->execute([
-            $logoCloudinaryPublicId,
-            $idInstitucion,
-        ]);
+        Institucion::actualizarLogoCloudinaryMetadata($pdo, $idInstitucion, $logoCloudinaryPublicId);
     }
 
     echo json_encode([

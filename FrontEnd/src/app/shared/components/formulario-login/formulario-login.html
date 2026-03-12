@@ -1,4 +1,10 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+  <button mat-stroked-button type="button" class="google-btn" [disabled]="cargando" (click)="onGoogleLogin()">
+    Continuar con Google
+  </button>
+
+  <div class="divider">o ingresá con email y contraseña</div>
+
   <mat-form-field appearance="outline" class="full-width">
     <mat-label>Email</mat-label>
     <input matInput type="email" formControlName="email" placeholder="tu.email@ejemplo.com" />

@@ -14,6 +14,18 @@
   width: 100%;
 }
 
+.google-btn {
+  width: 100%;
+  border-radius: 0;
+}
+
+.divider {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  text-align: center;
+  text-transform: uppercase;
+}
+
 .error-message {
   font-size: 0.9rem;
   font-weight: 500;

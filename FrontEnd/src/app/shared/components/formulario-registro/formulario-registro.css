@@ -20,6 +20,35 @@
   width: 100%;
 }
 
+.google-btn {
+  width: 100%;
+  border-radius: 0;
+}
+
+.divider {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.google-helper {
+  font-size: 0.9rem;
+  padding: 8px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.google-helper-ready {
+  border-color: rgba(46, 125, 50, 0.45);
+  background: rgba(46, 125, 50, 0.08);
+}
+
+.google-note {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
 .error-message {
   font-size: 0.9rem;
   font-weight: 500;

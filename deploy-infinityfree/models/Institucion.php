@@ -376,6 +376,105 @@ class Institucion {
     }
 
     /**
+     * Obtener institucion activa por ID con campos minimos para flujos de auth.
+     */
+    public static function obtenerActivaPorId($pdo, $id) {
+        $sql = "SELECT id_institucion, nombre_ifts
+                FROM institucion
+                WHERE id_institucion = ?
+                  AND habilitado = 1
+                  AND cancelado = 0
+                LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$id]);
+
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
+    public static function existePorId($pdo, $id) {
+        $stmt = $pdo->prepare('SELECT id_institucion FROM institucion WHERE id_institucion = ? LIMIT 1');
+        $stmt->execute([$id]);
+        return (bool)$stmt->fetch();
+    }
+
+    public static function obtenerConLogoPorId($pdo, $id) {
+        $stmt = $pdo->prepare('SELECT id_institucion, logo_ifts FROM institucion WHERE id_institucion = ? LIMIT 1');
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
+    public static function eliminarConRelaciones($pdo, $id) {
+        $pdo->beginTransaction();
+        try {
+            $stmtRel = $pdo->prepare('DELETE FROM institucion_carrera WHERE id_institucion = ?');
+            $stmtRel->execute([$id]);
+
+            $stmtInst = $pdo->prepare('DELETE FROM institucion WHERE id_institucion = ?');
+            $stmtInst->execute([$id]);
+
+            $pdo->commit();
+            return true;
+        } catch (\Throwable $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
+    }
+
+    public static function actualizarLogoCloudinaryMetadata($pdo, $id, $publicId) {
+        $stmt = $pdo->prepare(
+            'UPDATE institucion SET logo_cloudinary_public_id = ? WHERE id_institucion = ?'
+        );
+        return $stmt->execute([$publicId, $id]);
+    }
+
+    public static function listarParaMigracionLogos($pdo, $limit, $offset, $onlyId = 0) {
+        $sql = "SELECT id_institucion, logo_ifts, logo_cloudinary_public_id
+                FROM institucion
+                WHERE logo_ifts IS NOT NULL
+                  AND TRIM(logo_ifts) <> ''";
+        $params = [];
+
+        if ($onlyId > 0) {
+            $sql .= ' AND id_institucion = ?';
+            $params[] = $onlyId;
+        }
+
+        $sql .= ' ORDER BY id_institucion ASC LIMIT ? OFFSET ?';
+        $params[] = $limit;
+        $params[] = $offset;
+
+        $stmt = $pdo->prepare($sql);
+        foreach ($params as $idx => $value) {
+            $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $stmt->bindValue($idx + 1, $value, $paramType);
+        }
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function actualizarLogoMigrado($pdo, $id, $url, $publicId) {
+        $stmt = $pdo->prepare(
+            'UPDATE institucion
+             SET logo_ifts = ?, logo_cloudinary_public_id = ?
+             WHERE id_institucion = ?'
+        );
+        return $stmt->execute([$url, $publicId, $id]);
+    }
+
+    public static function backfillLogoPublicId($pdo, $id, $publicId) {
+        $stmt = $pdo->prepare(
+            'UPDATE institucion
+             SET logo_cloudinary_public_id = ?
+             WHERE id_institucion = ?'
+        );
+        return $stmt->execute([$publicId, $id]);
+    }
+
+    /**
      * Crear institución desde array de datos
      */
     public static function desdeArray($data) {

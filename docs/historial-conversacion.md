@@ -2,6 +2,34 @@
 
 **Fecha de inicio:** 26 de enero de 2026
 
+## Actualizacion - 12 de marzo de 2026
+
+### Implementaciones recientes
+- Autenticacion Google completa (login/registro) con aprobacion manual preservada.
+- Refactor backend aplicado para que la capa `api/` no tenga SQL inline y delegue en `models/`.
+- Soporte de foto de perfil en entidad `persona`:
+  - `foto_perfil_url`
+  - `foto_perfil_public_id`
+- Endpoint nuevo para actualizacion manual de foto autenticada:
+  - `POST /api/actualizar-foto-perfil.php` (`multipart/form-data`, campo `foto_perfil`).
+
+### Decision sobre fotos de Google
+- Se decidio centralizar fotos en Cloudinary cuando sea posible.
+- Flujo actual en `api/google-auth.php`:
+  - Si Google provee `picture`, el backend intenta copiar esa imagen a Cloudinary.
+  - Si Cloudinary responde OK, se guardan URL/Public ID de Cloudinary.
+  - Si falla Cloudinary, se aplica fallback a URL original de Google para no bloquear login/registro.
+
+### Frontend (UX)
+- Navbar actualizado para mostrar avatar antes de "Hola {nombre}".
+- Si no hay foto, se muestra fallback con inicial del usuario.
+- Se mantiene la preferencia de no cambiar foto desde navbar; el cambio definitivo quedara en la futura pantalla de perfil de usuario.
+
+### Deploy
+- `deploy-infinityfree/` se mantuvo como snapshot de subida al server.
+- Se removio ruido de `vendor/` cuando no hubo cambios de dependencias backend.
+- Se sincronizaron archivos nuevos/modificados de `api/`, `models/`, `config/`, `services/` y migracion.
+
 ---
 
 ## Contexto del Proyecto

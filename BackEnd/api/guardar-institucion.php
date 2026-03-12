@@ -99,15 +99,7 @@ try {
 
     // Guardar metadata de Cloudinary si corresponde
     if (!empty($logoFinalUrl)) {
-        $stmtMeta = $pdo->prepare(
-            "UPDATE institucion
-             SET logo_cloudinary_public_id = ?
-             WHERE id_institucion = ?"
-        );
-        $stmtMeta->execute([
-            $logoCloudinaryPublicId,
-            $institucion->getId(),
-        ]);
+        Institucion::actualizarLogoCloudinaryMetadata($pdo, $institucion->getId(), $logoCloudinaryPublicId);
     }
 
     echo json_encode([

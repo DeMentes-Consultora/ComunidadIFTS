@@ -43,6 +43,7 @@ BackEnd/
 │   ├── Institucion.php
 │   ├── Carrera.php
 │   ├── Persona.php
+│   ├── Rol.php
 │   └── Usuario.php
 ├── database/               # Scripts SQL
 │   └── comunidad_ifts.sql
@@ -52,6 +53,20 @@ BackEnd/
 ```
 
 ## API Endpoints
+
+## Documentacion de arquitectura
+
+- Guia de arquitectura backend: `docs/ARQUITECTURA_BACKEND.md`
+- Catalogo de endpoints: `docs/ENDPOINTS.md`
+
+## Patron de arquitectura (SQL separado de API)
+
+- `api/*.php`: solo HTTP (request/response), validaciones de entrada y orquestacion.
+- `models/*.php`: todo acceso a base de datos (SQL, consultas, persistencia).
+- No se permite SQL inline en endpoints (sin `prepare`, `query` ni `SELECT/INSERT/...` en `api/`).
+- Si un flujo requiere varias consultas, el endpoint coordina llamadas a metodos de modelos.
+
+Este patron se aplica en todos los endpoints dentro de `api/`.
 
 ### GET /api/instituciones.php
 Obtiene todas las instituciones con sus carreras.
@@ -124,6 +139,31 @@ Cierra la sesión activa en servidor.
 {
   "success": true,
   "message": "Sesión cerrada correctamente"
+}
+```
+
+### POST /api/google-auth.php
+Login o registro con Google validando `id_token` en backend.
+
+**Body (login):**
+```json
+{
+  "mode": "login",
+  "id_token": "token_de_google"
+}
+```
+
+**Body (registro):**
+```json
+{
+  "mode": "register",
+  "id_token": "token_de_google",
+  "nombre": "Juan",
+  "apellido": "Perez",
+  "dni": "12345678",
+  "fecha_nacimiento": "2000-05-10",
+  "telefono": "1112345678",
+  "id_institucion": 3
 }
 ```
 

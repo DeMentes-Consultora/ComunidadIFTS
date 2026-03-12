@@ -47,4 +47,9 @@ export class Navbar {
       data: { view }
     });
   }
+
+  getAvatarText(nombre?: string | null): string {
+    const cleanName = (nombre ?? '').trim();
+    return cleanName ? cleanName.charAt(0).toUpperCase() : '?';
+  }
 }

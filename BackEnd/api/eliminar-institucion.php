@@ -6,6 +6,7 @@
 
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../models/Institucion.php';
 
 session_start();
 
@@ -43,23 +44,13 @@ try {
     $db = Database::getInstance();
     $pdo = $db->getConnection();
 
-    $stmtExiste = $pdo->prepare('SELECT id_institucion FROM institucion WHERE id_institucion = ? LIMIT 1');
-    $stmtExiste->execute([$idInstitucion]);
-    if (!$stmtExiste->fetch()) {
+    if (!Institucion::existePorId($pdo, $idInstitucion)) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Institución no encontrada']);
         exit;
     }
 
-    $pdo->beginTransaction();
-
-    $stmtRel = $pdo->prepare('DELETE FROM institucion_carrera WHERE id_institucion = ?');
-    $stmtRel->execute([$idInstitucion]);
-
-    $stmtInst = $pdo->prepare('DELETE FROM institucion WHERE id_institucion = ?');
-    $stmtInst->execute([$idInstitucion]);
-
-    $pdo->commit();
+    Institucion::eliminarConRelaciones($pdo, $idInstitucion);
 
     echo json_encode([
         'success' => true,

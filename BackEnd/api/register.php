@@ -15,7 +15,9 @@
 
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../models/Institucion.php';
 require_once __DIR__ . '/../models/Persona.php';
+require_once __DIR__ . '/../models/Rol.php';
 require_once __DIR__ . '/../models/Usuario.php';
 
 ini_set('display_errors', '0');
@@ -38,27 +40,6 @@ function calcularEdadDesdeFecha($fechaNacimiento) {
 
     $hoy = new DateTime();
     return (int)$hoy->diff($nacimiento)->y;
-}
-
-/**
- * Obtiene el ID del rol predeterminado para nuevos usuarios (Alumno regular)
- * ID 2 = Alumno regular
- */
-function obtenerRolAlumno($pdo) {
-    $idRolAlumno = 2; // ID del rol "Alumno regular"
-    
-    // Verificar que el rol existe y está habilitado
-    $sql = "SELECT id_rol
-            FROM rol
-            WHERE id_rol = ?
-              AND habilitado = 1
-              AND cancelado = 0
-            LIMIT 1";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$idRolAlumno]);
-    $row = $stmt->fetch();
-    return $row ? (int)$row['id_rol'] : null;
 }
 
 try {
@@ -140,9 +121,8 @@ try {
 
     $pdo->beginTransaction();
 
-    $stmtInst = $pdo->prepare("SELECT id_institucion FROM institucion WHERE id_institucion = ? AND habilitado = 1 AND cancelado = 0 LIMIT 1");
-    $stmtInst->execute([$idInstitucion]);
-    if (!$stmtInst->fetch()) {
+    $institucion = Institucion::obtenerActivaPorId($pdo, $idInstitucion);
+    if (!$institucion) {
         $pdo->rollBack();
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'La institución seleccionada no es válida']);
@@ -163,7 +143,7 @@ try {
         exit;
     }
 
-    $idRolAlumno = obtenerRolAlumno($pdo);
+    $idRolAlumno = Rol::obtenerRolAlumnoActivo($pdo);
     if ($idRolAlumno === null) {
         $pdo->rollBack();
         http_response_code(500);
@@ -207,11 +187,7 @@ try {
         require_once __DIR__ . '/../config/Mailer.php';
         $mailer = new Mailer();
         
-        // Obtener nombre de la institución
-        $stmtInstNombre = $pdo->prepare("SELECT nombre_ifts FROM institucion WHERE id_institucion = ? LIMIT 1");
-        $stmtInstNombre->execute([$idInstitucion]);
-        $institucion = $stmtInstNombre->fetch();
-        $nombreInstitucion = $institucion ? $institucion['nombre_ifts'] : 'No especificada';
+        $nombreInstitucion = $institucion['nombre_ifts'] ?? 'No especificada';
         
         $datosUsuario = [
             'nombre' => $nombre,

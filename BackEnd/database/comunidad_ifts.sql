@@ -300,6 +300,8 @@ CREATE TABLE `persona` (
   `dni` varchar(9) NOT NULL,
   `fecha_nacimiento` date NOT NULL,
   `telefono` varchar(11) NOT NULL,
+  `foto_perfil_url` varchar(512) DEFAULT NULL,
+  `foto_perfil_public_id` varchar(255) DEFAULT NULL,
   `habilitado` int(1) NOT NULL DEFAULT 1,
   `cancelado` int(1) NOT NULL DEFAULT 0,
   `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),

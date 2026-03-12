@@ -3,21 +3,25 @@
  * Configuración de CORS para permitir peticiones desde el frontend Angular
  */
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
+if (!isset($_ENV['APP_ENV']) || !isset($_ENV['CORS_ALLOWED_ORIGINS'])) {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->safeLoad();
+}
+
 // Resolver origin de la petición actual
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$appEnv = $_ENV['APP_ENV'] ?? getenv('APP_ENV') ?: 'development';
+$defaultOrigins = 'http://localhost:4200,http://localhost:3000,https://comunidadifts.infinityfreeapp.com,http://comunidadifts.infinityfreeapp.com';
 
 // En desarrollo, permitir frontend local con credenciales
-if (getenv('APP_ENV') === 'production') {
+if ($appEnv === 'production') {
     // En producción, usar configuración estricta del .env
-    if (!isset($_ENV['CORS_ALLOWED_ORIGINS'])) {
-        require_once __DIR__ . '/../vendor/autoload.php';
-        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-        $dotenv->safeLoad();
-    }
-    
-    $allowedOriginsString = $_ENV['CORS_ALLOWED_ORIGINS'] ?? 'https://comunidadifts.infinityfreeapp.com';
+
+    $allowedOriginsString = $_ENV['CORS_ALLOWED_ORIGINS'] ?? $defaultOrigins;
     $allowedOrigins = array_map('trim', explode(',', $allowedOriginsString));
-    
+
     if (in_array($origin, $allowedOrigins)) {
         header("Access-Control-Allow-Origin: $origin");
     }
@@ -30,6 +34,7 @@ if (getenv('APP_ENV') === 'production') {
     }
 }
 
+header('Vary: Origin');
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Access-Control-Allow-Credentials: true");

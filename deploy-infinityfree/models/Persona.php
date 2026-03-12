@@ -11,6 +11,8 @@ class Persona {
     private $dni;
     private $fechaNacimiento;
     private $telefono;
+    private $fotoPerfilUrl;
+    private $fotoPerfilPublicId;
     private $habilitado;
     private $cancelado;
     private $idCreate;
@@ -23,6 +25,8 @@ class Persona {
         $dni,
         $fechaNacimiento,
         $telefono,
+        $fotoPerfilUrl = null,
+        $fotoPerfilPublicId = null,
         $idPersona = null,
         $habilitado = 1,
         $cancelado = 0,
@@ -36,6 +40,8 @@ class Persona {
         $this->dni = $dni;
         $this->fechaNacimiento = $fechaNacimiento;
         $this->telefono = $telefono;
+        $this->fotoPerfilUrl = $fotoPerfilUrl;
+        $this->fotoPerfilPublicId = $fotoPerfilPublicId;
         $this->habilitado = (int)$habilitado;
         $this->cancelado = (int)$cancelado;
         $this->idCreate = $idCreate;
@@ -49,6 +55,8 @@ class Persona {
     public function getDni() { return $this->dni; }
     public function getFechaNacimiento() { return $this->fechaNacimiento; }
     public function getTelefono() { return $this->telefono; }
+    public function getFotoPerfilUrl() { return $this->fotoPerfilUrl; }
+    public function getFotoPerfilPublicId() { return $this->fotoPerfilPublicId; }
     public function getHabilitado() { return $this->habilitado; }
     public function getCancelado() { return $this->cancelado; }
 
@@ -58,12 +66,14 @@ class Persona {
     public function setDni($dni) { $this->dni = $dni; }
     public function setFechaNacimiento($fechaNacimiento) { $this->fechaNacimiento = $fechaNacimiento; }
     public function setTelefono($telefono) { $this->telefono = $telefono; }
+    public function setFotoPerfilUrl($fotoPerfilUrl) { $this->fotoPerfilUrl = $fotoPerfilUrl; }
+    public function setFotoPerfilPublicId($fotoPerfilPublicId) { $this->fotoPerfilPublicId = $fotoPerfilPublicId; }
     public function setHabilitado($habilitado) { $this->habilitado = (int)$habilitado; }
     public function setCancelado($cancelado) { $this->cancelado = (int)$cancelado; }
 
     public function guardar($pdo) {
-        $sql = "INSERT INTO persona (apellido, nombre, edad, dni, fecha_nacimiento, telefono, habilitado, cancelado)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO persona (apellido, nombre, edad, dni, fecha_nacimiento, telefono, foto_perfil_url, foto_perfil_public_id, habilitado, cancelado)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $pdo->prepare($sql);
         $ok = $stmt->execute([
@@ -73,6 +83,8 @@ class Persona {
             $this->dni,
             $this->fechaNacimiento,
             $this->telefono,
+            $this->fotoPerfilUrl,
+            $this->fotoPerfilPublicId,
             $this->habilitado,
             $this->cancelado
         ]);
@@ -88,5 +100,27 @@ class Persona {
         $stmt = $pdo->prepare("SELECT id_persona FROM persona WHERE dni = ? LIMIT 1");
         $stmt->execute([$dni]);
         return (bool)$stmt->fetch();
+    }
+
+    public static function obtenerFotoPerfilPorId($pdo, $idPersona) {
+        $stmt = $pdo->prepare(
+            "SELECT foto_perfil_url, foto_perfil_public_id
+             FROM persona
+             WHERE id_persona = ?
+             LIMIT 1"
+        );
+        $stmt->execute([$idPersona]);
+
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
+    public static function actualizarFotoPerfil($pdo, $idPersona, $fotoPerfilUrl, $fotoPerfilPublicId = null) {
+        $stmt = $pdo->prepare(
+            "UPDATE persona
+             SET foto_perfil_url = ?, foto_perfil_public_id = ?
+             WHERE id_persona = ?"
+        );
+        return $stmt->execute([$fotoPerfilUrl, $fotoPerfilPublicId, $idPersona]);
     }
 }

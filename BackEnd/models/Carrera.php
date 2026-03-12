@@ -135,4 +135,83 @@ class Carrera {
             $data['id'] ?? null
         );
     }
+
+    public static function existeActivaPorNombre($pdo, $nombre) {
+        $stmt = $pdo->prepare(
+            "SELECT id_carrera
+             FROM carrera
+             WHERE cancelado = 0
+               AND LOWER(TRIM(nombre_carrera)) = LOWER(TRIM(?))
+             LIMIT 1"
+        );
+        $stmt->execute([$nombre]);
+        return $stmt->fetch() ?: null;
+    }
+
+    public static function existePorNombreIncluyendoCanceladas($pdo, $nombre) {
+        $stmt = $pdo->prepare(
+            "SELECT id_carrera, cancelado
+             FROM carrera
+             WHERE LOWER(TRIM(nombre_carrera)) = LOWER(TRIM(?))
+             LIMIT 1"
+        );
+        $stmt->execute([$nombre]);
+        return $stmt->fetch() ?: null;
+    }
+
+    public static function reactivarPorNombre($pdo, $idCarrera, $nombre) {
+        $stmt = $pdo->prepare(
+            "UPDATE carrera
+             SET nombre_carrera = ?, cancelado = 0, habilitado = 1
+             WHERE id_carrera = ?"
+        );
+        return $stmt->execute([$nombre, $idCarrera]);
+    }
+
+    public static function actualizarNombre($pdo, $idCarrera, $nombre) {
+        $stmt = $pdo->prepare(
+            "UPDATE carrera
+             SET nombre_carrera = ?
+             WHERE id_carrera = ? AND cancelado = 0"
+        );
+        $stmt->execute([$nombre, $idCarrera]);
+        return $stmt->rowCount();
+    }
+
+    public static function softDeleteConRelaciones($pdo, $idCarrera) {
+        $pdo->beginTransaction();
+        try {
+            $stmtRelacion = $pdo->prepare(
+                "UPDATE carrera_materia
+                 SET cancelado = 1
+                 WHERE id_carrera = ?"
+            );
+            $stmtRelacion->execute([$idCarrera]);
+
+            $stmtInstitucion = $pdo->prepare(
+                "UPDATE institucion_carrera
+                 SET cancelado = 1
+                 WHERE id_carrera = ?"
+            );
+            $stmtInstitucion->execute([$idCarrera]);
+
+            $stmtCarrera = $pdo->prepare(
+                "UPDATE carrera
+                 SET cancelado = 1, habilitado = 0
+                 WHERE id_carrera = ? AND cancelado = 0"
+            );
+            $stmtCarrera->execute([$idCarrera]);
+
+            if ($stmtCarrera->rowCount() === 0) {
+                $pdo->rollBack();
+                return 0;
+            }
+
+            $pdo->commit();
+            return 1;
+        } catch (\Throwable $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
+    }
 }

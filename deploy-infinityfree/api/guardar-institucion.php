@@ -9,6 +9,7 @@
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/Institucion.php';
+require_once __DIR__ . '/../services/CloudinaryService.php';
 
 session_start();
 
@@ -37,13 +38,47 @@ if (!in_array($_SESSION['id_rol'], $rolesPermitidos)) {
 }
 
 try {
-    // Obtener datos del body
-    $input = json_decode(file_get_contents('php://input'), true);
+    $mediaFolders = require __DIR__ . '/../config/media-folders.php';
+    $logoFinalUrl = null;
+    $logoCloudinaryPublicId = null;
+
+    // Soporte dual: JSON legacy y multipart/form-data
+    $esMultipart = !empty($_POST) || !empty($_FILES);
+    if ($esMultipart) {
+        $input = $_POST;
+    } else {
+        $input = json_decode(file_get_contents('php://input'), true);
+    }
 
     if (!$input) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Datos no válidos']);
         exit;
+    }
+
+    // Normalizar carreras cuando llega como JSON string en FormData
+    if (isset($input['carreras']) && is_string($input['carreras'])) {
+        $carrerasDecoded = json_decode($input['carreras'], true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $input['carreras'] = $carrerasDecoded;
+        }
+    }
+
+    // Subir logo a Cloudinary si se envio archivo
+    $logoFile = $_FILES['logo_file'] ?? $_FILES['logo'] ?? null;
+    if ($logoFile && (($logoFile['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK)) {
+        $cloudinary = new CloudinaryService($mediaFolders['base'] ?? 'ComunidadIFTS');
+        $folderLogo = $mediaFolders['instituciones']['logo'] ?? 'ComunidadIFTS/logoIFTS';
+
+        $upload = $cloudinary->uploadFromFileArray($logoFile, $folderLogo, 'image');
+        if (!$upload['success']) {
+            throw new Exception($upload['message'] ?? 'No se pudo subir el logo a Cloudinary.');
+        }
+
+        $logoFinalUrl = $upload['url'] ?? null;
+        $logoCloudinaryPublicId = $upload['public_id'] ?? null;
+        $input['logo'] = $logoFinalUrl;
+        $input['logo_ifts'] = $logoFinalUrl;
     }
 
     // Validar campos requeridos
@@ -61,6 +96,11 @@ try {
     
     // Guardar en la base de datos
     $institucion->guardar($pdo);
+
+    // Guardar metadata de Cloudinary si corresponde
+    if (!empty($logoFinalUrl)) {
+        Institucion::actualizarLogoCloudinaryMetadata($pdo, $institucion->getId(), $logoCloudinaryPublicId);
+    }
 
     echo json_encode([
         'success' => true,

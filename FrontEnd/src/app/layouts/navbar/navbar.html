@@ -11,6 +11,17 @@
   
   <div class="navbar-right">
     <ng-container *ngIf="currentUser$ | async as user; else loginButton">
+      <div class="avatar" aria-hidden="true">
+        <img
+          *ngIf="user.foto_perfil_url; else avatarFallback"
+          [src]="user.foto_perfil_url"
+          [alt]="'Foto de ' + user.nombre"
+          loading="lazy"
+        />
+        <ng-template #avatarFallback>
+          <span>{{ getAvatarText(user.nombre) }}</span>
+        </ng-template>
+      </div>
       <span class="user-greeting">Hola {{ user.nombre }} ({{ user.nombre_rol }})</span>
       <button mat-button type="button" (click)="cerrarSesion()">
         <mat-icon>logout</mat-icon>

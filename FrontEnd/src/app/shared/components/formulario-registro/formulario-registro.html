@@ -1,4 +1,10 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="register-form">
+  <div class="divider">completa los datos para solicitud de alta</div>
+
+  <div *ngIf="googleFlowActivo && googleHelperMessage" class="google-helper" [class.google-helper-ready]="puedeFinalizarConGoogle">
+    {{ googleHelperMessage }}
+  </div>
+
   <div class="row">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Nombre</mat-label>
@@ -53,7 +59,7 @@
     <mat-error *ngIf="form.get('email')?.hasError('email')">Ingresá un email válido</mat-error>
   </mat-form-field>
 
-  <div class="row">
+  <div class="row" *ngIf="!googleFlowActivo">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Contraseña</mat-label>
       <input matInput [type]="ocultarClave ? 'password' : 'text'" formControlName="clave" title="Contraseña" placeholder="Mínimo 6 caracteres" />
@@ -77,11 +83,19 @@
 
   <div *ngIf="error" class="error-message">{{ error }}</div>
 
+  <button mat-stroked-button type="button" class="google-btn" [disabled]="cargando" (click)="onGoogleRegister()">
+    {{ googleFlowActivo ? 'Cambiar cuenta de Google' : 'Continuar con Google' }}
+  </button>
+
   <div class="form-actions">
     <button mat-button type="button" (click)="cancelar()">Cancelar</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="cargando">
-      {{ cargando ? 'Registrando...' : 'Crear cuenta' }}
+    <button mat-raised-button color="primary" type="submit" [disabled]="cargando || (!googleFlowActivo && form.invalid)">
+      {{ cargando ? (googleFlowActivo ? 'Finalizando...' : 'Registrando...') : (googleFlowActivo ? 'Crear cuenta con Google' : 'Crear cuenta') }}
     </button>
+  </div>
+
+  <div *ngIf="googleFlowActivo" class="google-note">
+    Para continuar con Google, completa los datos faltantes y usa el boton "Finalizar con Google".
   </div>
 
   <div class="form-question">

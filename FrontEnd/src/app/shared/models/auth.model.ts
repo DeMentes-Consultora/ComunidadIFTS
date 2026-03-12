@@ -29,6 +29,8 @@ export interface AuthUser {
   telefono: string;
   edad: number;
   fecha_nacimiento: string;
+  foto_perfil_url?: string | null;
+  foto_perfil_public_id?: string | null;
   habilitado: number;
   cancelado: number;
 }
@@ -51,4 +53,28 @@ export interface RegisterResponse {
 export interface BasicAuthResponse {
   success: boolean;
   message?: string;
+}
+
+export interface GoogleIdentity {
+  idToken: string;
+  email: string;
+  nombre?: string;
+  apellido?: string;
+  fotoPerfilUrl?: string;
+}
+
+export interface GoogleLoginRequest {
+  mode: 'login';
+  id_token: string;
+}
+
+export interface GoogleRegisterRequest {
+  mode: 'register';
+  id_token: string;
+  nombre: string;
+  apellido: string;
+  dni: string;
+  fecha_nacimiento: string;
+  telefono: string;
+  id_institucion: number;
 }
