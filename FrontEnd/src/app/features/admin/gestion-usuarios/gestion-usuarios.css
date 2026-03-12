@@ -16,6 +16,28 @@ mat-card-header {
   border-radius: 4px 4px 0 0;
 }
 
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-vista {
+  border-color: rgba(255, 255, 255, 0.75) !important;
+  color: #fff !important;
+}
+
+.btn-vista mat-icon {
+  margin-right: 6px;
+}
+
 mat-card-title {
   display: flex;
   align-items: center;
@@ -105,6 +127,42 @@ mat-card-title mat-icon {
   border-bottom: 1px solid #e0e0e0;
 }
 
+.usuarios-table-compacta th {
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 600;
+}
+
+.usuarios-table-compacta td {
+  padding: 4px 10px;
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 400;
+}
+
+.usuarios-table-compacta .mat-mdc-row,
+.usuarios-table-compacta .mat-mdc-header-row {
+  min-height: 30px;
+}
+
+.usuarios-table-compacta .mdc-data-table__cell,
+.usuarios-table-compacta .mdc-data-table__header-cell {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.rol-field {
+  min-width: 200px;
+  width: 100%;
+  margin: 0;
+}
+
+.usuarios-table-compacta .rol-field {
+  --mat-form-field-container-height: 30px;
+  --mat-form-field-container-vertical-padding: 4px;
+}
+
 .usuarios-table tr:hover {
   background-color: #f9f9f9;
 }
@@ -189,6 +247,19 @@ mat-card-title mat-icon {
 
   mat-card-title {
     font-size: 20px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .btn-vista {
+    width: 100%;
   }
 
   .usuarios-table th,

@@ -335,4 +335,59 @@ class Usuario {
         $stmt = $pdo->prepare("UPDATE usuario SET cancelado = 1 WHERE id_usuario = ?");
         return $stmt->execute([$idUsuario]);
     }
+
+    public static function obtenerRegistradosAprobados($pdo) {
+        $sql = "SELECT
+                    u.id_usuario,
+                    u.email,
+                    p.apellido,
+                    p.nombre,
+                    p.dni,
+                    u.id_rol,
+                    r.nombre_rol
+                FROM usuario u
+                INNER JOIN persona p ON u.id_persona = p.id_persona
+                INNER JOIN rol r ON u.id_rol = r.id_rol
+                WHERE u.habilitado = 1
+                  AND u.cancelado = 0
+                  AND r.habilitado = 1
+                  AND r.cancelado = 0
+                ORDER BY p.apellido ASC, p.nombre ASC";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function obtenerRegistradoPorId($pdo, $idUsuario) {
+        $sql = "SELECT
+                    u.id_usuario,
+                    u.id_rol,
+                    p.nombre,
+                    p.apellido
+                FROM usuario u
+                INNER JOIN persona p ON u.id_persona = p.id_persona
+                WHERE u.id_usuario = ?
+                  AND u.habilitado = 1
+                  AND u.cancelado = 0
+                LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$idUsuario]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    public static function cambiarRolPorId($pdo, $idUsuario, $idRolNuevo) {
+        $sql = "UPDATE usuario
+                SET id_rol = ?, idUpdate = CURRENT_TIMESTAMP
+                WHERE id_usuario = ?
+                  AND habilitado = 1
+                  AND cancelado = 0";
+
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute([(int)$idRolNuevo, (int)$idUsuario]);
+    }
 }

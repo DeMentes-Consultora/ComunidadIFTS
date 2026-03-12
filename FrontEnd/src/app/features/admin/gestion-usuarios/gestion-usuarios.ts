@@ -8,6 +8,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
@@ -25,6 +27,21 @@ interface UsuarioPendiente {
   habilitado: number;
 }
 
+interface RolDisponible {
+  id_rol: number;
+  nombre_rol: string;
+}
+
+interface UsuarioRegistrado {
+  id_usuario: number;
+  email: string;
+  apellido: string;
+  nombre: string;
+  dni: string;
+  id_rol: number;
+  nombre_rol: string;
+}
+
 @Component({
   selector: 'app-gestion-usuarios',
   imports: [
@@ -36,7 +53,9 @@ interface UsuarioPendiente {
     MatCardModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatFormFieldModule,
+    MatSelectModule
   ],
   templateUrl: './gestion-usuarios.html',
   styleUrl: './gestion-usuarios.css',
@@ -47,8 +66,13 @@ export class GestionUsuarios implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   usuarios: UsuarioPendiente[] = [];
+  usuariosRegistrados: UsuarioRegistrado[] = [];
+  rolesDisponibles: RolDisponible[] = [];
   displayedColumns: string[] = ['nombre', 'email', 'dni', 'institucion', 'fecha_registro', 'acciones'];
+  displayedColumnsRegistrados: string[] = ['usuario', 'apellido', 'nombre', 'dni', 'rol'];
   cargando = true;
+  cargandoRegistrados = false;
+  vistaActual: 'pendientes' | 'registrados' = 'pendientes';
 
   ngOnInit(): void {
     this.cargarUsuariosPendientes();
@@ -106,6 +130,89 @@ export class GestionUsuarios implements OnInit {
       error: (error) => {
         console.error('Error:', error);
         const mensaje = error?.error?.message || 'Error al aprobar usuario';
+        this.mostrarMensaje(mensaje, 'error');
+      }
+    });
+  }
+
+  cambiarVista(vista: 'pendientes' | 'registrados'): void {
+    this.vistaActual = vista;
+
+    if (vista === 'registrados' && this.usuariosRegistrados.length === 0) {
+      this.cargarUsuariosRegistrados();
+    }
+  }
+
+  cargarUsuariosRegistrados(): void {
+    this.cargandoRegistrados = true;
+
+    this.http.get<{success: boolean, data: UsuarioRegistrado[], roles: RolDisponible[], total: number}>(
+      `${environment.apiUrl}/usuarios-registrados.php`,
+      { withCredentials: true }
+    ).subscribe({
+      next: (response) => {
+        setTimeout(() => {
+          if (response.success) {
+            this.usuariosRegistrados = response.data ?? [];
+            this.rolesDisponibles = response.roles ?? [];
+          } else {
+            this.mostrarMensaje('Error al cargar usuarios registrados', 'error');
+          }
+          this.cargandoRegistrados = false;
+          this.cdr.markForCheck();
+        }, 0);
+      },
+      error: (error) => {
+        console.error('Error cargando usuarios registrados:', error);
+        setTimeout(() => {
+          this.mostrarMensaje('Error al cargar usuarios registrados', 'error');
+          this.cargandoRegistrados = false;
+          this.cdr.markForCheck();
+        }, 0);
+      }
+    });
+  }
+
+  obtenerRolesParaUsuario(usuario: UsuarioRegistrado): RolDisponible[] {
+    const rolActual = this.rolesDisponibles.find((rol) => rol.id_rol === usuario.id_rol);
+    const otrosRoles = this.rolesDisponibles.filter((rol) => rol.id_rol !== usuario.id_rol);
+    return rolActual ? [rolActual, ...otrosRoles] : this.rolesDisponibles;
+  }
+
+  cambiarRolUsuario(usuario: UsuarioRegistrado, idRolNuevo: number): void {
+    if (!idRolNuevo || idRolNuevo === usuario.id_rol) {
+      return;
+    }
+
+    this.http.put<{success: boolean, message?: string, data?: {id_usuario: number, id_rol: number, nombre_rol: string | null}}>(
+      `${environment.apiUrl}/cambiar-rol-usuario.php`,
+      {
+        id_usuario: usuario.id_usuario,
+        id_rol: idRolNuevo
+      },
+      { withCredentials: true }
+    ).subscribe({
+      next: (response) => {
+        if (response.success) {
+          const nombreRolNuevo = response.data?.nombre_rol
+            ?? this.rolesDisponibles.find((rol) => rol.id_rol === idRolNuevo)?.nombre_rol
+            ?? usuario.nombre_rol;
+
+          this.usuariosRegistrados = this.usuariosRegistrados.map((u) =>
+            u.id_usuario === usuario.id_usuario
+              ? { ...u, id_rol: idRolNuevo, nombre_rol: nombreRolNuevo }
+              : u
+          );
+
+          this.mostrarMensaje('Rol actualizado correctamente', 'success');
+          this.cdr.markForCheck();
+        } else {
+          this.mostrarMensaje(response.message || 'No se pudo actualizar el rol', 'error');
+        }
+      },
+      error: (error) => {
+        console.error('Error actualizando rol:', error);
+        const mensaje = error?.error?.message || 'No se pudo actualizar el rol';
         this.mostrarMensaje(mensaje, 'error');
       }
     });

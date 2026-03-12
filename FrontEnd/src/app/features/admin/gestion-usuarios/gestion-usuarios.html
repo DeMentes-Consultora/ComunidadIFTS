@@ -1,26 +1,42 @@
 <div class="gestion-usuarios-container">
   <mat-card>
     <mat-card-header>
-      <mat-card-title>
-        <mat-icon>people</mat-icon>
-        Gestión de Usuarios Pendientes
-      </mat-card-title>
+      <div class="header-content">
+        <mat-card-title>
+          <mat-icon>people</mat-icon>
+          Gestión de usuarios
+        </mat-card-title>
+
+        <div class="header-actions">
+          @if (vistaActual === 'pendientes') {
+            <button mat-stroked-button class="btn-vista" (click)="cambiarVista('registrados')">
+              <mat-icon>groups</mat-icon>
+              Usuarios registrados
+            </button>
+          } @else {
+            <button mat-stroked-button class="btn-vista" (click)="cambiarVista('pendientes')">
+              <mat-icon>hourglass_top</mat-icon>
+              Usuarios pendientes
+            </button>
+          }
+        </div>
+      </div>
     </mat-card-header>
 
     <mat-card-content>
-      @if (cargando) {
+      @if (vistaActual === 'pendientes' && cargando) {
         <div class="loading-container">
           <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
           <p>Cargando usuarios pendientes...</p>
         </div>
       } @else {
-        @if (usuarios.length === 0) {
+        @if (vistaActual === 'pendientes' && usuarios.length === 0) {
           <div class="empty-state">
             <mat-icon class="empty-icon">check_circle</mat-icon>
             <h2>No hay usuarios pendientes</h2>
             <p>Todos los usuarios han sido aprobados o rechazados.</p>
           </div>
-        } @else {
+        } @else if (vistaActual === 'pendientes') {
           <div class="table-container">
             <p class="count-info">
               <mat-icon>info</mat-icon>
@@ -102,6 +118,66 @@
 
               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+        } @else if (cargandoRegistrados) {
+          <div class="loading-container">
+            <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+            <p>Cargando usuarios registrados...</p>
+          </div>
+        } @else if (usuariosRegistrados.length === 0) {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">group_off</mat-icon>
+            <h2>No hay usuarios registrados</h2>
+            <p>No se encontraron usuarios aprobados para gestionar roles.</p>
+          </div>
+        } @else {
+          <div class="table-container">
+            <p class="count-info">
+              <mat-icon>info</mat-icon>
+              Hay <strong>{{ usuariosRegistrados.length }}</strong> usuario(s) registrados
+            </p>
+
+            <table mat-table [dataSource]="usuariosRegistrados" class="usuarios-table usuarios-table-compacta">
+              <ng-container matColumnDef="apellido">
+                <th mat-header-cell *matHeaderCellDef>Apellido</th>
+                <td mat-cell *matCellDef="let usuario">{{ usuario.apellido }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let usuario">{{ usuario.nombre }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="usuario">
+                <th mat-header-cell *matHeaderCellDef>Usuario</th>
+                <td mat-cell *matCellDef="let usuario">{{ usuario.email }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="dni">
+                <th mat-header-cell *matHeaderCellDef>DNI</th>
+                <td mat-cell *matCellDef="let usuario">{{ usuario.dni }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="rol">
+                <th mat-header-cell *matHeaderCellDef>Rol</th>
+                <td mat-cell *matCellDef="let usuario">
+                  <mat-form-field appearance="outline" class="rol-field">
+                    <mat-select
+                      [value]="usuario.id_rol"
+                      (selectionChange)="cambiarRolUsuario(usuario, $event.value)">
+                      @for (rol of obtenerRolesParaUsuario(usuario); track rol.id_rol) {
+                        <mat-option [value]="rol.id_rol">
+                          {{ rol.nombre_rol }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumnsRegistrados"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumnsRegistrados;"></tr>
             </table>
           </div>
         }
