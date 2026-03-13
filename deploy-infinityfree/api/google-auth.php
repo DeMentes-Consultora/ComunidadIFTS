@@ -14,9 +14,23 @@ require_once __DIR__ . '/../services/CloudinaryService.php';
 
 header('Content-Type: application/json');
 
+function safe_json_encode(array $payload): string
+{
+    $json = json_encode(
+        $payload,
+        JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR
+    );
+
+    if ($json !== false) {
+        return $json;
+    }
+
+    return '{"success":false,"message":"Error serializando respuesta JSON"}';
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode([
+    echo safe_json_encode([
         'success' => false,
         'message' => 'Metodo no permitido'
     ]);
@@ -106,7 +120,7 @@ try {
 
     if ($idToken === '') {
         http_response_code(400);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => 'Token de Google requerido'
         ]);
@@ -116,7 +130,7 @@ try {
     $tokenData = validarTokenGoogle($idToken);
     if (!$tokenData || isset($tokenData['error_description'])) {
         http_response_code(401);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => 'Token de Google invalido o expirado'
         ]);
@@ -126,7 +140,7 @@ try {
     $googleClientId = trim($_ENV['GOOGLE_CLIENT_ID'] ?? '');
     if ($googleClientId !== '' && ($tokenData['aud'] ?? '') !== $googleClientId) {
         http_response_code(401);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => 'Token de Google no valido para esta aplicacion'
         ]);
@@ -135,11 +149,16 @@ try {
 
     $email = trim($tokenData['email'] ?? '');
     $emailVerified = ($tokenData['email_verified'] ?? '') === 'true';
-    $fotoPerfilGoogle = trim($tokenData['picture'] ?? '');
+    $fotoPerfilGoogle = trim((string)($tokenData['picture'] ?? ''));
+
+    // Fallback: algunos entornos no devuelven picture en tokeninfo.
+    if ($fotoPerfilGoogle === '') {
+        $fotoPerfilGoogle = trim((string)($payload['foto_perfil_url'] ?? ''));
+    }
 
     if ($email === '' || !$emailVerified) {
         http_response_code(400);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => 'La cuenta de Google debe tener email verificado'
         ]);
@@ -157,7 +176,7 @@ try {
             $estado = Usuario::obtenerEstadoPorEmail($pdo, $email);
             if ($estado && (int)$estado['habilitado'] === 0 && (int)$estado['cancelado'] === 0) {
                 http_response_code(403);
-                echo json_encode([
+                echo safe_json_encode([
                     'success' => false,
                     'message' => 'Tu cuenta esta pendiente de aprobacion por el administrador.',
                     'pendiente_aprobacion' => true
@@ -165,10 +184,11 @@ try {
                 exit;
             }
 
-            http_response_code(404);
-            echo json_encode([
+            http_response_code(200);
+            echo safe_json_encode([
                 'success' => false,
-                'message' => 'No existe una cuenta registrada con este Google. Usa la opcion de registro.'
+                'message' => 'No existe una cuenta registrada con este Google. Usa la opcion de registro.',
+                'requiere_registro' => true
             ]);
             exit;
         }
@@ -202,7 +222,7 @@ try {
         $_SESSION['nombre'] = $usuario->getNombre();
         $_SESSION['apellido'] = $usuario->getApellido();
 
-        echo json_encode([
+        echo safe_json_encode([
             'success' => true,
             'message' => 'Login con Google correcto',
             'data' => $usuario->toArray()
@@ -212,7 +232,7 @@ try {
 
     if ($mode !== 'register') {
         http_response_code(400);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => 'Modo de autenticacion invalido'
         ]);
@@ -229,7 +249,7 @@ try {
 
     if ($nombre === '' || $apellido === '' || $dni === '' || $fechaNacimiento === '' || $telefono === '' || $idInstitucion <= 0) {
         http_response_code(400);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => 'Faltan datos obligatorios para completar el registro con Google'
         ]);
@@ -238,7 +258,7 @@ try {
 
     if (!preg_match('/^\d{7,9}$/', $dni)) {
         http_response_code(400);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => 'DNI invalido'
         ]);
@@ -248,7 +268,7 @@ try {
     $edad = calcularEdadGoogle($fechaNacimiento);
     if ($edad === null || $edad < 16 || $edad > 99) {
         http_response_code(400);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => 'Fecha de nacimiento invalida'
         ]);
@@ -264,7 +284,7 @@ try {
         $pendiente = $estado && (int)$estado['habilitado'] === 0 && (int)$estado['cancelado'] === 0;
 
         http_response_code(409);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => $pendiente
                 ? 'Ese email ya esta registrado y pendiente de aprobacion.'
@@ -276,7 +296,7 @@ try {
     if (Persona::dniExiste($pdo, $dni)) {
         $pdo->rollBack();
         http_response_code(409);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => 'El DNI ya esta registrado'
         ]);
@@ -287,7 +307,7 @@ try {
     if (!$institucion) {
         $pdo->rollBack();
         http_response_code(400);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => 'La institucion seleccionada no es valida'
         ]);
@@ -298,7 +318,7 @@ try {
     if ($idRolAlumno === null) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => 'El rol predeterminado de alumno no esta disponible'
         ]);
@@ -309,7 +329,7 @@ try {
     if (!$persona->guardar($pdo)) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => 'No fue posible registrar la persona'
         ]);
@@ -349,7 +369,7 @@ try {
     if (!$usuario->guardar($pdo)) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode([
+        echo safe_json_encode([
             'success' => false,
             'message' => 'No fue posible registrar el usuario'
         ]);
@@ -397,7 +417,7 @@ try {
         error_log($emailWarning);
     }
 
-    echo json_encode([
+    echo safe_json_encode([
         'success' => true,
         'message' => 'Registro con Google exitoso. Tu cuenta quedo pendiente de aprobacion.',
         'pendiente_aprobacion' => true,
@@ -411,7 +431,7 @@ try {
     }
 
     http_response_code(500);
-    echo json_encode([
+    echo safe_json_encode([
         'success' => false,
         'message' => 'Error interno del servidor',
         'error' => ($_ENV['APP_DEBUG'] ?? false) ? $e->getMessage() : null
