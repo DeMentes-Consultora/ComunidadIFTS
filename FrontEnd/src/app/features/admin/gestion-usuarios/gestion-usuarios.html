@@ -100,6 +100,7 @@
                       mat-raised-button 
                       color="primary" 
                       (click)="aprobarUsuario(usuario)"
+                      [disabled]="estaProcesando(usuario.id_usuario)"
                       class="btn-aprobar">
                       <mat-icon>check</mat-icon>
                       Aprobar
@@ -108,6 +109,7 @@
                       mat-raised-button 
                       color="warn" 
                       (click)="rechazarUsuario(usuario)"
+                      [disabled]="estaProcesando(usuario.id_usuario)"
                       class="btn-rechazar">
                       <mat-icon>close</mat-icon>
                       Rechazar

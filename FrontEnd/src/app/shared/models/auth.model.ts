@@ -77,4 +77,5 @@ export interface GoogleRegisterRequest {
   fecha_nacimiento: string;
   telefono: string;
   id_institucion: number;
+  foto_perfil_url?: string;
 }

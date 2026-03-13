@@ -73,6 +73,11 @@ export class GestionUsuarios implements OnInit {
   cargando = true;
   cargandoRegistrados = false;
   vistaActual: 'pendientes' | 'registrados' = 'pendientes';
+  private usuariosEnProceso = new Set<number>();
+
+  estaProcesando(idUsuario: number): boolean {
+    return this.usuariosEnProceso.has(idUsuario);
+  }
 
   ngOnInit(): void {
     this.cargarUsuariosPendientes();
@@ -108,6 +113,12 @@ export class GestionUsuarios implements OnInit {
   }
 
   aprobarUsuario(usuario: UsuarioPendiente): void {
+    if (this.usuariosEnProceso.has(usuario.id_usuario)) {
+      return;
+    }
+
+    this.usuariosEnProceso.add(usuario.id_usuario);
+
     this.http.put(
       `${environment.apiUrl}/aprobar-usuario.php`,
       {
@@ -126,11 +137,14 @@ export class GestionUsuarios implements OnInit {
         } else {
           this.mostrarMensaje(response.message || 'Error al aprobar usuario', 'error');
         }
+
+        this.liberarUsuarioEnProceso(usuario.id_usuario);
       },
       error: (error) => {
         console.error('Error:', error);
         const mensaje = error?.error?.message || 'Error al aprobar usuario';
         this.mostrarMensaje(mensaje, 'error');
+        this.liberarUsuarioEnProceso(usuario.id_usuario);
       }
     });
   }
@@ -219,9 +233,15 @@ export class GestionUsuarios implements OnInit {
   }
 
   rechazarUsuario(usuario: UsuarioPendiente): void {
+    if (this.usuariosEnProceso.has(usuario.id_usuario)) {
+      return;
+    }
+
     if (!confirm(`¿Estás seguro de rechazar al usuario ${usuario.nombre} ${usuario.apellido}?`)) {
       return;
     }
+
+    this.usuariosEnProceso.add(usuario.id_usuario);
 
     this.http.put(
       `${environment.apiUrl}/aprobar-usuario.php`,
@@ -242,13 +262,24 @@ export class GestionUsuarios implements OnInit {
         } else {
           this.mostrarMensaje(response.message || 'Error al rechazar usuario', 'error');
         }
+
+        this.liberarUsuarioEnProceso(usuario.id_usuario);
       },
       error: (error) => {
         console.error('Error:', error);
         const mensaje = error?.error?.message || 'Error al rechazar usuario';
         this.mostrarMensaje(mensaje, 'error');
+        this.liberarUsuarioEnProceso(usuario.id_usuario);
       }
     });
+  }
+
+  private liberarUsuarioEnProceso(idUsuario: number): void {
+    // Evita NG0100: liberar el estado en el siguiente tick de CD.
+    setTimeout(() => {
+      this.usuariosEnProceso.delete(idUsuario);
+      this.cdr.markForCheck();
+    }, 0);
   }
 
   private mostrarMensaje(mensaje: string, tipo: 'success' | 'error' | 'info'): void {

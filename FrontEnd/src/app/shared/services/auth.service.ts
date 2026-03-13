@@ -139,8 +139,9 @@ export class AuthService {
       id_token: idToken
     };
 
-    return this.http.post<AuthResponse>(this.apiGoogleAuthUrl, payload, { withCredentials: true }).pipe(
-      map((response) => {
+    return this.http.post(this.apiGoogleAuthUrl, payload, { withCredentials: true, responseType: 'text' }).pipe(
+      map((rawResponse) => {
+        const response = this.parseJsonResponse<AuthResponse>(rawResponse);
         if (!response.success || !response.data) {
           throw new Error(response.message || 'No fue posible iniciar sesión con Google');
         }
@@ -151,22 +152,23 @@ export class AuthService {
         this.currentUserSubject.next(user);
       }),
       catchError((err) => {
-        const message = err?.error?.message || err?.message || 'Error de autenticación con Google';
+        const message = this.extractBackendErrorMessage(err, 'Error de autenticación con Google');
         return throwError(() => new Error(message));
       })
     );
   }
 
   registerWithGoogleToken(payload: GoogleRegisterRequest): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(this.apiGoogleAuthUrl, payload, { withCredentials: true }).pipe(
-      map((response) => {
+    return this.http.post(this.apiGoogleAuthUrl, payload, { withCredentials: true, responseType: 'text' }).pipe(
+      map((rawResponse) => {
+        const response = this.parseJsonResponse<RegisterResponse>(rawResponse);
         if (!response.success) {
           throw new Error(response.message || 'No fue posible registrarse con Google');
         }
         return response;
       }),
       catchError((err) => {
-        const message = err?.error?.message || err?.message || 'Error de registro con Google';
+        const message = this.extractBackendErrorMessage(err, 'Error de registro con Google');
         return throwError(() => new Error(message));
       })
     );
@@ -229,5 +231,69 @@ export class AuthService {
   private clearLocalSession(): void {
     localStorage.removeItem(this.storageKey);
     this.currentUserSubject.next(null);
+  }
+
+  private parseJsonResponse<T>(rawResponse: unknown): T {
+    if (typeof rawResponse !== 'string') {
+      return rawResponse as T;
+    }
+
+    const text = rawResponse.replace(/^\uFEFF/, '').trim();
+    if (text === '') {
+      throw new Error('El servidor devolvió una respuesta vacía');
+    }
+
+    const parsedDirect = this.tryParseJson<T>(text);
+    if (parsedDirect !== null) {
+      return parsedDirect;
+    }
+
+    // Fallback para respuestas con warnings/notices antes o después del JSON.
+    const start = text.indexOf('{');
+    const end = text.lastIndexOf('}');
+    if (start !== -1 && end > start) {
+      const candidate = text.slice(start, end + 1);
+      const parsedCandidate = this.tryParseJson<T>(candidate);
+      if (parsedCandidate !== null) {
+        return parsedCandidate;
+      }
+    }
+
+    throw new Error('El servidor devolvió una respuesta inválida');
+  }
+
+  private extractBackendErrorMessage(err: any, fallback: string): string {
+    const rawError = err?.error;
+
+    if (typeof rawError === 'string') {
+      const text = rawError.replace(/^\uFEFF/, '').trim();
+      if (text !== '') {
+        const parsed = this.tryParseJson<{ message?: string }>(text);
+        if (parsed?.message) {
+          return parsed.message;
+        }
+
+        const start = text.indexOf('{');
+        const end = text.lastIndexOf('}');
+        if (start !== -1 && end > start) {
+          const parsedCandidate = this.tryParseJson<{ message?: string }>(text.slice(start, end + 1));
+          if (parsedCandidate?.message) {
+            return parsedCandidate.message;
+          }
+        }
+
+        return text;
+      }
+    }
+
+    return err?.error?.message || err?.message || fallback;
+  }
+
+  private tryParseJson<T>(text: string): T | null {
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      return null;
+    }
   }
 }

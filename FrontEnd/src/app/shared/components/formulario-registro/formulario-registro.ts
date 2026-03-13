@@ -43,6 +43,7 @@ export class FormularioRegistroComponent implements OnInit {
   ocultarClave = true;
   ocultarConfirmarClave = true;
   googleIdToken: string | null = null;
+  googleFotoPerfilUrl: string | null = null;
   googleHelperMessage: string | null = null;
 
   form;
@@ -248,6 +249,10 @@ export class FormularioRegistroComponent implements OnInit {
       id_institucion: Number(this.form.value.id_institucion ?? 0)
     };
 
+    if (this.googleFotoPerfilUrl) {
+      payload.foto_perfil_url = this.googleFotoPerfilUrl;
+    }
+
     if (
       payload.nombre === '' ||
       payload.apellido === '' ||
@@ -351,6 +356,7 @@ export class FormularioRegistroComponent implements OnInit {
 
   private aplicarIdentidadGoogle(identity: GoogleIdentity): void {
     this.googleIdToken = identity.idToken;
+    this.googleFotoPerfilUrl = identity.fotoPerfilUrl ?? null;
 
     this.form.patchValue({
       nombre: identity.nombre || this.form.value.nombre,

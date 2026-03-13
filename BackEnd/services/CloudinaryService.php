@@ -11,9 +11,11 @@ class CloudinaryService
     private UploadApi $uploadApi;
     private AdminApi $adminApi;
     private string $baseFolder;
+    private string $cloudName;
 
     public function __construct(?string $baseFolder = null)
     {
+        $this->cloudName = trim((string)($_ENV['CLOUDINARY_CLOUD_NAME'] ?? ''));
         $this->configureCloudinary();
 
         $this->uploadApi = new UploadApi();
@@ -48,13 +50,18 @@ class CloudinaryService
         try {
             $result = $this->uploadApi->upload($filePath, array_merge($defaultOptions, $options));
 
+            $publicId = (string)($this->resultValue($result, 'public_id') ?? '');
+            $format = $this->resultValue($result, 'format');
+            $resourceTypeResult = (string)($this->resultValue($result, 'resource_type') ?? $resourceType);
+            $resolvedUrl = $this->resolveAssetUrl($result, $publicId, $resourceTypeResult, $format);
+
             return [
                 'success' => true,
-                'url' => $result['secure_url'] ?? null,
-                'public_id' => $result['public_id'] ?? null,
-                'resource_type' => $result['resource_type'] ?? $resourceType,
-                'format' => $result['format'] ?? null,
-                'bytes' => $result['bytes'] ?? null,
+                'url' => $resolvedUrl,
+                'public_id' => $publicId !== '' ? $publicId : null,
+                'resource_type' => $resourceTypeResult,
+                'format' => $format,
+                'bytes' => $this->resultValue($result, 'bytes'),
                 'raw' => $result,
             ];
         } catch (\Throwable $e) {
@@ -220,7 +227,7 @@ class CloudinaryService
 
     private function configureCloudinary(): void
     {
-        $cloudName = $_ENV['CLOUDINARY_CLOUD_NAME'] ?? '';
+        $cloudName = $this->cloudName;
         $apiKey = $_ENV['CLOUDINARY_API_KEY'] ?? '';
         $apiSecret = $_ENV['CLOUDINARY_API_SECRET'] ?? '';
 
@@ -253,5 +260,66 @@ class CloudinaryService
         }
 
         return $this->baseFolder . '/' . $folder;
+    }
+
+    private function resultValue($result, string $key)
+    {
+        if (is_array($result)) {
+            return $result[$key] ?? null;
+        }
+
+        if (is_object($result)) {
+            if (isset($result->{$key})) {
+                return $result->{$key};
+            }
+
+            if (method_exists($result, 'offsetExists') && method_exists($result, 'offsetGet') && $result->offsetExists($key)) {
+                return $result->offsetGet($key);
+            }
+
+            if (method_exists($result, 'getArrayCopy')) {
+                $copy = $result->getArrayCopy();
+                if (is_array($copy)) {
+                    return $copy[$key] ?? null;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function resolveAssetUrl($result, string $publicId, string $resourceType, $format): ?string
+    {
+        $secureUrl = trim((string)($this->resultValue($result, 'secure_url') ?? ''));
+        if ($this->isCompleteCloudinaryUrl($secureUrl)) {
+            return $secureUrl;
+        }
+
+        $url = trim((string)($this->resultValue($result, 'url') ?? ''));
+        if ($this->isCompleteCloudinaryUrl($url)) {
+            return preg_replace('/^http:\/\//i', 'https://', $url);
+        }
+
+        if ($publicId === '' || $this->cloudName === '') {
+            return $secureUrl !== '' ? $secureUrl : ($url !== '' ? $url : null);
+        }
+
+        $ext = trim((string)$format);
+        $suffix = $ext !== '' ? ('.' . $ext) : '';
+
+        return 'https://res.cloudinary.com/' . rawurlencode($this->cloudName)
+            . '/' . trim($resourceType, '/')
+            . '/upload/'
+            . $publicId
+            . $suffix;
+    }
+
+    private function isCompleteCloudinaryUrl(string $url): bool
+    {
+        if ($url === '' || strpos($url, 'res.cloudinary.com/') === false) {
+            return false;
+        }
+
+        return (bool)preg_match('~/upload/(?:v\d+/)?[^?#]+~', $url);
     }
 }
