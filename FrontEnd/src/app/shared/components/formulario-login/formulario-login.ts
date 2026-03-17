@@ -107,8 +107,13 @@ export class FormularioLoginComponent {
             setTimeout(() => {
               const httpErr = err as HttpErrorResponse;
               const backendMessage = httpErr?.error?.message || err.message || '';
+              const errorCode = (err as any)?.code || '';
 
-              if (httpErr?.status === 404 || backendMessage.includes('No existe una cuenta registrada con este Google')) {
+              if (
+                errorCode === 'GOOGLE_REQUIERE_REGISTRO' ||
+                httpErr?.status === 404 ||
+                backendMessage.includes('No existe una cuenta registrada con este Google')
+              ) {
                 this.authService.setPendingGoogleIdentity(identity);
                 this.cargando = false;
                 this.error = null;

@@ -17,6 +17,11 @@ import {
   RegisterResponse
 } from '../models/auth.model';
 
+type GoogleAuthApiResponse = AuthResponse & {
+  requiere_registro?: boolean;
+  pendiente_aprobacion?: boolean;
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -141,9 +146,16 @@ export class AuthService {
 
     return this.http.post(this.apiGoogleAuthUrl, payload, { withCredentials: true, responseType: 'text' }).pipe(
       map((rawResponse) => {
-        const response = this.parseJsonResponse<AuthResponse>(rawResponse);
+        const response = this.parseJsonResponse<GoogleAuthApiResponse>(rawResponse);
         if (!response.success || !response.data) {
-          throw new Error(response.message || 'No fue posible iniciar sesión con Google');
+          const error = new Error(response.message || 'No fue posible iniciar sesión con Google');
+          if (response.requiere_registro) {
+            (error as any).code = 'GOOGLE_REQUIERE_REGISTRO';
+          }
+          if (response.pendiente_aprobacion) {
+            (error as any).code = 'GOOGLE_PENDIENTE_APROBACION';
+          }
+          throw error;
         }
         return response.data;
       }),
