@@ -9,6 +9,9 @@
  */
 return [
     'base' => 'ComunidadIFTS',
+    'navbar' => [
+        'logo' => 'ComunidadIFTS/navbar',
+    ],
     'instituciones' => [
         'logo' => 'ComunidadIFTS/logoIFTS',
         'video' => 'ComunidadIFTS/videoIFTS',

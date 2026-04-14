@@ -1,0 +1,114 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+import {
+  DashboardStats,
+  SiteCustomizationConfig,
+  SiteCustomizationResponse,
+  SiteCustomizationSavePayload,
+} from '../models/site-customization.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SiteCustomizationService {
+  private readonly apiUrl = `${environment.apiUrl}/site-customization.php`;
+  private readonly statsUrl = `${environment.apiUrl}/dashboard-stats.php`;
+  private readonly siteConfigSubject = new BehaviorSubject<SiteCustomizationConfig>({
+    navbar: {
+      id_navbar: null,
+      brand_text: 'Comunidad IFTS',
+      logo_url: null,
+      logo_public_id: null,
+      habilitado: 1,
+    },
+    carousel: [],
+  });
+  private loaded = false;
+
+  readonly siteConfig$ = this.siteConfigSubject.asObservable();
+
+  constructor(private http: HttpClient) {}
+
+  loadPublicConfig(force = false): Observable<SiteCustomizationConfig> {
+    if (this.loaded && !force) {
+      return of(this.siteConfigSubject.value);
+    }
+
+    return this.http.get<SiteCustomizationResponse<SiteCustomizationConfig>>(this.apiUrl).pipe(
+      map((response) => {
+        if (!response.success || !response.data) {
+          throw new Error(response.message || 'No fue posible obtener la configuracion publica');
+        }
+        return response.data;
+      }),
+      tap((config) => {
+        this.loaded = true;
+        this.siteConfigSubject.next(config);
+      })
+    );
+  }
+
+  getAdminConfig(): Observable<SiteCustomizationConfig> {
+    return this.http.get<SiteCustomizationResponse<SiteCustomizationConfig>>(`${this.apiUrl}?scope=admin`, { withCredentials: true }).pipe(
+      map((response) => {
+        if (!response.success || !response.data) {
+          throw new Error(response.message || 'No fue posible obtener la configuracion de administracion');
+        }
+        return response.data;
+      })
+    );
+  }
+
+  saveSiteConfig(
+    payload: SiteCustomizationSavePayload,
+    files: {
+      navbarLogo?: File | null;
+      carouselFiles?: Record<string, File | null>;
+    }
+  ): Observable<SiteCustomizationConfig> {
+    const formData = new FormData();
+    formData.append('payload', JSON.stringify(payload));
+
+    if (files.navbarLogo) {
+      formData.append('navbar_logo', files.navbarLogo);
+    }
+
+    Object.entries(files.carouselFiles ?? {}).forEach(([clientKey, file]) => {
+      if (!file) {
+        return;
+      }
+
+      formData.append(`carousel_image_${clientKey}`, file);
+    });
+
+    return this.http.post<SiteCustomizationResponse<SiteCustomizationConfig>>(this.apiUrl, formData, { withCredentials: true }).pipe(
+      map((response) => {
+        if (!response.success || !response.data) {
+          throw new Error(response.message || 'No fue posible guardar la configuracion del sitio');
+        }
+        return response.data;
+      }),
+      tap((adminConfig) => {
+        this.loaded = true;
+        this.siteConfigSubject.next({
+          navbar: adminConfig.navbar,
+          carousel: adminConfig.carousel.filter((slide) => slide.habilitado === 1),
+        });
+      })
+    );
+  }
+
+  getDashboardStats(): Observable<DashboardStats> {
+    return this.http.get<SiteCustomizationResponse<DashboardStats>>(this.statsUrl, { withCredentials: true }).pipe(
+      map((response) => {
+        if (!response.success || !response.data) {
+          throw new Error(response.message || 'No fue posible obtener las estadisticas del dashboard');
+        }
+        return response.data;
+      })
+    );
+  }
+}

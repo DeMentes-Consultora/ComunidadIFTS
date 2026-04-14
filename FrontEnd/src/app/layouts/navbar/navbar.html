@@ -5,12 +5,29 @@
   </button>
   
   <div class="navbar-brand">
-    <mat-icon class="brand-icon">school</mat-icon>
-    <span class="brand-text">Comunidad IFTS</span>
+    <ng-container *ngIf="siteConfig$ | async as siteConfig">
+      <div class="brand-logo" *ngIf="siteConfig.navbar.logo_url; else defaultBrandIcon">
+        <img [src]="siteConfig.navbar.logo_url" [alt]="siteConfig.navbar.brand_text" loading="lazy" />
+      </div>
+      <ng-template #defaultBrandIcon>
+        <mat-icon class="brand-icon">school</mat-icon>
+      </ng-template>
+      <span class="brand-text">{{ siteConfig.navbar.brand_text }}</span>
+    </ng-container>
   </div>
   
   <div class="navbar-right">
     <ng-container *ngIf="currentUser$ | async as user; else loginButton">
+      <button
+        *ngIf="esAdmin(user.id_rol)"
+        mat-button
+        class="admin-button"
+        type="button"
+        [routerLink]="['/admin/dashboard']"
+      >
+        <mat-icon>dashboard_customize</mat-icon>
+        Dashboard
+      </button>
       <div class="avatar" aria-hidden="true">
         <img
           *ngIf="user.foto_perfil_url; else avatarFallback"

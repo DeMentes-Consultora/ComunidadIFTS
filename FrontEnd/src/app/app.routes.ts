@@ -21,6 +21,10 @@ export const routes: Routes = [
     data: { roles: [1] },
     children: [
       {
+        path: 'dashboard',
+        loadComponent: () => import('./features/admin/dashboard/dashboard').then(m => m.AdminDashboard)
+      },
+      {
         path: 'gestion-usuarios',
         loadComponent: () => import('./features/admin/gestion-usuarios/gestion-usuarios').then(m => m.GestionUsuarios)
       },
@@ -34,7 +38,7 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'gestion-usuarios',
+        redirectTo: 'dashboard',
         pathMatch: 'full'
       }
     ]

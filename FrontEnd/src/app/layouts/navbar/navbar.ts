@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { SiteCustomizationService } from '../../shared/services/site-customization.service';
 import { SidenavService } from '../../shared/services/sidenav.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { AuthModalComponent } from '../../shared/components/auth-modal/auth-modal';
@@ -17,14 +18,18 @@ import { AuthModalComponent } from '../../shared/components/auth-modal/auth-moda
 })
 export class Navbar {
   currentUser$;
+  siteConfig$;
 
   constructor(
+    private siteCustomizationService: SiteCustomizationService,
     private sidenavService: SidenavService,
     private authService: AuthService,
     private router: Router,
     private dialog: MatDialog
   ) {
     this.currentUser$ = this.authService.currentUser$;
+    this.siteConfig$ = this.siteCustomizationService.siteConfig$;
+    this.siteCustomizationService.loadPublicConfig().subscribe();
   }
 
   openSidenav() {
@@ -51,5 +56,9 @@ export class Navbar {
   getAvatarText(nombre?: string | null): string {
     const cleanName = (nombre ?? '').trim();
     return cleanName ? cleanName.charAt(0).toUpperCase() : '?';
+  }
+
+  esAdmin(idRol?: number | null): boolean {
+    return Number(idRol) === 1;
   }
 }

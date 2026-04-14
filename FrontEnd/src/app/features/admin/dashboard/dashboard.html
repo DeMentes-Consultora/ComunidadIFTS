@@ -1,0 +1,162 @@
+<section class="dashboard-page">
+  @if (loading()) {
+    <div class="dashboard-loading">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  } @else {
+    <div class="dashboard-layout">
+      <aside class="dashboard-sidebar">
+        <div class="sidebar-block">
+          <span class="sidebar-label">Visual</span>
+          <button type="button" class="sidebar-link" [class.active]="selectedSection() === 'navbar'" (click)="seleccionarSeccion('navbar')">
+            <mat-icon>branding_watermark</mat-icon>
+            Marca del navbar
+          </button>
+          <button type="button" class="sidebar-link" [class.active]="selectedSection() === 'carousel'" (click)="seleccionarSeccion('carousel')">
+            <mat-icon>view_carousel</mat-icon>
+            Carrusel principal
+          </button>
+        </div>
+
+        <div class="sidebar-block">
+          <span class="sidebar-label">Proximamente</span>
+          <button type="button" class="sidebar-link muted" disabled>
+            <mat-icon>work</mat-icon>
+            Bolsa de trabajo
+          </button>
+          <button type="button" class="sidebar-link muted" disabled>
+            <mat-icon>campaign</mat-icon>
+            Novedades
+          </button>
+        </div>
+      </aside>
+
+      <div class="dashboard-main">
+        <section class="stats-grid">
+          @for (card of statsCards(); track card.label) {
+            <mat-card class="stat-card">
+              <div class="stat-icon">
+                <mat-icon>{{ card.icon }}</mat-icon>
+              </div>
+              <div>
+                <span class="stat-label">{{ card.label }}</span>
+                <strong class="stat-value">{{ card.value }}</strong>
+              </div>
+            </mat-card>
+          }
+        </section>
+
+        <mat-card class="editor-card">
+          <div class="editor-header">
+            <div>
+              <h2>Panel de personalizacion</h2>
+              <p>Administra el contenido visible sin tocar codigo.</p>
+            </div>
+
+            <button mat-flat-button color="primary" type="button" (click)="guardarCambios()" [disabled]="saving()">
+              <mat-icon>save</mat-icon>
+              Guardar cambios
+            </button>
+          </div>
+
+          @if (selectedSection() === 'navbar') {
+            <form class="editor-section" [formGroup]="navbarForm">
+              <div class="editor-grid">
+                <mat-form-field appearance="outline">
+                  <mat-label>Texto del navbar</mat-label>
+                  <input matInput formControlName="brand_text" maxlength="255" />
+                </mat-form-field>
+
+                <div class="logo-panel">
+                  <div class="logo-preview" *ngIf="navbarLogoPreview(); else logoPlaceholder">
+                    <img [src]="navbarLogoPreview()!" alt="Logo del navbar" />
+                  </div>
+                  <ng-template #logoPlaceholder>
+                    <div class="logo-preview empty">
+                      <mat-icon>image</mat-icon>
+                    </div>
+                  </ng-template>
+
+                  <div class="logo-actions">
+                    <label class="file-button">
+                      <input type="file" accept="image/*" (change)="cambiarArchivoNavbar($event)" />
+                      <span>{{ navbarLogoPreview() ? 'Cambiar logo' : 'Agregar logo' }}</span>
+                    </label>
+                    <button mat-stroked-button type="button" (click)="quitarLogoNavbar()" [disabled]="!navbarLogoPreview()">
+                      Quitar logo
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          }
+
+          @if (selectedSection() === 'carousel') {
+            <div class="editor-section">
+              <div class="section-actions">
+                <button mat-stroked-button type="button" (click)="agregarSlide()">
+                  <mat-icon>add_photo_alternate</mat-icon>
+                  Agregar slide
+                </button>
+              </div>
+
+              <div class="slides-list">
+                @for (slide of carouselSlides(); track slide.client_key) {
+                  <article class="slide-editor">
+                    <div class="slide-topbar">
+                      <strong>Slide {{ slide.orden_visual }}</strong>
+                      <button mat-icon-button type="button" (click)="eliminarSlide(slide.client_key)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+
+                    <div class="slide-grid">
+                      <div class="slide-preview" [class.empty]="!slide.preview_url">
+                        @if (slide.preview_url) {
+                          <img [src]="slide.preview_url" [alt]="slide.titulo || 'Slide del carrusel'" />
+                        } @else {
+                          <mat-icon>photo</mat-icon>
+                        }
+                      </div>
+
+                      <div class="slide-fields">
+                        <mat-form-field appearance="outline">
+                          <mat-label>Titulo</mat-label>
+                          <input matInput [value]="slide.titulo" (input)="actualizarSlide(slide.client_key, 'titulo', $any($event.target).value)" />
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                          <mat-label>Descripcion</mat-label>
+                          <textarea matInput rows="3" [value]="slide.descripcion" (input)="actualizarSlide(slide.client_key, 'descripcion', $any($event.target).value)"></textarea>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                          <mat-label>Enlace</mat-label>
+                          <input matInput [value]="slide.enlace" (input)="actualizarSlide(slide.client_key, 'enlace', $any($event.target).value)" />
+                        </mat-form-field>
+
+                        <mat-slide-toggle [checked]="slide.habilitado" (change)="actualizarSlide(slide.client_key, 'habilitado', $event.checked)">
+                          Mostrar en el home
+                        </mat-slide-toggle>
+
+                        <div class="slide-actions">
+                          <label class="file-button">
+                            <input type="file" accept="image/*" (change)="cambiarImagenSlide(slide.client_key, $event)" />
+                            <span>{{ slide.preview_url ? 'Cambiar imagen' : 'Agregar imagen' }}</span>
+                          </label>
+                          <button mat-stroked-button type="button" (click)="quitarImagenSlide(slide.client_key)" [disabled]="!slide.preview_url">
+                            Quitar imagen
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                }
+              </div>
+            </div>
+          }
+        </mat-card>
+      </div>
+    </div>
+  }
+</section>
