@@ -2,6 +2,94 @@
 
 **Fecha de inicio:** 26 de enero de 2026
 
+## Actualizacion - 14 de abril de 2026
+
+### Dashboard de personalizacion del sitio
+- Se implemento un dashboard admin nuevo en FrontEnd bajo la ruta `/admin/dashboard`.
+- El objetivo del dashboard es permitir personalizar el sitio sin tocar codigo.
+- Alcance implementado en esta etapa:
+  - Edicion del logo y texto del navbar.
+  - Edicion del carrusel principal.
+  - Panel lateral interno del dashboard con seccion `Visual`.
+  - Tarjetas de estadisticas en el sector derecho.
+
+### Backend agregado o ajustado
+- Endpoint nuevo de configuracion del sitio:
+  - `BackEnd/api/site-customization.php`
+- Endpoint nuevo de estadisticas del dashboard:
+  - `BackEnd/api/dashboard-stats.php`
+- Modelo backend nuevo/renombrado:
+  - `BackEnd/models/SiteCustomizationModel.php`
+- Se mantuvo el criterio del proyecto:
+  - `api/` para HTTP/sesion/request.
+  - `models/` para acceso a base y persistencia.
+
+### Frontend agregado o ajustado
+- Dashboard admin:
+  - `FrontEnd/src/app/features/admin/dashboard/dashboard.ts`
+  - `FrontEnd/src/app/features/admin/dashboard/dashboard.html`
+  - `FrontEnd/src/app/features/admin/dashboard/dashboard.css`
+- Servicio compartido:
+  - `FrontEnd/src/app/shared/services/site-customization.service.ts`
+- Modelos compartidos:
+  - `FrontEnd/src/app/shared/models/site-customization.model.ts`
+- Navbar dinamico:
+  - `FrontEnd/src/app/layouts/navbar/navbar.ts`
+  - `FrontEnd/src/app/layouts/navbar/navbar.html`
+  - `FrontEnd/src/app/layouts/navbar/navbar.css`
+- Carrusel dinamico:
+  - `FrontEnd/src/app/shared/components/carrusel/carrusel.ts`
+  - `FrontEnd/src/app/shared/components/carrusel/carrusel.html`
+  - `FrontEnd/src/app/shared/components/carrusel/carrusel.css`
+- Rutas admin actualizadas en:
+  - `FrontEnd/src/app/app.routes.ts`
+
+### Esquema de base de datos acordado
+- Tabla final del carrusel: `carrousel`
+- Clave primaria final del carrusel: `id_carrousel`
+- Tabla `navbar` extendida con `brand_text`.
+- Se alinearon dump SQL y migraciones a estos nombres finales.
+
+### Migraciones y ajustes de esquema
+- Se agrego migracion para personalizacion del sitio:
+  - `BackEnd/database/migrations/20260414_dashboard_personalizacion_sitio.sql`
+- Se agrego migracion para renombrar la PK vieja del carrusel cuando la BD local seguia usando el nombre anterior:
+  - `BackEnd/database/migrations/20260414_rename_carrousel_id_column.sql`
+- El dump principal fue actualizado en:
+  - `BackEnd/database/comunidad_ifts.sql`
+
+### Problemas resueltos durante esta etapa
+- Se adapto el codigo cuando el nombre de tabla paso de variantes anteriores a `carrousel`.
+- Se adapto el codigo cuando la PK paso a `id_carrousel`.
+- Se renombro el modelo backend de `SiteCustomization.php` a `SiteCustomizationModel.php` para diferenciarlo del endpoint `site-customization.php`.
+- Se detecto y resolvio un error 500 real causado por desalineacion entre el codigo y la columna real de la base.
+
+### Verificaciones realizadas
+- Verificacion del modelo backend con conexion real: OK.
+- Verificacion del endpoint publico:
+  - `GET /api/site-customization.php?scope=public` -> HTTP 200 con datos reales.
+- Validaciones de sintaxis PHP: OK en modelo y endpoint principales.
+
+### Comportamiento confirmado del carrusel
+- El carrusel no esta limitado a 2 slides.
+- Backend y frontend toman todos los slides habilitados ordenados por `orden_visual`.
+- Si hoy se ven 2 slides reales es porque actualmente hay 2 registros habilitados cargados en la tabla `carrousel`.
+
+### Cambio de navegacion admin
+- El acceso a `Dashboard` se movio desde el navbar hacia la barra lateral admin.
+- Nueva ubicacion:
+  - por encima de `Gestion`
+  - en negrita
+  - con `mat-divider` debajo
+- Se quito el boton duplicado del navbar para respetar el pedido funcional.
+
+### Pendiente tecnico detectado
+- El editor sigue mostrando un warning/compileError en:
+  - `FrontEnd/src/app/layouts/navbar/navbar.ts`
+- Mensaje:
+  - problema de inyeccion sobre `SiteCustomizationService`
+- Este warning no fue introducido por el movimiento del menu y el flujo publico verificado siguio funcionando.
+
 ## Actualizacion - 12 de marzo de 2026
 
 ### Implementaciones recientes

@@ -21,7 +21,7 @@ import { SiteCustomizationService } from '../../../shared/services/site-customiz
 type DashboardSection = 'navbar' | 'carousel';
 
 interface EditableCarouselSlide {
-  id_carousel: number | null;
+  id_carrousel: number | null;
   client_key: string;
   titulo: string;
   descripcion: string;
@@ -193,7 +193,7 @@ export class AdminDashboard implements OnInit {
         remove_logo: this.removeNavbarLogo(),
       },
       carousel: this.reordenarSlides(this.carouselSlides()).map((slide, index) => ({
-        id_carousel: slide.id_carousel,
+        id_carrousel: slide.id_carrousel,
         client_key: slide.client_key,
         titulo: slide.titulo.trim(),
         descripcion: slide.descripcion.trim(),
@@ -259,8 +259,8 @@ export class AdminDashboard implements OnInit {
 
   private mapEditableSlide(slide: SiteCarouselItem, index: number): EditableCarouselSlide {
     return {
-      id_carousel: slide.id_carousel,
-      client_key: `slide_${slide.id_carousel}_${index}`,
+      id_carrousel: slide.id_carrousel,
+      client_key: `slide_${slide.id_carrousel}_${index}`,
       titulo: slide.titulo,
       descripcion: slide.descripcion,
       enlace: slide.enlace ?? '',
@@ -276,7 +276,7 @@ export class AdminDashboard implements OnInit {
 
   private createEmptySlide(order: number): EditableCarouselSlide {
     return {
-      id_carousel: null,
+      id_carrousel: null,
       client_key: `new_${Date.now()}_${order}`,
       titulo: '',
       descripcion: '',

@@ -28,6 +28,13 @@
     <mat-divider></mat-divider>
 
     <ng-container *ngIf="(currentUser$ | async)?.id_rol === 1">
+      <a mat-button routerLink="/admin/dashboard" (click)="closeSidenavPanel()" class="nav-link dashboard-link">
+        <mat-icon>dashboard_customize</mat-icon>
+        Dashboard
+      </a>
+
+      <mat-divider class="admin-divider"></mat-divider>
+
       <h3 class="section-title">Gestion</h3>
 
       <a mat-button routerLink="/admin/gestion-usuarios" (click)="closeSidenavPanel()" class="nav-link">

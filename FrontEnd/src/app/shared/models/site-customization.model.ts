@@ -7,7 +7,7 @@ export interface SiteNavbarConfig {
 }
 
 export interface SiteCarouselItem {
-  id_carousel: number;
+  id_carrousel: number;
   titulo: string;
   descripcion: string;
   enlace: string | null;
@@ -43,7 +43,7 @@ export interface SiteCustomizationSavePayload {
     remove_logo?: boolean;
   };
   carousel: Array<{
-    id_carousel?: number | null;
+    id_carrousel?: number | null;
     client_key: string;
     titulo: string;
     descripcion: string;

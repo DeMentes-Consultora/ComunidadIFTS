@@ -57,8 +57,4 @@ export class Navbar {
     const cleanName = (nombre ?? '').trim();
     return cleanName ? cleanName.charAt(0).toUpperCase() : '?';
   }
-
-  esAdmin(idRol?: number | null): boolean {
-    return Number(idRol) === 1;
-  }
 }

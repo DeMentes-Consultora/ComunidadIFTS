@@ -18,16 +18,6 @@
   
   <div class="navbar-right">
     <ng-container *ngIf="currentUser$ | async as user; else loginButton">
-      <button
-        *ngIf="esAdmin(user.id_rol)"
-        mat-button
-        class="admin-button"
-        type="button"
-        [routerLink]="['/admin/dashboard']"
-      >
-        <mat-icon>dashboard_customize</mat-icon>
-        Dashboard
-      </button>
       <div class="avatar" aria-hidden="true">
         <img
           *ngIf="user.foto_perfil_url; else avatarFallback"

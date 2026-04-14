@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../models/SiteCustomization.php';
+require_once __DIR__ . '/../models/SiteCustomizationModel.php';
 
 header('Content-Type: application/json');
 
@@ -44,7 +44,7 @@ try {
 
     echo json_encode([
         'success' => true,
-        'data' => SiteCustomization::obtenerEstadisticasDashboard($pdo),
+        'data' => SiteCustomizationModel::obtenerEstadisticasDashboard($pdo),
     ]);
 } catch (Throwable $e) {
     http_response_code(500);

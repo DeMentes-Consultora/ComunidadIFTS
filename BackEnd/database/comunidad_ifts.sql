@@ -117,7 +117,7 @@ CREATE TABLE `carrera_materia` (
 --
 
 CREATE TABLE `carrousel` (
-  `id_carousel` int(11) NOT NULL,
+  `id_carrousel` int(11) NOT NULL,
   `titulo` varchar(255) DEFAULT NULL,
   `descripcion` varchar(500) DEFAULT NULL,
   `enlace` varchar(255) DEFAULT NULL,
@@ -461,7 +461,7 @@ ALTER TABLE `carrera_materia`
 -- Indices de la tabla `carrousel`
 --
 ALTER TABLE `carrousel`
-  ADD PRIMARY KEY (`id_carousel`);
+  ADD PRIMARY KEY (`id_carrousel`);
 
 --
 -- Indices de la tabla `institucion`
@@ -531,7 +531,7 @@ ALTER TABLE `carrera_materia`
 -- AUTO_INCREMENT de la tabla `carrousel`
 --
 ALTER TABLE `carrousel`
-  MODIFY `id_carousel` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_carrousel` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `institucion`

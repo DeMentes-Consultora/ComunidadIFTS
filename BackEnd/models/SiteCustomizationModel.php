@@ -1,6 +1,6 @@
 <?php
 
-class SiteCustomization
+class SiteCustomizationModel
 {
     public static function obtenerConfiguracionPublica(PDO $pdo): array
     {
@@ -67,7 +67,7 @@ class SiteCustomization
 
     public static function obtenerCarrusel(PDO $pdo, bool $includeDisabled = false): array
     {
-        $sql = 'SELECT id_carousel, titulo, descripcion, enlace, orden_visual, foto_perfil_url, foto_perfil_public_id, habilitado
+        $sql = 'SELECT id_carrousel, titulo, descripcion, enlace, orden_visual, foto_perfil_url, foto_perfil_public_id, habilitado
                 FROM carrousel
                 WHERE cancelado = 0';
 
@@ -75,14 +75,14 @@ class SiteCustomization
             $sql .= ' AND habilitado = 1';
         }
 
-        $sql .= ' ORDER BY orden_visual ASC, id_carousel ASC';
+        $sql .= ' ORDER BY orden_visual ASC, id_carrousel ASC';
 
         $stmt = $pdo->query($sql);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return array_map(static function (array $row): array {
             return [
-                'id_carousel' => (int)$row['id_carousel'],
+                'id_carrousel' => (int)$row['id_carrousel'],
                 'titulo' => trim((string)($row['titulo'] ?? '')),
                 'descripcion' => trim((string)($row['descripcion'] ?? '')),
                 'enlace' => self::nullableText($row['enlace'] ?? null),
@@ -99,13 +99,13 @@ class SiteCustomization
         $existentes = self::obtenerCarrusel($pdo, true);
         $existentesPorId = [];
         foreach ($existentes as $slideExistente) {
-            $existentesPorId[(int)$slideExistente['id_carousel']] = $slideExistente;
+            $existentesPorId[(int)$slideExistente['id_carrousel']] = $slideExistente;
         }
 
         $idsPersistidos = [];
 
         foreach ($slides as $index => $slide) {
-            $id = isset($slide['id_carousel']) ? (int)$slide['id_carousel'] : 0;
+            $id = isset($slide['id_carrousel']) ? (int)$slide['id_carrousel'] : 0;
             $titulo = trim((string)($slide['titulo'] ?? ''));
             $descripcion = trim((string)($slide['descripcion'] ?? ''));
             $enlace = self::nullableText($slide['enlace'] ?? null);
@@ -118,7 +118,7 @@ class SiteCustomization
                 $stmt = $pdo->prepare(
                     'UPDATE carrousel
                      SET titulo = ?, descripcion = ?, enlace = ?, orden_visual = ?, foto_perfil_url = ?, foto_perfil_public_id = ?, habilitado = ?, cancelado = 0
-                     WHERE id_carousel = ?'
+                     WHERE id_carrousel = ?'
                 );
                 $stmt->execute([$titulo, $descripcion, $enlace, $ordenVisual, $fotoUrl, $fotoPublicId, $habilitado, $id]);
                 $idsPersistidos[] = $id;
@@ -138,7 +138,7 @@ class SiteCustomization
                 continue;
             }
 
-            $stmt = $pdo->prepare('UPDATE carrousel SET cancelado = 1 WHERE id_carousel = ?');
+            $stmt = $pdo->prepare('UPDATE carrousel SET cancelado = 1 WHERE id_carrousel = ?');
             $stmt->execute([$existingId]);
         }
 

@@ -133,7 +133,7 @@ export class CarruselComponent implements OnInit, OnDestroy {
 
   private mapSlide(slide: SiteCarouselItem): Slide {
     return {
-      id: slide.id_carousel,
+      id: slide.id_carrousel,
       titulo: slide.titulo || 'Comunidad IFTS',
       descripcion: slide.descripcion || '',
       imagen: slide.foto_perfil_url || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',

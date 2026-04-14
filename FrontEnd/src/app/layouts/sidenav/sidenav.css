@@ -70,6 +70,14 @@ mat-divider {
   transition: all 0.2s ease;
 }
 
+.dashboard-link {
+  font-weight: 700;
+}
+
+.admin-divider {
+  margin: 0.35rem 0 0.5rem;
+}
+
 .nav-link mat-icon {
   margin-right: 12px;
   color: #006633;

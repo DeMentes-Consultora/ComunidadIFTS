@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../models/SiteCustomization.php';
+require_once __DIR__ . '/../models/SiteCustomizationModel.php';
 require_once __DIR__ . '/../services/CloudinaryService.php';
 
 header('Content-Type: application/json');
@@ -71,8 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         respond(200, [
             'success' => true,
             'data' => $scope === 'admin'
-                ? SiteCustomization::obtenerConfiguracionAdmin($pdo)
-                : SiteCustomization::obtenerConfiguracionPublica($pdo),
+                ? SiteCustomizationModel::obtenerConfiguracionAdmin($pdo)
+                : SiteCustomizationModel::obtenerConfiguracionPublica($pdo),
         ]);
     } catch (Throwable $e) {
         respond(500, [
@@ -99,7 +99,7 @@ try {
 
     $db = Database::getInstance();
     $pdo = $db->getConnection();
-    $configActual = SiteCustomization::obtenerConfiguracionAdmin($pdo);
+    $configActual = SiteCustomizationModel::obtenerConfiguracionAdmin($pdo);
 
     $mediaFolders = require __DIR__ . '/../config/media-folders.php';
     $cloudinary = new CloudinaryService($mediaFolders['base'] ?? 'ComunidadIFTS');
@@ -136,7 +136,7 @@ try {
 
     $slidesActuales = [];
     foreach ($configActual['carousel'] as $slideActual) {
-        $slidesActuales[(int)$slideActual['id_carousel']] = $slideActual;
+        $slidesActuales[(int)$slideActual['id_carrousel']] = $slideActual;
     }
 
     $slidesSanitizados = [];
@@ -147,7 +147,7 @@ try {
             continue;
         }
 
-        $idCarousel = isset($slide['id_carousel']) ? (int)$slide['id_carousel'] : 0;
+        $idCarousel = isset($slide['id_carrousel']) ? (int)$slide['id_carrousel'] : 0;
         $slideActual = $idCarousel > 0 && isset($slidesActuales[$idCarousel]) ? $slidesActuales[$idCarousel] : null;
         $clientKey = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($slide['client_key'] ?? ('slide_' . $index)));
         $fileKey = 'carousel_image_' . $clientKey;
@@ -181,7 +181,7 @@ try {
         }
 
         $slidesSanitizados[] = [
-            'id_carousel' => $idCarousel > 0 ? $idCarousel : null,
+            'id_carrousel' => $idCarousel > 0 ? $idCarousel : null,
             'titulo' => trim((string)($slide['titulo'] ?? '')),
             'descripcion' => trim((string)($slide['descripcion'] ?? '')),
             'enlace' => trim((string)($slide['enlace'] ?? '')),
@@ -209,21 +209,21 @@ try {
 
     $pdo->beginTransaction();
 
-    SiteCustomization::guardarNavbar($pdo, [
+    SiteCustomizationModel::guardarNavbar($pdo, [
         'brand_text' => $navbarPayload['brand_text'] ?? $navbarActual['brand_text'] ?? 'Comunidad IFTS',
         'logo_url' => $navbarLogoUrl !== '' ? $navbarLogoUrl : null,
         'logo_public_id' => $navbarLogoPublicId !== '' ? $navbarLogoPublicId : null,
         'habilitado' => 1,
     ]);
 
-    SiteCustomization::guardarCarrusel($pdo, $slidesSanitizados);
+    SiteCustomizationModel::guardarCarrusel($pdo, $slidesSanitizados);
 
     $pdo->commit();
 
     respond(200, [
         'success' => true,
         'message' => 'Configuracion del sitio actualizada correctamente',
-        'data' => SiteCustomization::obtenerConfiguracionAdmin($pdo),
+        'data' => SiteCustomizationModel::obtenerConfiguracionAdmin($pdo),
     ]);
 } catch (Throwable $e) {
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
