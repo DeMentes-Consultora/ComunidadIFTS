@@ -19,7 +19,7 @@ export class SiteCustomizationService {
   private readonly siteConfigSubject = new BehaviorSubject<SiteCustomizationConfig>({
     navbar: {
       id_navbar: null,
-      brand_text: 'Comunidad IFTS',
+      brand_text: '',
       logo_url: null,
       logo_public_id: null,
       habilitado: 1,

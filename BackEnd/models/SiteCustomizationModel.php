@@ -32,7 +32,7 @@ class SiteCustomizationModel
 
         return [
             'id_navbar' => isset($row['id_navbar']) ? (int)$row['id_navbar'] : null,
-            'brand_text' => trim((string)($row['brand_text'] ?? '')) ?: 'Comunidad IFTS',
+            'brand_text' => trim((string)($row['brand_text'] ?? '')),
             'logo_url' => self::nullableText($row['foto_perfil_url'] ?? null),
             'logo_public_id' => self::nullableText($row['foto_perfil_public_id'] ?? null),
             'habilitado' => isset($row['habilitado']) ? (int)$row['habilitado'] : 1,
@@ -42,7 +42,7 @@ class SiteCustomizationModel
     public static function guardarNavbar(PDO $pdo, array $navbar): array
     {
         $actual = self::obtenerNavbar($pdo);
-        $brandText = trim((string)($navbar['brand_text'] ?? '')) ?: 'Comunidad IFTS';
+        $brandText = trim((string)($navbar['brand_text'] ?? ''));
         $logoUrl = self::nullableText($navbar['logo_url'] ?? null);
         $logoPublicId = self::nullableText($navbar['logo_public_id'] ?? null);
         $habilitado = isset($navbar['habilitado']) ? (int)((bool)$navbar['habilitado']) : 1;

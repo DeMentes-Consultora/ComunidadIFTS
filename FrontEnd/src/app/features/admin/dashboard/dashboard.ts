@@ -85,7 +85,7 @@ export class AdminDashboard implements OnInit {
   });
 
   readonly navbarForm = this.fb.group({
-    brand_text: this.fb.nonNullable.control('Comunidad IFTS', [Validators.required, Validators.maxLength(255)]),
+    brand_text: this.fb.nonNullable.control('', [Validators.maxLength(255)]),
   });
 
   ngOnInit(): void {
@@ -183,7 +183,7 @@ export class AdminDashboard implements OnInit {
   guardarCambios(): void {
     if (this.navbarForm.invalid) {
       this.navbarForm.markAllAsTouched();
-      this.mostrarMensaje('Completa correctamente el texto del navbar', 'error');
+      this.mostrarMensaje('El texto del navbar supera el maximo permitido', 'error');
       return;
     }
 
@@ -248,7 +248,7 @@ export class AdminDashboard implements OnInit {
 
   private applyConfig(config: SiteCustomizationConfig): void {
     this.navbarForm.patchValue({
-      brand_text: config.navbar.brand_text || 'Comunidad IFTS',
+      brand_text: config.navbar.brand_text ?? '',
     });
 
     this.navbarLogoPreview.set(config.navbar.logo_url || null);

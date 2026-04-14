@@ -210,7 +210,7 @@ try {
     $pdo->beginTransaction();
 
     SiteCustomizationModel::guardarNavbar($pdo, [
-        'brand_text' => $navbarPayload['brand_text'] ?? $navbarActual['brand_text'] ?? 'Comunidad IFTS',
+        'brand_text' => $navbarPayload['brand_text'] ?? $navbarActual['brand_text'] ?? '',
         'logo_url' => $navbarLogoUrl !== '' ? $navbarLogoUrl : null,
         'logo_public_id' => $navbarLogoPublicId !== '' ? $navbarLogoPublicId : null,
         'habilitado' => 1,

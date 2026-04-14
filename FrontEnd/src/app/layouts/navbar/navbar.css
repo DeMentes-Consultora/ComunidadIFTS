@@ -3,7 +3,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 64px;
+  height: 88px;
   z-index: 1000;
   background: linear-gradient(135deg, #006633 0%, #004d26 100%);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -16,15 +16,23 @@
 .navbar-brand {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   color: white;
   font-weight: 600;
   font-size: 20px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  min-height: 76px;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .brand-logo {
-  width: 38px;
-  height: 38px;
+  width: 76px;
+  height: 76px;
   border-radius: 10px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.12);
@@ -48,7 +56,9 @@
 }
 
 .brand-text {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .navbar-right {
@@ -107,7 +117,10 @@
   }
   
   .navbar-brand {
+    position: static;
+    transform: none;
     flex: 1;
+    justify-content: center;
   }
   
   .brand-text {
@@ -115,8 +128,8 @@
   }
 
   .brand-logo {
-    width: 34px;
-    height: 34px;
+    width: 68px;
+    height: 68px;
   }
   
   .navbar-right {

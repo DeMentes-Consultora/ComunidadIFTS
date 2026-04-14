@@ -4,17 +4,17 @@
     <mat-icon>menu</mat-icon>
   </button>
   
-  <div class="navbar-brand">
+  <a class="navbar-brand" routerLink="/home" aria-label="Ir al inicio">
     <ng-container *ngIf="siteConfig$ | async as siteConfig">
       <div class="brand-logo" *ngIf="siteConfig.navbar.logo_url; else defaultBrandIcon">
-        <img [src]="siteConfig.navbar.logo_url" [alt]="siteConfig.navbar.brand_text" loading="lazy" />
+        <img [src]="siteConfig.navbar.logo_url" [alt]="siteConfig.navbar.brand_text || 'Logo del sitio'" loading="lazy" />
       </div>
       <ng-template #defaultBrandIcon>
         <mat-icon class="brand-icon">school</mat-icon>
       </ng-template>
-      <span class="brand-text">{{ siteConfig.navbar.brand_text }}</span>
+      <span class="brand-text" *ngIf="siteConfig.navbar.brand_text">{{ siteConfig.navbar.brand_text }}</span>
     </ng-container>
-  </div>
+  </a>
   
   <div class="navbar-right">
     <ng-container *ngIf="currentUser$ | async as user; else loginButton">
