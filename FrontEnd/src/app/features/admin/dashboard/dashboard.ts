@@ -10,12 +10,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import {
   DashboardStats,
   SiteCarouselItem,
   SiteCustomizationConfig,
   SiteCustomizationSavePayload,
 } from '../../../shared/models/site-customization.model';
+import { AuthService } from '../../../shared/services/auth.service';
 import { SiteCustomizationService } from '../../../shared/services/site-customization.service';
 
 type DashboardSection = 'navbar' | 'carousel';
@@ -56,6 +58,8 @@ interface EditableCarouselSlide {
 })
 export class AdminDashboard implements OnInit {
   private readonly siteCustomizationService = inject(SiteCustomizationService);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
   private readonly fb = inject(FormBuilder);
 
@@ -222,6 +226,11 @@ export class AdminDashboard implements OnInit {
       },
       error: (error) => {
         this.saving.set(false);
+
+        if (this.handleAuthErrors(error)) {
+          return;
+        }
+
         this.mostrarMensaje(error?.message || 'No fue posible guardar la personalizacion', 'error');
       },
     });
@@ -241,9 +250,41 @@ export class AdminDashboard implements OnInit {
       },
       error: (error) => {
         this.loading.set(false);
+
+        if (this.handleAuthErrors(error)) {
+          return;
+        }
+
         this.mostrarMensaje(error?.message || 'No fue posible cargar el dashboard', 'error');
       },
     });
+  }
+
+  private handleAuthErrors(error: unknown): boolean {
+    const status = Number((error as { status?: number })?.status ?? 0);
+
+    if (status === 401) {
+      this.authService.logout().subscribe({
+        next: () => {
+          this.mostrarMensaje('Tu sesion expiro. Inicia sesion nuevamente.', 'error');
+          void this.router.navigate(['/home']);
+        },
+        error: () => {
+          this.mostrarMensaje('Tu sesion expiro. Inicia sesion nuevamente.', 'error');
+          void this.router.navigate(['/home']);
+        },
+      });
+
+      return true;
+    }
+
+    if (status === 403) {
+      this.mostrarMensaje('No tienes permisos para acceder al dashboard.', 'error');
+      void this.router.navigate(['/home']);
+      return true;
+    }
+
+    return false;
   }
 
   private applyConfig(config: SiteCustomizationConfig): void {
