@@ -1,8 +1,15 @@
 <nav class="sidebar-nav">
   <!-- Logo y título -->
   <div class="sidebar-header">
-    <mat-icon class="header-icon">school</mat-icon>
-    <h2>Comunidad IFTS</h2>
+    <ng-container *ngIf="siteConfig$ | async as siteConfig">
+      <div class="header-logo" *ngIf="siteConfig.sidebar.logo_url; else defaultSidebarIcon">
+        <img [src]="siteConfig.sidebar.logo_url" [alt]="siteConfig.sidebar.brand_text || 'Logo del sidebar'" loading="lazy" />
+      </div>
+      <ng-template #defaultSidebarIcon>
+        <mat-icon class="header-icon">school</mat-icon>
+      </ng-template>
+      <h2>{{ siteConfig.sidebar.brand_text || 'Comunidad IFTS' }}</h2>
+    </ng-container>
   </div>
   
   <!-- Separador -->

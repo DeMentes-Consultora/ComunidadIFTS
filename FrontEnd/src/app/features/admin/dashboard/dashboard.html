@@ -12,6 +12,10 @@
             <mat-icon>branding_watermark</mat-icon>
             Marca del navbar
           </button>
+          <button type="button" class="sidebar-link" [class.active]="selectedSection() === 'sidebar'" (click)="seleccionarSeccion('sidebar')">
+            <mat-icon>menu_open</mat-icon>
+            Marca del sidebar
+          </button>
           <button type="button" class="sidebar-link" [class.active]="selectedSection() === 'carousel'" (click)="seleccionarSeccion('carousel')">
             <mat-icon>view_carousel</mat-icon>
             Carrusel principal
@@ -84,6 +88,39 @@
                       <span>{{ navbarLogoPreview() ? 'Cambiar logo' : 'Agregar logo' }}</span>
                     </label>
                     <button mat-stroked-button type="button" (click)="quitarLogoNavbar()" [disabled]="!navbarLogoPreview()">
+                      Quitar logo
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          }
+
+          @if (selectedSection() === 'sidebar') {
+            <form class="editor-section" [formGroup]="sidebarForm">
+              <div class="editor-grid">
+                <mat-form-field appearance="outline">
+                  <mat-label>Texto del sidebar</mat-label>
+                  <input matInput formControlName="brand_text" maxlength="255" />
+                  <mat-hint>Opcional. Si queda vacio, se mostrara solo el logo o icono.</mat-hint>
+                </mat-form-field>
+
+                <div class="logo-panel">
+                  <div class="logo-preview" *ngIf="sidebarLogoPreview(); else sidebarLogoPlaceholder">
+                    <img [src]="sidebarLogoPreview()!" alt="Logo del sidebar" />
+                  </div>
+                  <ng-template #sidebarLogoPlaceholder>
+                    <div class="logo-preview empty">
+                      <mat-icon>image</mat-icon>
+                    </div>
+                  </ng-template>
+
+                  <div class="logo-actions">
+                    <label class="file-button">
+                      <input type="file" accept="image/*" (change)="cambiarArchivoSidebar($event)" />
+                      <span>{{ sidebarLogoPreview() ? 'Cambiar logo' : 'Agregar logo' }}</span>
+                    </label>
+                    <button mat-stroked-button type="button" (click)="quitarLogoSidebar()" [disabled]="!sidebarLogoPreview()">
                       Quitar logo
                     </button>
                   </div>

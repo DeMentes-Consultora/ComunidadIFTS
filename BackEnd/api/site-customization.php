@@ -95,6 +95,7 @@ try {
 
     $payload = parsePayload();
     $navbarPayload = is_array($payload['navbar'] ?? null) ? $payload['navbar'] : [];
+    $sidebarPayload = is_array($payload['sidebar'] ?? null) ? $payload['sidebar'] : [];
     $carouselPayload = is_array($payload['carousel'] ?? null) ? $payload['carousel'] : [];
 
     $db = Database::getInstance();
@@ -108,6 +109,11 @@ try {
     $navbarLogoPublicId = trim((string)($navbarActual['logo_public_id'] ?? ''));
     $navbarLogoUrl = trim((string)($navbarActual['logo_url'] ?? ''));
     $removeNavbarLogo = !empty($navbarPayload['remove_logo']);
+
+    $sidebarActual = $configActual['sidebar'];
+    $sidebarLogoPublicId = trim((string)($sidebarActual['logo_public_id'] ?? ''));
+    $sidebarLogoUrl = trim((string)($sidebarActual['logo_url'] ?? ''));
+    $removeSidebarLogo = !empty($sidebarPayload['remove_logo']);
 
     if ($removeNavbarLogo && $navbarLogoPublicId !== '') {
         $cloudinary->delete($navbarLogoPublicId, 'image');
@@ -132,6 +138,31 @@ try {
 
         $navbarLogoPublicId = trim((string)($uploadLogo['public_id'] ?? ''));
         $navbarLogoUrl = trim((string)($uploadLogo['url'] ?? ''));
+    }
+
+    if ($removeSidebarLogo && $sidebarLogoPublicId !== '') {
+        $cloudinary->delete($sidebarLogoPublicId, 'image');
+        $sidebarLogoPublicId = '';
+        $sidebarLogoUrl = '';
+    }
+
+    if (!empty($_FILES['sidebar_logo']) && (int)($_FILES['sidebar_logo']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+        $folderSidebar = $mediaFolders['sidebar']['logo'] ?? 'ComunidadIFTS/sidebar';
+        $uploadSidebarLogo = $cloudinary->uploadFromFileArray($_FILES['sidebar_logo'], $folderSidebar, 'image');
+        if (empty($uploadSidebarLogo['success'])) {
+            respond(500, [
+                'success' => false,
+                'message' => $uploadSidebarLogo['message'] ?? 'No fue posible subir el logo del sidebar',
+                'error' => ($_ENV['APP_DEBUG'] ?? false) ? ($uploadSidebarLogo['error'] ?? null) : null,
+            ]);
+        }
+
+        if ($sidebarLogoPublicId !== '' && $sidebarLogoPublicId !== (string)($uploadSidebarLogo['public_id'] ?? '')) {
+            $cloudinary->delete($sidebarLogoPublicId, 'image');
+        }
+
+        $sidebarLogoPublicId = trim((string)($uploadSidebarLogo['public_id'] ?? ''));
+        $sidebarLogoUrl = trim((string)($uploadSidebarLogo['url'] ?? ''));
     }
 
     $slidesActuales = [];
@@ -213,6 +244,13 @@ try {
         'brand_text' => $navbarPayload['brand_text'] ?? $navbarActual['brand_text'] ?? '',
         'logo_url' => $navbarLogoUrl !== '' ? $navbarLogoUrl : null,
         'logo_public_id' => $navbarLogoPublicId !== '' ? $navbarLogoPublicId : null,
+        'habilitado' => 1,
+    ]);
+
+    SiteCustomizationModel::guardarSidebar($pdo, [
+        'brand_text' => $sidebarPayload['brand_text'] ?? $sidebarActual['brand_text'] ?? '',
+        'logo_url' => $sidebarLogoUrl !== '' ? $sidebarLogoUrl : null,
+        'logo_public_id' => $sidebarLogoPublicId !== '' ? $sidebarLogoPublicId : null,
         'habilitado' => 1,
     ]);
 

@@ -12,6 +12,9 @@ return [
     'navbar' => [
         'logo' => 'ComunidadIFTS/navbar',
     ],
+    'sidebar' => [
+        'logo' => 'ComunidadIFTS/sidebar',
+    ],
     'instituciones' => [
         'logo' => 'ComunidadIFTS/logoIFTS',
         'video' => 'ComunidadIFTS/videoIFTS',

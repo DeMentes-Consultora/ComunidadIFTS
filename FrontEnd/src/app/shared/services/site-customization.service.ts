@@ -24,6 +24,13 @@ export class SiteCustomizationService {
       logo_public_id: null,
       habilitado: 1,
     },
+    sidebar: {
+      id_sidebar: null,
+      brand_text: '',
+      logo_url: null,
+      logo_public_id: null,
+      habilitado: 1,
+    },
     carousel: [],
   });
   private loaded = false;
@@ -66,6 +73,7 @@ export class SiteCustomizationService {
     payload: SiteCustomizationSavePayload,
     files: {
       navbarLogo?: File | null;
+      sidebarLogo?: File | null;
       carouselFiles?: Record<string, File | null>;
     }
   ): Observable<SiteCustomizationConfig> {
@@ -74,6 +82,10 @@ export class SiteCustomizationService {
 
     if (files.navbarLogo) {
       formData.append('navbar_logo', files.navbarLogo);
+    }
+
+    if (files.sidebarLogo) {
+      formData.append('sidebar_logo', files.sidebarLogo);
     }
 
     Object.entries(files.carouselFiles ?? {}).forEach(([clientKey, file]) => {
@@ -95,6 +107,7 @@ export class SiteCustomizationService {
         this.loaded = true;
         this.siteConfigSubject.next({
           navbar: adminConfig.navbar,
+          sidebar: adminConfig.sidebar,
           carousel: adminConfig.carousel.filter((slide) => slide.habilitado === 1),
         });
       })

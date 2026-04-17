@@ -6,6 +6,14 @@ export interface SiteNavbarConfig {
   habilitado: number;
 }
 
+export interface SiteSidebarConfig {
+  id_sidebar: number | null;
+  brand_text: string;
+  logo_url: string | null;
+  logo_public_id: string | null;
+  habilitado: number;
+}
+
 export interface SiteCarouselItem {
   id_carrousel: number;
   titulo: string;
@@ -19,6 +27,7 @@ export interface SiteCarouselItem {
 
 export interface SiteCustomizationConfig {
   navbar: SiteNavbarConfig;
+  sidebar: SiteSidebarConfig;
   carousel: SiteCarouselItem[];
 }
 
@@ -39,6 +48,10 @@ export interface SiteCustomizationResponse<T> {
 
 export interface SiteCustomizationSavePayload {
   navbar: {
+    brand_text: string;
+    remove_logo?: boolean;
+  };
+  sidebar: {
     brand_text: string;
     remove_logo?: boolean;
   };

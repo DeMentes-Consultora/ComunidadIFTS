@@ -6,6 +6,7 @@ class SiteCustomizationModel
     {
         return [
             'navbar' => self::obtenerNavbar($pdo),
+            'sidebar' => self::obtenerSidebar($pdo),
             'carousel' => self::obtenerCarrusel($pdo, false),
         ];
     }
@@ -14,6 +15,7 @@ class SiteCustomizationModel
     {
         return [
             'navbar' => self::obtenerNavbar($pdo),
+            'sidebar' => self::obtenerSidebar($pdo),
             'carousel' => self::obtenerCarrusel($pdo, true),
         ];
     }
@@ -63,6 +65,53 @@ class SiteCustomizationModel
         }
 
         return self::obtenerNavbar($pdo);
+    }
+
+    public static function obtenerSidebar(PDO $pdo): array
+    {
+        $stmt = $pdo->query(
+            'SELECT id_sidebar, brand_text, foto_perfil_url, foto_perfil_public_id, habilitado
+             FROM sidebar
+             WHERE cancelado = 0
+             ORDER BY id_sidebar ASC
+             LIMIT 1'
+        );
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return [
+            'id_sidebar' => isset($row['id_sidebar']) ? (int)$row['id_sidebar'] : null,
+            'brand_text' => trim((string)($row['brand_text'] ?? '')),
+            'logo_url' => self::nullableText($row['foto_perfil_url'] ?? null),
+            'logo_public_id' => self::nullableText($row['foto_perfil_public_id'] ?? null),
+            'habilitado' => isset($row['habilitado']) ? (int)$row['habilitado'] : 1,
+        ];
+    }
+
+    public static function guardarSidebar(PDO $pdo, array $sidebar): array
+    {
+        $actual = self::obtenerSidebar($pdo);
+        $brandText = trim((string)($sidebar['brand_text'] ?? ''));
+        $logoUrl = self::nullableText($sidebar['logo_url'] ?? null);
+        $logoPublicId = self::nullableText($sidebar['logo_public_id'] ?? null);
+        $habilitado = isset($sidebar['habilitado']) ? (int)((bool)$sidebar['habilitado']) : 1;
+
+        if (!empty($actual['id_sidebar'])) {
+            $stmt = $pdo->prepare(
+                'UPDATE sidebar
+                 SET brand_text = ?, foto_perfil_url = ?, foto_perfil_public_id = ?, habilitado = ?, cancelado = 0
+                 WHERE id_sidebar = ?'
+            );
+            $stmt->execute([$brandText, $logoUrl, $logoPublicId, $habilitado, $actual['id_sidebar']]);
+        } else {
+            $stmt = $pdo->prepare(
+                'INSERT INTO sidebar (brand_text, foto_perfil_url, foto_perfil_public_id, habilitado, cancelado)
+                 VALUES (?, ?, ?, ?, 0)'
+            );
+            $stmt->execute([$brandText, $logoUrl, $logoPublicId, $habilitado]);
+        }
+
+        return self::obtenerSidebar($pdo);
     }
 
     public static function obtenerCarrusel(PDO $pdo, bool $includeDisabled = false): array

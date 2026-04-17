@@ -3,7 +3,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 88px;
+  height: 4rem;
   z-index: 1000;
   background: linear-gradient(135deg, #006633 0%, #004d26 100%);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -31,9 +31,9 @@
 }
 
 .brand-logo {
-  width: 76px;
-  height: 76px;
-  border-radius: 10px;
+  width: 60px;
+  height: 60px;
+  border-radius: 35rem;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.28);

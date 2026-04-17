@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 17-04-2026 a las 04:00:45
+-- Tiempo de generación: 17-04-2026 a las 17:23:55
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -20,31 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `comunidad_ifts`
 --
-
--- --------------------------------------------------------
-CREATE DATABASE IF NOT EXISTS `comunidad_ifts` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `comunidad_ifts`;
--- Estructura de tabla para la tabla `bolsadetrabajo`
---
-
-CREATE TABLE `bolsadetrabajo` (
-  `id_bolsaDeTrabajo` int(11) NOT NULL,
-  `id_institucion` int(11) NOT NULL,
-  `id_usuario` int(11) NOT NULL,
-  `tituloOferta` varchar(512) NOT NULL,
-  `textoOferta` varchar(512) NOT NULL,
-  `habilitado` int(1) NOT NULL DEFAULT 0,
-  `cancelado` int(1) NOT NULL DEFAULT 0,
-  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
-  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `bolsadetrabajo`
---
-
-INSERT INTO `bolsadetrabajo` (`id_bolsaDeTrabajo`, `id_institucion`, `id_usuario`, `tituloOferta`, `textoOferta`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, 3, 21, 'oferta laboral de prueba', 'descripción de oferta laboral de prueba', 1, 0, '2026-04-17 01:08:24', '2026-04-17 01:09:36');
 
 -- --------------------------------------------------------
 
@@ -158,11 +133,8 @@ CREATE TABLE `carrousel` (
 --
 
 INSERT INTO `carrousel` (`id_carrousel`, `titulo`, `descripcion`, `enlace`, `orden_visual`, `foto_perfil_public_id`, `foto_perfil_url`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, 'titulo_1', 'descripcion_1', NULL, 1, 'ComunidadIFTS/carrusel/php752E_k2lrf1', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776208945/ComunidadIFTS/carrusel/php752E_k2lrf1.png', 1, 0, '2026-04-14 23:22:37', '2026-04-14 23:22:37'),
-(2, '', '', NULL, 2, 'ComunidadIFTS/carrusel/php755E_bfwshl', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776208947/ComunidadIFTS/carrusel/php755E_bfwshl.png', 1, 0, '2026-04-14 23:22:37', '2026-04-14 23:22:37'),
-(3, '', '', NULL, 3, 'ComunidadIFTS/carrusel/php756E_g1eywk', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776208949/ComunidadIFTS/carrusel/php756E_g1eywk.png', 1, 0, '2026-04-14 23:22:37', '2026-04-14 23:22:37'),
-(4, '', '', NULL, 4, 'ComunidadIFTS/carrusel/php759E_frd8ze', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776208950/ComunidadIFTS/carrusel/php759E_frd8ze.png', 1, 0, '2026-04-14 23:22:37', '2026-04-14 23:22:37'),
-(5, '', '', NULL, 5, 'ComunidadIFTS/carrusel/phpB93B_jg100v', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776372835/ComunidadIFTS/carrusel/phpB93B_jg100v.png', 1, 0, '2026-04-14 23:22:37', '2026-04-16 20:53:56');
+(1, 'Bienvenido a Comunidad IFTS', 'Conecta con todos los Institutos Superiores de Tecnologia de Buenos Aires', '#', 1, 'ComunidadIFTS/carrusel/php86D5_sydagd', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776363189/ComunidadIFTS/carrusel/php86D5_sydagd.png', 1, 0, '2026-04-14 15:50:23', '2026-04-16 18:13:12'),
+(2, 'IFTS y comunidad', 'Descubre carreras, instituciones y oportunidades para crecer profesionalmente', '#', 2, 'ComunidadIFTS/carrusel/php8792_bpidkr', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776363190/ComunidadIFTS/carrusel/php8792_bpidkr.png', 1, 0, '2026-04-14 15:50:23', '2026-04-16 18:13:12');
 
 -- --------------------------------------------------------
 
@@ -359,7 +331,7 @@ CREATE TABLE `navbar` (
 --
 
 INSERT INTO `navbar` (`id_navbar`, `brand_text`, `foto_perfil_public_id`, `foto_perfil_url`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, '', 'ComunidadIFTS/navbar/phpD7_qwghdt', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776372800/ComunidadIFTS/navbar/phpD7_qwghdt.png', 1, 0, '2026-04-14 22:37:59', '2026-04-16 20:53:21');
+(1, '', 'ComunidadIFTS/navbar/php2585_mdlpuq', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776430687/ComunidadIFTS/navbar/php2585_mdlpuq.png', 1, 0, '2026-04-14 15:50:23', '2026-04-17 12:58:09');
 
 -- --------------------------------------------------------
 
@@ -413,30 +385,6 @@ INSERT INTO `persona` (`id_persona`, `apellido`, `nombre`, `edad`, `dni`, `fecha
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `postulacion`
---
-
-CREATE TABLE `postulacion` (
-  `id_postulacion` int(11) NOT NULL,
-  `id_bolsaDeTrabajo` int(11) NOT NULL COMMENT 'FK a bolsadetrabajo',
-  `id_usuario` int(11) NOT NULL COMMENT 'Alumno que se postula',
-  `cv_url` varchar(512) DEFAULT NULL COMMENT 'URL pública del CV en Cloudinary',
-  `cv_public_id` varchar(512) DEFAULT NULL COMMENT 'Public ID en Cloudinary para borrado',
-  `cancelado` int(1) NOT NULL DEFAULT 0,
-  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
-  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `postulacion`
---
-
-INSERT INTO `postulacion` (`id_postulacion`, `id_bolsaDeTrabajo`, `id_usuario`, `cv_url`, `cv_public_id`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, 1, 19, 'https://res.cloudinary.com/dm8ds67tb/raw/upload/v1776388807/ComunidadIFTS/CVs/CVs/php6FBD_evfhey.tmp', 'ComunidadIFTS/CVs/CVs/php6FBD_evfhey.tmp', 0, '2026-04-17 01:20:07', '2026-04-17 01:20:07');
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `rol`
 --
 
@@ -457,6 +405,30 @@ INSERT INTO `rol` (`id_rol`, `nombre_rol`, `habilitado`, `cancelado`, `idCreate`
 (1, 'Administrador', 1, 0, '2026-02-25 23:16:00', '2026-02-25 23:16:00'),
 (2, 'Alumno', 1, 0, '2026-02-25 23:16:00', '2026-02-25 23:16:00'),
 (3, 'AdministradorIFTS', 1, 0, '2026-02-25 23:16:00', '2026-02-25 23:16:00');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `sidebar`
+--
+
+CREATE TABLE `sidebar` (
+  `id_sidebar` int(11) NOT NULL,
+  `brand_text` varchar(255) DEFAULT NULL,
+  `foto_perfil_public_id` varchar(255) DEFAULT NULL,
+  `foto_perfil_url` varchar(512) DEFAULT NULL,
+  `habilitado` int(11) NOT NULL DEFAULT 1,
+  `cancelado` int(11) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `sidebar`
+--
+
+INSERT INTO `sidebar` (`id_sidebar`, `brand_text`, `foto_perfil_public_id`, `foto_perfil_url`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, 'Comunidad IFTS', NULL, NULL, 1, 0, '2026-04-17 15:22:41', '2026-04-17 15:22:41');
 
 -- --------------------------------------------------------
 
@@ -482,7 +454,7 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id_usuario`, `email`, `clave`, `id_rol`, `id_persona`, `id_institucion`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, 'seba@gmail.com', '$2y$12$6iOiuuGdcf3QY.KII.EwTujjzTI3jUUxjL4f3rlyWr6WAUvGyNOd2', 1, 1, 1, 1, 0, '2026-02-25 23:53:22', '2026-04-17 01:42:26'),
+(1, 'seba@gmail.com', '$2y$10$Tb.mgWSOKMVKkQM4hpt.kuqZwNRy/wYgY4WIJzPbUCuNDCDGJTnTC', 1, 1, 1, 1, 0, '2026-02-25 23:53:22', '2026-02-26 03:03:10'),
 (2, 'test507238115@mail.com', '$2y$10$ZbO25iUGI7.4wfZOjKbv5Osag0DGvr9t4rRw9oy.X1CTHpP6fMKGC', 2, 2, 1, 1, 0, '2026-02-25 23:54:32', '2026-02-26 00:16:11'),
 (3, 'test1864180326@mail.com', '$2y$10$f/nEWTe0RvjsEH7MQaN3ZesPM88yGpcqtrS36OyUtKbQUhUxVH1km', 2, 3, 1, 1, 0, '2026-02-25 23:58:22', '2026-02-26 00:16:04'),
 (4, 'test1364295098@mail.com', '$2y$10$NpGAF9WJHAUqd/SSO/EMZuOa9dIVUBCqqbHQXTZoykgQSDFWXDgKi', 2, 4, 1, 1, 0, '2026-02-25 23:59:25', '2026-02-26 00:15:56'),
@@ -497,24 +469,16 @@ INSERT INTO `usuario` (`id_usuario`, `email`, `clave`, `id_rol`, `id_persona`, `
 (13, 'sebaminotti@gmail.com', '$2y$10$yrb7XSIm1FISbp0eEzDc0OhY9OYm9YxpIvUJIU73YawHRmBVeVu6y', 2, 13, 3, 1, 0, '2026-02-26 03:00:33', '2026-03-13 15:20:11'),
 (14, 'dementesconsultora2025@gmail.com', '$2y$10$O4hHfJSOH8sQ2t2SwOjnU.Pr5qi/.PdGhm7pNrMUN.L7iu06/eQa2', 1, 14, 1, 1, 0, '2026-03-13 12:50:34', '2026-03-13 14:06:38'),
 (15, 'lesmuchachosdelinapifts@gmail.com', '$2y$10$j5pc/WJyzfxQgBJSOz4RqeBB1MiYSxZCgK4VqgsJsbU3UxUh6fTG2', 2, 15, 1, 1, 0, '2026-03-13 14:33:55', '2026-03-13 15:15:10'),
-(16, 'losmuchachosdelinapifts@gmail.com', '$2y$10$ZZysVBEqJbRNHCT9jZMvxeRBzHbqqbMuxi1dhmlkO.bow7k1mvNjm', 2, 16, 2, 1, 0, '2026-03-13 15:17:03', '2026-04-17 01:22:58'),
+(16, 'losmuchachosdelinapifts@gmail.com', '$2y$10$ZZysVBEqJbRNHCT9jZMvxeRBzHbqqbMuxi1dhmlkO.bow7k1mvNjm', 1, 16, 2, 1, 0, '2026-03-13 15:17:03', '2026-03-13 15:18:50'),
 (17, 'sminotti@gmail.com', '$2y$10$L3mpNFklv4C2Z4I6cgf9e.xJcoLalV6F05bZ520upSD/v/JcXPSqG', 1, 17, 1, 1, 0, '2026-03-13 15:22:26', '2026-03-13 15:35:45'),
 (18, 'seb@gmail.com', '$2y$10$UhkPI9fR0FG/SuP1rKVC5O.TCHOkjsmfFX9ZdfwH1o85cAl.Qrs8e', 1, 18, 6, 1, 0, '2026-03-13 17:29:18', '2026-03-13 17:48:31'),
-(19, 'mino@gmail.com', '$2y$12$6iOiuuGdcf3QY.KII.EwTujjzTI3jUUxjL4f3rlyWr6WAUvGyNOd2', 2, 19, 5, 1, 0, '2026-03-13 17:49:33', '2026-04-17 01:02:28'),
+(19, 'mino@gmail.com', '$2y$10$rFCJ2WVPayAWbi0JkJE6KudkElZRI.HVkbb/ai9LY9aXLMvniQode', 2, 19, 5, 1, 0, '2026-03-13 17:49:33', '2026-03-13 18:07:34'),
 (20, 'sebas@gmail.com', '$2y$10$PguAEskHTJUTMqB2kh28v.DRU3.UYFrv4fJHHe6ONNYNq6Errz.AG', 2, 20, 5, 1, 0, '2026-03-13 18:18:35', '2026-03-13 18:29:07'),
-(21, 'sebastianminotti@gmail.com', '$2y$12$6iOiuuGdcf3QY.KII.EwTujjzTI3jUUxjL4f3rlyWr6WAUvGyNOd2', 3, 21, 3, 1, 0, '2026-03-13 18:30:06', '2026-04-17 01:05:46');
+(21, 'sebastianminotti@gmail.com', '$2y$10$r0Tf23UJ27Xt5rMMBEG/KOjwD.y95yDlgzdDvG.JtwnRAlXQ4gw1q', 2, 21, 3, 1, 0, '2026-03-13 18:30:06', '2026-03-13 18:39:03');
 
 --
 -- Índices para tablas volcadas
 --
-
---
--- Indices de la tabla `bolsadetrabajo`
---
-ALTER TABLE `bolsadetrabajo`
-  ADD PRIMARY KEY (`id_bolsaDeTrabajo`),
-  ADD KEY `id_institucion` (`id_institucion`,`id_usuario`),
-  ADD KEY `fk_bolsa_usuario_creador` (`id_usuario`);
 
 --
 -- Indices de la tabla `carrera`
@@ -569,18 +533,16 @@ ALTER TABLE `persona`
   ADD PRIMARY KEY (`id_persona`);
 
 --
--- Indices de la tabla `postulacion`
---
-ALTER TABLE `postulacion`
-  ADD PRIMARY KEY (`id_postulacion`),
-  ADD UNIQUE KEY `uq_postulacion` (`id_bolsaDeTrabajo`,`id_usuario`),
-  ADD KEY `fk_postulacion_alumno` (`id_usuario`);
-
---
 -- Indices de la tabla `rol`
 --
 ALTER TABLE `rol`
   ADD PRIMARY KEY (`id_rol`);
+
+--
+-- Indices de la tabla `sidebar`
+--
+ALTER TABLE `sidebar`
+  ADD PRIMARY KEY (`id_sidebar`);
 
 --
 -- Indices de la tabla `usuario`
@@ -595,12 +557,6 @@ ALTER TABLE `usuario`
 --
 -- AUTO_INCREMENT de las tablas volcadas
 --
-
---
--- AUTO_INCREMENT de la tabla `bolsadetrabajo`
---
-ALTER TABLE `bolsadetrabajo`
-  MODIFY `id_bolsaDeTrabajo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `carrera`
@@ -618,7 +574,7 @@ ALTER TABLE `carrera_materia`
 -- AUTO_INCREMENT de la tabla `carrousel`
 --
 ALTER TABLE `carrousel`
-  MODIFY `id_carrousel` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_carrousel` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `institucion`
@@ -651,64 +607,22 @@ ALTER TABLE `persona`
   MODIFY `id_persona` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
--- AUTO_INCREMENT de la tabla `postulacion`
---
-ALTER TABLE `postulacion`
-  MODIFY `id_postulacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT de la tabla `rol`
 --
 ALTER TABLE `rol`
   MODIFY `id_rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT de la tabla `sidebar`
+--
+ALTER TABLE `sidebar`
+  MODIFY `id_sidebar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
   MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
-
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `bolsadetrabajo`
---
-ALTER TABLE `bolsadetrabajo`
-  ADD CONSTRAINT `bolsadetrabajo_ibfk_1` FOREIGN KEY (`id_institucion`) REFERENCES `institucion` (`id_institucion`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `bolsadetrabajo_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_bolsa_institucion` FOREIGN KEY (`id_institucion`) REFERENCES `institucion` (`id_institucion`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_bolsa_usuario_creador` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `carrera_materia`
---
-ALTER TABLE `carrera_materia`
-  ADD CONSTRAINT `carrera_materia_ibfk_1` FOREIGN KEY (`id_carrera`) REFERENCES `carrera` (`id_carrera`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `carrera_materia_ibfk_2` FOREIGN KEY (`id_materia`) REFERENCES `materia` (`id_materia`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `institucion_carrera`
---
-ALTER TABLE `institucion_carrera`
-  ADD CONSTRAINT `institucion_carrera_ibfk_1` FOREIGN KEY (`id_institucion`) REFERENCES `institucion` (`id_institucion`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `institucion_carrera_ibfk_2` FOREIGN KEY (`id_carrera`) REFERENCES `carrera` (`id_carrera`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `postulacion`
---
-ALTER TABLE `postulacion`
-  ADD CONSTRAINT `fk_postulacion_alumno` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_postulacion_oferta` FOREIGN KEY (`id_bolsaDeTrabajo`) REFERENCES `bolsadetrabajo` (`id_bolsaDeTrabajo`) ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `usuario`
---
-ALTER TABLE `usuario`
-  ADD CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`id_rol`) REFERENCES `rol` (`id_rol`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `usuario_ibfk_2` FOREIGN KEY (`id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `usuario_ibfk_3` FOREIGN KEY (`id_institucion`) REFERENCES `institucion` (`id_institucion`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -20,7 +20,7 @@ import {
 import { AuthService } from '../../../shared/services/auth.service';
 import { SiteCustomizationService } from '../../../shared/services/site-customization.service';
 
-type DashboardSection = 'navbar' | 'carousel';
+type DashboardSection = 'navbar' | 'sidebar' | 'carousel';
 
 interface EditableCarouselSlide {
   id_carrousel: number | null;
@@ -71,6 +71,9 @@ export class AdminDashboard implements OnInit {
   readonly navbarLogoPreview = signal<string | null>(null);
   readonly navbarLogoFile = signal<File | null>(null);
   readonly removeNavbarLogo = signal(false);
+  readonly sidebarLogoPreview = signal<string | null>(null);
+  readonly sidebarLogoFile = signal<File | null>(null);
+  readonly removeSidebarLogo = signal(false);
 
   readonly statsCards = computed(() => {
     const stats = this.stats();
@@ -89,6 +92,10 @@ export class AdminDashboard implements OnInit {
   });
 
   readonly navbarForm = this.fb.group({
+    brand_text: this.fb.nonNullable.control('', [Validators.maxLength(255)]),
+  });
+
+  readonly sidebarForm = this.fb.group({
     brand_text: this.fb.nonNullable.control('', [Validators.maxLength(255)]),
   });
 
@@ -141,6 +148,21 @@ export class AdminDashboard implements OnInit {
     this.removeNavbarLogo.set(true);
   }
 
+  cambiarArchivoSidebar(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+
+    this.sidebarLogoFile.set(file);
+    this.removeSidebarLogo.set(false);
+    this.sidebarLogoPreview.set(file ? URL.createObjectURL(file) : this.sidebarLogoPreview());
+  }
+
+  quitarLogoSidebar(): void {
+    this.sidebarLogoFile.set(null);
+    this.sidebarLogoPreview.set(null);
+    this.removeSidebarLogo.set(true);
+  }
+
   cambiarImagenSlide(clientKey: string, event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
@@ -185,9 +207,10 @@ export class AdminDashboard implements OnInit {
   }
 
   guardarCambios(): void {
-    if (this.navbarForm.invalid) {
+    if (this.navbarForm.invalid || this.sidebarForm.invalid) {
       this.navbarForm.markAllAsTouched();
-      this.mostrarMensaje('El texto del navbar supera el maximo permitido', 'error');
+      this.sidebarForm.markAllAsTouched();
+      this.mostrarMensaje('El texto del navbar o sidebar supera el maximo permitido', 'error');
       return;
     }
 
@@ -195,6 +218,10 @@ export class AdminDashboard implements OnInit {
       navbar: {
         brand_text: this.navbarForm.getRawValue().brand_text.trim(),
         remove_logo: this.removeNavbarLogo(),
+      },
+      sidebar: {
+        brand_text: this.sidebarForm.getRawValue().brand_text.trim(),
+        remove_logo: this.removeSidebarLogo(),
       },
       carousel: this.reordenarSlides(this.carouselSlides()).map((slide, index) => ({
         id_carrousel: slide.id_carrousel,
@@ -217,6 +244,7 @@ export class AdminDashboard implements OnInit {
 
     this.siteCustomizationService.saveSiteConfig(payload, {
       navbarLogo: this.navbarLogoFile(),
+      sidebarLogo: this.sidebarLogoFile(),
       carouselFiles,
     }).subscribe({
       next: (config) => {
@@ -292,9 +320,16 @@ export class AdminDashboard implements OnInit {
       brand_text: config.navbar.brand_text ?? '',
     });
 
+    this.sidebarForm.patchValue({
+      brand_text: config.sidebar.brand_text ?? '',
+    });
+
     this.navbarLogoPreview.set(config.navbar.logo_url || null);
     this.navbarLogoFile.set(null);
     this.removeNavbarLogo.set(false);
+    this.sidebarLogoPreview.set(config.sidebar.logo_url || null);
+    this.sidebarLogoFile.set(null);
+    this.removeSidebarLogo.set(false);
     this.carouselSlides.set(this.reordenarSlides((config.carousel ?? []).map((slide, index) => this.mapEditableSlide(slide, index))));
   }
 
