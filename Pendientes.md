@@ -6,9 +6,14 @@ Básate en el formulario de contacto del proyecto ifst15 si puede ser.
 PERFIL DE USUARIO:
 
 Rol Alumno:
-Primero quiero crear el perfil de usuario. Lo que van a ver los usuarios registrados es: del lado izquierdo como en el proyecto del ifts15, fíjate por favor, la foto de perfil, debajo los datos personales, el ifts al cual esta anotado, la carrera y el año a las que está cursando (todo esto está en la base de datos), del lado derecho que aparezcan las ofertas laborales a las que este postulado. Cuando la “oferta laboral sea deshabilitada debería desaparecer del perfil del usuario.
+Primero quiero crear el perfil de usuario. Lo que van a ver los usuarios registrados es: del lado izquierdo como en el proyecto del ifts15, fíjate por favor, la foto de perfil, debajo los datos personales, el ifts al cual esta anotado, la carrera y el año a las que está cursando (todo esto está en la base de datos), del lado derecho que aparezcan las ofertas laborales a las que este postulado. Cuando la “oferta laboral sea deshabilitada debería desaparecer del perfil del usuario y si el usuario no quiere ver mas esa oferta a la cual se postulo que pueda eliminarla de su perfil(en la base de datos pasaria a estar cancelada=1,habilitada=0).
+
 Rol AdministradorIfts (3):
-Las instituciones registradas pueden ver: siguiendo el mismo formato del lado izquierdo la foto de perfil (será el logo de la institución), debajo los datos de la misma: email de contacto, dirección, si tiene teléfono de contacto. Con posibilidad de que pueda cambiar los mismos.
+Las instituciones registradas pueden ver: siguiendo el mismo formato del lado izquierdo la foto de perfil (será el logo de la institución), debajo los datos de la misma: email de contacto, dirección, si tiene teléfono de contacto. Con posibilidad de que pueda cambiar los mismos.Del lado derecho quiero poder ver la cantidad total de ofertas laborales publicadas por la institucion,cantidad total de postulantes, ofertas laborales publicadas con dos slide toggle ,una para deshabilitar o habilitar la oferta y otro para cancvelarla y que se oculte .
+
+DASHBOARD Rol administradorIFTS:
+
+Del lado derecho quiero: una tabla con los siguientes campos: titulo de ofertas laboral publicada por la institucion,fecha de publicacion,usuario,apellido, nombre y la posibilidad de descargar el CV del postulante.Tambien quiero que como en el dashboard aparezcan algunas estadisticas como: cantidad de ofertas publicadas,cantidad de postulantes total
 
 BOLSAS DE TRABAJO:
 
