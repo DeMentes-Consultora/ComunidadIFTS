@@ -1,0 +1,52 @@
+<div class="bolsa-container">
+  <div class="page-header">
+    <mat-icon class="header-icon">work</mat-icon>
+    <div>
+      <h1>Bolsa de Trabajo</h1>
+      <p>Ofertas laborales de las instituciones de la comunidad IFTS.</p>
+    </div>
+  </div>
+
+  @if (cargando) {
+    <div class="loading-container">
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+      <p>Cargando ofertas...</p>
+    </div>
+  } @else if (ofertas.length === 0) {
+    <div class="empty-state">
+      <mat-icon class="empty-icon">work_off</mat-icon>
+      <h2>No hay ofertas disponibles</h2>
+      <p>Volvé pronto, las instituciones publicarán nuevas oportunidades.</p>
+    </div>
+  } @else {
+    <div class="ofertas-grid">
+      @for (oferta of ofertas; track oferta.id_bolsaDeTrabajo) {
+        <mat-card class="oferta-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="avatar-icon">school</mat-icon>
+            <mat-card-title>{{ oferta.tituloOferta }}</mat-card-title>
+            <mat-card-subtitle>{{ oferta.nombre_ifts }}</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <p class="oferta-texto">{{ oferta.textoOferta }}</p>
+          </mat-card-content>
+
+          <mat-card-actions align="end">
+            @if (oferta.ya_postulado) {
+              <mat-chip class="chip-postulado">
+                <mat-icon>check_circle</mat-icon>
+                Ya te postulaste
+              </mat-chip>
+            } @else {
+              <button mat-flat-button color="primary" (click)="abrirPostulacion(oferta)">
+                <mat-icon>send</mat-icon>
+                Postularme
+              </button>
+            }
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

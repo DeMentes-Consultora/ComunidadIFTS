@@ -28,6 +28,11 @@ El script automáticamente:
 - ✅ Validará que exista `BackEnd/.env.production`
 - ✅ Fallará si no puede copiar el Frontend compilado
 
+Por defecto, el script NO copia `vendor/` si no necesitas redeploy completo de dependencias.
+
+- Usa `prepare-deploy.bat` para deploy incremental.
+- Usa `prepare-deploy.bat --with-vendor` para primer deploy o cuando cambien `composer.json` / `composer.lock`.
+
 ### 2. Configurar Contraseña
 
 Edita el archivo `deploy-infinityfree/.env`:
@@ -56,11 +61,12 @@ Edita el archivo `deploy-infinityfree/.env`:
 ### Subir los Archivos
 
 1. En el panel derecho de FileZilla, navega a la carpeta `htdocs/`
-2. **ELIMINA** todo el contenido actual de `htdocs/` (si existe)
-3. En el panel izquierdo, navega a tu carpeta `deploy-infinityfree/`
-4. Selecciona **TODO** el contenido de `deploy-infinityfree/`
-5. Arrastra todos los archivos al panel derecho (`htdocs/`)
-6. Espera a que termine la transferencia (puede tardar varios minutos)
+2. Si generaste deploy con `--with-vendor`, puedes reemplazar todo `htdocs/`.
+3. Si generaste deploy sin `vendor/`, NO elimines `htdocs/vendor/` del servidor.
+4. En el panel izquierdo, navega a tu carpeta `deploy-infinityfree/`
+5. Selecciona **TODO** el contenido de `deploy-infinityfree/`
+6. Arrastra todos los archivos al panel derecho (`htdocs/`) y acepta reemplazar los existentes.
+7. Espera a que termine la transferencia (puede tardar varios minutos)
 
 **Archivos que deben estar en htdocs/:**
 ```
@@ -77,6 +83,10 @@ htdocs/
 ├── models/
 └── check-server.php
 ```
+
+Nota:
+- `vendor/` debe estar en `htdocs/` solo en primer deploy o cuando cambien dependencias PHP.
+- En deploys normales de código, puedes conservar el `vendor/` ya existente en el servidor.
 
 ---
 
@@ -239,7 +249,8 @@ Para hacer cambios después del despliegue inicial:
 
 1. Haz los cambios en tu código local
 2. Vuelve a ejecutar `prepare-deploy.bat`
-3. Sube solo los archivos modificados vía FTP
+3. Si cambiaste dependencias PHP, ejecuta `prepare-deploy.bat --with-vendor`
+4. Sube los archivos modificados vía FTP
 4. Si cambiaste la base de datos, exporta e importa de nuevo
 
 ---

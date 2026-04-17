@@ -10,6 +10,9 @@ echo   Dominio: comunidadifts.infinityfreeapp.com
 echo ================================================
 echo.
 
+set INCLUDE_VENDOR=0
+if /I "%~1"=="--with-vendor" set INCLUDE_VENDOR=1
+
 if not exist "BackEnd" (
     echo ERROR: Ejecuta este script desde la carpeta raiz del proyecto
     pause
@@ -69,7 +72,12 @@ if not exist "BackEnd\.env.production" (
 )
 
 echo    - Copiando Backend...
-xcopy /E /I /Y BackEnd\vendor "%DEPLOY_DIR%\vendor" >nul
+if "%INCLUDE_VENDOR%"=="1" (
+    echo      Incluyendo vendor porque se solicito --with-vendor
+    xcopy /E /I /Y BackEnd\vendor "%DEPLOY_DIR%\vendor" >nul
+) else (
+    echo      Omitiendo vendor ^(sin cambios de Composer / deploy incremental^)
+)
 xcopy /E /I /Y BackEnd\config "%DEPLOY_DIR%\config" >nul
 xcopy /E /I /Y BackEnd\api "%DEPLOY_DIR%\api" >nul
 xcopy /E /I /Y BackEnd\models "%DEPLOY_DIR%\models" >nul
@@ -111,7 +119,13 @@ echo    Puerto: 21
 echo    Usuario: epiz_XXXXXXXX ^(tu usuario FTP^)
 echo    Contraseña: ^(tu contraseña FTP^)
 echo.
-echo 3. Sube TODO el contenido de deploy-infinityfree/ a htdocs/
+echo 3. Sube el contenido de deploy-infinityfree/ a htdocs/
+if "%INCLUDE_VENDOR%"=="1" (
+echo    - Puedes reemplazar todo el contenido de htdocs/
+) else (
+echo    - NO elimines vendor/ del servidor si ya existe y no cambiaste Composer
+echo    - Sube y reemplaza solo los archivos/carpetas presentes en deploy-infinityfree/
+)
 echo.
 echo 4. Importar la base de datos:
 echo    - Accede a phpMyAdmin desde VistaPanel
@@ -154,7 +168,12 @@ echo    Completa MAIL_USERNAME, MAIL_PASSWORD, MAIL_FROM_ADDRESS y ADMIN_EMAIL r
 echo.
 echo 2. Lee: deploy-infinityfree\INSTRUCCIONES.txt
 echo.
-echo 3. Sube los archivos via FTP a InfinityFree
+if "%INCLUDE_VENDOR%"=="1" (
+echo 3. Sube los archivos via FTP a InfinityFree ^(incluye vendor/^)
+) else (
+echo 3. Sube los archivos via FTP a InfinityFree ^(sin borrar vendor/ en el server^)
+echo    Si necesitas un deploy completo, ejecuta: prepare-deploy.bat --with-vendor
+)
 echo.
 echo Presiona cualquier tecla para salir...
 pause >nul

@@ -52,6 +52,32 @@
         Gestión de carreras
       </a>
 
+      <a mat-button routerLink="/admin/gestion-ofertas" (click)="closeSidenavPanel()" class="nav-link">
+        <mat-icon>work</mat-icon>
+        Bolsa de trabajo
+      </a>
+
+      <mat-divider></mat-divider>
+    </ng-container>
+
+    <!-- AdministradorIFTS (rol 3) -->
+    <ng-container *ngIf="(currentUser$ | async)?.id_rol === 3">
+      <mat-divider></mat-divider>
+      <h3 class="section-title">Mi institución</h3>
+      <a mat-button routerLink="/crear-oferta" (click)="closeSidenavPanel()" class="nav-link">
+        <mat-icon>post_add</mat-icon>
+        Publicar oferta laboral
+      </a>
+      <mat-divider></mat-divider>
+    </ng-container>
+
+    <!-- Alumnos (rol 2) -->
+    <ng-container *ngIf="(currentUser$ | async)?.id_rol === 2">
+      <mat-divider></mat-divider>
+      <a mat-button routerLink="/bolsa-trabajo" (click)="closeSidenavPanel()" class="nav-link">
+        <mat-icon>work</mat-icon>
+        Bolsa de trabajo
+      </a>
       <mat-divider></mat-divider>
     </ng-container>
     

@@ -1,0 +1,67 @@
+<div class="crear-oferta-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>post_add</mat-icon>
+        Publicar Oferta Laboral
+      </mat-card-title>
+      @if (usuario$ | async; as user) {
+        <mat-card-subtitle>{{ user.nombre }} {{ user.apellido }} — {{ user.email }}</mat-card-subtitle>
+      }
+    </mat-card-header>
+
+    <mat-card-content>
+
+      @if (ofertaEnviada) {
+        <!-- Estado: enviada con éxito -->
+        <div class="success-state">
+          <mat-icon class="success-icon">pending_actions</mat-icon>
+          <h2>Oferta enviada exitosamente</h2>
+          <p>Tu oferta fue recibida y está <strong>pendiente de aprobación</strong>.<br>
+            Te notificaremos por email cuando sea publicada.</p>
+          <button mat-flat-button color="primary" (click)="nuevaOferta()">
+            <mat-icon>add</mat-icon>
+            Publicar otra oferta
+          </button>
+        </div>
+      } @else {
+        <!-- Formulario -->
+        <form [formGroup]="form" (ngSubmit)="enviar()" class="oferta-form">
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Título de la oferta</mat-label>
+            <input matInput formControlName="titulo" placeholder="Ej: Desarrollador/a Full Stack" maxlength="512">
+            <mat-hint align="end">{{ form.get('titulo')?.value?.length || 0 }}/512</mat-hint>
+            @if (form.get('titulo')?.invalid && form.get('titulo')?.touched) {
+              <mat-error>El título es obligatorio</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descripción de la oferta</mat-label>
+            <textarea matInput formControlName="texto" rows="6"
+              placeholder="Describí los requisitos, tareas y condiciones del puesto..."
+              maxlength="512"></textarea>
+            <mat-hint align="end">{{ form.get('texto')?.value?.length || 0 }}/512</mat-hint>
+            @if (form.get('texto')?.invalid && form.get('texto')?.touched) {
+              <mat-error>La descripción es obligatoria</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="form-actions">
+            <button mat-flat-button color="primary" type="submit"
+              [disabled]="form.invalid || enviando">
+              @if (enviando) {
+                <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+              } @else {
+                Enviar para aprobación
+              }
+            </button>
+          </div>
+
+        </form>
+      }
+
+    </mat-card-content>
+  </mat-card>
+</div>

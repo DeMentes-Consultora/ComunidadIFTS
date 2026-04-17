@@ -37,11 +37,27 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/gestion-carreras/gestion-carreras').then(m => m.GestionCarreras)
       },
       {
+        path: 'gestion-ofertas',
+        loadComponent: () => import('./features/admin/gestion-ofertas/gestion-ofertas').then(m => m.GestionOfertas)
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'
       }
     ]
+  },
+  {
+    path: 'bolsa-trabajo',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: [2] },
+    loadComponent: () => import('./features/bolsa-trabajo/bolsa-trabajo').then(m => m.BolsaTrabajo)
+  },
+  {
+    path: 'crear-oferta',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: [3] },
+    loadComponent: () => import('./features/bolsa-trabajo/crear-oferta/crear-oferta').then(m => m.CrearOferta)
   },
   {
     path: '**',

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 14-04-2026 a las 17:08:42
+-- Tiempo de generación: 17-04-2026 a las 00:36:50
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -11,8 +11,6 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-CREATE DATABASE IF NOT EXISTS `comunidad_ifts` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `comunidad_ifts`;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -22,6 +20,24 @@ USE `comunidad_ifts`;
 --
 -- Base de datos: `comunidad_ifts`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `bolsadetrabajo`
+--
+
+CREATE TABLE `bolsadetrabajo` (
+  `id_bolsaDeTrabajo` int(11) NOT NULL,
+  `id_institucion` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `tituloOferta` varchar(512) NOT NULL,
+  `textoOferta` varchar(512) NOT NULL,
+  `habilitado` int(1) NOT NULL DEFAULT 0,
+  `cancelado` int(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -129,6 +145,17 @@ CREATE TABLE `carrousel` (
   `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
   `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `carrousel`
+--
+
+INSERT INTO `carrousel` (`id_carrousel`, `titulo`, `descripcion`, `enlace`, `orden_visual`, `foto_perfil_public_id`, `foto_perfil_url`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, 'titulo_1', 'descripcion_1', NULL, 1, 'ComunidadIFTS/carrusel/php752E_k2lrf1', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776208945/ComunidadIFTS/carrusel/php752E_k2lrf1.png', 1, 0, '2026-04-14 23:22:37', '2026-04-14 23:22:37'),
+(2, '', '', NULL, 2, 'ComunidadIFTS/carrusel/php755E_bfwshl', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776208947/ComunidadIFTS/carrusel/php755E_bfwshl.png', 1, 0, '2026-04-14 23:22:37', '2026-04-14 23:22:37'),
+(3, '', '', NULL, 3, 'ComunidadIFTS/carrusel/php756E_g1eywk', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776208949/ComunidadIFTS/carrusel/php756E_g1eywk.png', 1, 0, '2026-04-14 23:22:37', '2026-04-14 23:22:37'),
+(4, '', '', NULL, 4, 'ComunidadIFTS/carrusel/php759E_frd8ze', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776208950/ComunidadIFTS/carrusel/php759E_frd8ze.png', 1, 0, '2026-04-14 23:22:37', '2026-04-14 23:22:37'),
+(5, '', '', NULL, 5, 'ComunidadIFTS/carrusel/phpB93B_jg100v', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776372835/ComunidadIFTS/carrusel/phpB93B_jg100v.png', 1, 0, '2026-04-14 23:22:37', '2026-04-16 20:53:56');
 
 -- --------------------------------------------------------
 
@@ -320,6 +347,13 @@ CREATE TABLE `navbar` (
   `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `navbar`
+--
+
+INSERT INTO `navbar` (`id_navbar`, `brand_text`, `foto_perfil_public_id`, `foto_perfil_url`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, '', 'ComunidadIFTS/navbar/phpD7_qwghdt', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776372800/ComunidadIFTS/navbar/phpD7_qwghdt.png', 1, 0, '2026-04-14 22:37:59', '2026-04-16 20:53:21');
+
 -- --------------------------------------------------------
 
 --
@@ -368,6 +402,23 @@ INSERT INTO `persona` (`id_persona`, `apellido`, `nombre`, `edad`, `dni`, `fecha
 (19, 'Minotti', 'Sebastian', 25, '12589632', '2000-10-16', '1164589654', 'https://res.cloudinary.com/dm8ds67tb/image/upload/ComunidadIFTS/perfiles/bupiboaj6qlorvxo9xes.jpg', 'ComunidadIFTS/perfiles/bupiboaj6qlorvxo9xes', 1, 0, '2026-03-13 17:49:31', '2026-03-13 17:49:33'),
 (20, 'Minotti', 'Sebastian', 40, '12582365', '1985-10-16', '1165873428', 'https://res.cloudinary.com/dm8ds67tb/image/upload/ComunidadIFTS/perfiles/wu8eizz1kj3cph63312j.jpg', 'ComunidadIFTS/perfiles/wu8eizz1kj3cph63312j', 1, 0, '2026-03-13 18:18:32', '2026-03-13 18:18:35'),
 (21, 'Minotti', 'Sebastian', 25, '25365478', '2000-10-16', '1165236547', 'https://res.cloudinary.com/dm8ds67tb/image/upload/ComunidadIFTS/perfiles/xv4ibkunzn98x12dtmrw.jpg', 'ComunidadIFTS/perfiles/xv4ibkunzn98x12dtmrw', 1, 0, '2026-03-13 18:30:04', '2026-03-13 18:30:06');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `postulacion`
+--
+
+CREATE TABLE `postulacion` (
+  `id_postulacion` int(11) NOT NULL,
+  `id_bolsaDeTrabajo` int(11) NOT NULL COMMENT 'FK a bolsadetrabajo',
+  `id_usuario` int(11) NOT NULL COMMENT 'Alumno que se postula',
+  `cv_url` varchar(512) DEFAULT NULL COMMENT 'URL pública del CV en Cloudinary',
+  `cv_public_id` varchar(512) DEFAULT NULL COMMENT 'Public ID en Cloudinary para borrado',
+  `cancelado` int(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -444,6 +495,14 @@ INSERT INTO `usuario` (`id_usuario`, `email`, `clave`, `id_rol`, `id_persona`, `
 --
 
 --
+-- Indices de la tabla `bolsadetrabajo`
+--
+ALTER TABLE `bolsadetrabajo`
+  ADD PRIMARY KEY (`id_bolsaDeTrabajo`),
+  ADD KEY `id_institucion` (`id_institucion`,`id_usuario`),
+  ADD KEY `fk_bolsa_usuario_creador` (`id_usuario`);
+
+--
 -- Indices de la tabla `carrera`
 --
 ALTER TABLE `carrera`
@@ -496,6 +555,14 @@ ALTER TABLE `persona`
   ADD PRIMARY KEY (`id_persona`);
 
 --
+-- Indices de la tabla `postulacion`
+--
+ALTER TABLE `postulacion`
+  ADD PRIMARY KEY (`id_postulacion`),
+  ADD UNIQUE KEY `uq_postulacion` (`id_bolsaDeTrabajo`,`id_usuario`),
+  ADD KEY `fk_postulacion_alumno` (`id_usuario`);
+
+--
 -- Indices de la tabla `rol`
 --
 ALTER TABLE `rol`
@@ -516,6 +583,12 @@ ALTER TABLE `usuario`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `bolsadetrabajo`
+--
+ALTER TABLE `bolsadetrabajo`
+  MODIFY `id_bolsaDeTrabajo` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `carrera`
 --
 ALTER TABLE `carrera`
@@ -531,7 +604,7 @@ ALTER TABLE `carrera_materia`
 -- AUTO_INCREMENT de la tabla `carrousel`
 --
 ALTER TABLE `carrousel`
-  MODIFY `id_carrousel` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_carrousel` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `institucion`
@@ -555,13 +628,19 @@ ALTER TABLE `materia`
 -- AUTO_INCREMENT de la tabla `navbar`
 --
 ALTER TABLE `navbar`
-  MODIFY `id_navbar` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_navbar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `persona`
 --
 ALTER TABLE `persona`
   MODIFY `id_persona` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT de la tabla `postulacion`
+--
+ALTER TABLE `postulacion`
+  MODIFY `id_postulacion` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`
@@ -574,6 +653,48 @@ ALTER TABLE `rol`
 --
 ALTER TABLE `usuario`
   MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `bolsadetrabajo`
+--
+ALTER TABLE `bolsadetrabajo`
+  ADD CONSTRAINT `bolsadetrabajo_ibfk_1` FOREIGN KEY (`id_institucion`) REFERENCES `institucion` (`id_institucion`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `bolsadetrabajo_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_bolsa_institucion` FOREIGN KEY (`id_institucion`) REFERENCES `institucion` (`id_institucion`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_bolsa_usuario_creador` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `carrera_materia`
+--
+ALTER TABLE `carrera_materia`
+  ADD CONSTRAINT `carrera_materia_ibfk_1` FOREIGN KEY (`id_carrera`) REFERENCES `carrera` (`id_carrera`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `carrera_materia_ibfk_2` FOREIGN KEY (`id_materia`) REFERENCES `materia` (`id_materia`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `institucion_carrera`
+--
+ALTER TABLE `institucion_carrera`
+  ADD CONSTRAINT `institucion_carrera_ibfk_1` FOREIGN KEY (`id_institucion`) REFERENCES `institucion` (`id_institucion`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `institucion_carrera_ibfk_2` FOREIGN KEY (`id_carrera`) REFERENCES `carrera` (`id_carrera`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `postulacion`
+--
+ALTER TABLE `postulacion`
+  ADD CONSTRAINT `fk_postulacion_alumno` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_postulacion_oferta` FOREIGN KEY (`id_bolsaDeTrabajo`) REFERENCES `bolsadetrabajo` (`id_bolsaDeTrabajo`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  ADD CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`id_rol`) REFERENCES `rol` (`id_rol`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `usuario_ibfk_2` FOREIGN KEY (`id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `usuario_ibfk_3` FOREIGN KEY (`id_institucion`) REFERENCES `institucion` (`id_institucion`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

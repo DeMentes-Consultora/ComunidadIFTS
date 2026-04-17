@@ -1,0 +1,87 @@
+.crear-oferta-container {
+  padding: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+mat-card {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+mat-card-header {
+  background: linear-gradient(135deg, #006633 0%, #008844 100%);
+  color: white;
+  padding: 20px;
+  margin: -16px -16px 20px -16px;
+  border-radius: 4px 4px 0 0;
+}
+
+mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 500;
+  color: white;
+}
+
+mat-card-subtitle {
+  color: rgba(255, 255, 255, 0.85) !important;
+  margin-top: 6px;
+}
+
+.oferta-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.form-actions button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.success-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  text-align: center;
+  gap: 16px;
+  color: #555;
+}
+
+.success-icon {
+  font-size: 72px;
+  width: 72px;
+  height: 72px;
+  color: #006633;
+}
+
+.success-state h2 {
+  font-size: 22px;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+}
+
+.success-state p {
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 380px;
+  margin: 0;
+}

@@ -406,6 +406,245 @@ HTML;
 HTML;
     }
 
+    // =========================================================
+    // BOLSA DE TRABAJO
+    // =========================================================
+
+    /**
+     * Notifica a la institución que su oferta fue recibida y está pendiente de revisión.
+     */
+    public function notificarOfertaRecibida(string $emailIFTS, string $nombreIFTS, string $tituloOferta): bool {
+        $nombreSeguro  = htmlspecialchars($nombreIFTS);
+        $tituloSeguro  = htmlspecialchars($tituloOferta);
+        $asunto        = "Tu oferta laboral fue recibida - ComunidadIFTS";
+        $cuerpoHTML    = $this->plantillaOfertaRecibida($nombreSeguro, $tituloSeguro);
+        $cuerpoTexto   = "Hola $nombreIFTS,\n\nRecibimos tu oferta laboral \"$tituloOferta\".\n"
+                       . "Un administrador la revisará y te avisaremos cuando sea publicada.\n\n"
+                       . "Saludos,\nEquipo de ComunidadIFTS";
+        return $this->enviar($emailIFTS, $nombreIFTS, $asunto, $cuerpoHTML, $cuerpoTexto);
+    }
+
+    /**
+     * Notifica a la institución que su oferta fue aprobada y publicada.
+     */
+    public function notificarOfertaPublicada(string $emailIFTS, string $nombreIFTS, string $tituloOferta): bool {
+        $nombreSeguro  = htmlspecialchars($nombreIFTS);
+        $tituloSeguro  = htmlspecialchars($tituloOferta);
+        $asunto        = "¡Tu oferta laboral fue publicada! - ComunidadIFTS";
+        $cuerpoHTML    = $this->plantillaOfertaPublicada($nombreSeguro, $tituloSeguro);
+        $cuerpoTexto   = "Hola $nombreIFTS,\n\nTu oferta laboral \"$tituloOferta\" fue aprobada y ya está publicada en ComunidadIFTS.\n\n"
+                       . "Saludos,\nEquipo de ComunidadIFTS";
+        return $this->enviar($emailIFTS, $nombreIFTS, $asunto, $cuerpoHTML, $cuerpoTexto);
+    }
+
+    /**
+     * Notifica a la institución que su oferta fue rechazada.
+     */
+    public function notificarOfertaRechazada(string $emailIFTS, string $nombreIFTS, string $tituloOferta, string $motivo = ''): bool {
+        $nombreSeguro  = htmlspecialchars($nombreIFTS);
+        $tituloSeguro  = htmlspecialchars($tituloOferta);
+        $asunto        = "Tu oferta laboral no fue aprobada - ComunidadIFTS";
+        $cuerpoHTML    = $this->plantillaOfertaRechazada($nombreSeguro, $tituloSeguro, $motivo);
+        $cuerpoTexto   = "Hola $nombreIFTS,\n\nLamentamos informarte que tu oferta laboral \"$tituloOferta\" no fue aprobada."
+                       . ($motivo ? "\n\nMotivo: $motivo" : '') . "\n\nSaludos,\nEquipo de ComunidadIFTS";
+        return $this->enviar($emailIFTS, $nombreIFTS, $asunto, $cuerpoHTML, $cuerpoTexto);
+    }
+
+    /**
+     * Notifica al alumno que su postulación fue recibida.
+     */
+    public function notificarPostulacionAlumno(string $emailAlumno, string $nombreAlumno, string $tituloOferta, string $nombreIFTS): bool {
+        $nombreSeguro  = htmlspecialchars($nombreAlumno);
+        $tituloSeguro  = htmlspecialchars($tituloOferta);
+        $iftsSeguro    = htmlspecialchars($nombreIFTS);
+        $asunto        = "Postulación recibida - ComunidadIFTS";
+        $cuerpoHTML    = $this->plantillaPostulacionAlumno($nombreSeguro, $tituloSeguro, $iftsSeguro);
+        $cuerpoTexto   = "Hola $nombreAlumno,\n\nTu postulación a \"$tituloOferta\" de $nombreIFTS fue recibida correctamente.\n"
+                       . "Te avisaremos cuando haya novedades.\n\nSaludos,\nEquipo de ComunidadIFTS";
+        return $this->enviar($emailAlumno, $nombreAlumno, $asunto, $cuerpoHTML, $cuerpoTexto);
+    }
+
+    /**
+     * Notifica a la institución que recibió una nueva postulación, con link al CV.
+     */
+    public function notificarNuevaPostulacionIFTS(string $emailIFTS, string $nombreIFTS, string $tituloOferta, array $datosAlumno, string $cvUrl): bool {
+        $nombreSeguro   = htmlspecialchars($nombreIFTS);
+        $tituloSeguro   = htmlspecialchars($tituloOferta);
+        $alumnoNombre   = htmlspecialchars(($datosAlumno['nombre'] ?? '') . ' ' . ($datosAlumno['apellido'] ?? ''));
+        $alumnoEmail    = htmlspecialchars($datosAlumno['email'] ?? '');
+        $alumnoTel      = htmlspecialchars($datosAlumno['telefono'] ?? 'No informado');
+        $cvUrlSeguro    = htmlspecialchars($cvUrl);
+
+        $asunto      = "Nueva postulación para \"$tituloOferta\" - ComunidadIFTS";
+        $cuerpoHTML  = $this->plantillaNuevaPostulacionIFTS($nombreSeguro, $tituloSeguro, $alumnoNombre, $alumnoEmail, $alumnoTel, $cvUrlSeguro);
+        $cuerpoTexto = "Hola $nombreIFTS,\n\nRecibiste una nueva postulación para \"$tituloOferta\".\n\n"
+                     . "Postulante: $alumnoNombre\nEmail: $alumnoEmail\nTeléfono: $alumnoTel\n"
+                     . "CV: $cvUrl\n\nSaludos,\nEquipo de ComunidadIFTS";
+        return $this->enviar($emailIFTS, $nombreIFTS, $asunto, $cuerpoHTML, $cuerpoTexto);
+    }
+
+    // ----- Plantillas bolsa de trabajo -----
+
+    private function plantillaOfertaRecibida(string $nombreIFTS, string $tituloOferta): string {
+        return <<<HTML
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#f4f4f4;margin:0;padding:20px}
+  .c{max-width:600px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.1);overflow:hidden}
+  .h{background:linear-gradient(135deg,#006633,#008844);color:#fff;padding:30px;text-align:center}
+  .h h1{margin:0;font-size:22px}
+  .b{padding:30px}
+  .box{background:#f9f9f9;border-left:4px solid #006633;padding:15px;margin:20px 0}
+  .box p{margin:6px 0;color:#333}
+  .box strong{color:#006633}
+  .f{background:#f9f9f9;padding:20px;text-align:center;font-size:12px;color:#666}
+</style></head><body>
+<div class="c">
+  <div class="h"><h1>📋 Oferta Recibida</h1></div>
+  <div class="b">
+    <p>Hola <strong>$nombreIFTS</strong>,</p>
+    <p>Recibimos tu oferta laboral y está siendo revisada por nuestro equipo.</p>
+    <div class="box">
+      <p><strong>Oferta:</strong> $tituloOferta</p>
+      <p><strong>Estado:</strong> Pendiente de revisión</p>
+    </div>
+    <p>Te avisaremos por este medio cuando sea aprobada o si necesitamos más información.</p>
+  </div>
+  <div class="f"><p>Correo automático de ComunidadIFTS. No respondas este mensaje.</p></div>
+</div>
+</body></html>
+HTML;
+    }
+
+    private function plantillaOfertaPublicada(string $nombreIFTS, string $tituloOferta): string {
+        return <<<HTML
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#f4f4f4;margin:0;padding:20px}
+  .c{max-width:600px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.1);overflow:hidden}
+  .h{background:linear-gradient(135deg,#006633,#008844);color:#fff;padding:30px;text-align:center}
+  .h h1{margin:0;font-size:22px}
+  .b{padding:30px}
+  .box{background:#e8f5e9;border-left:4px solid #2e7d32;padding:15px;margin:20px 0}
+  .box p{margin:6px 0;color:#333}
+  .box strong{color:#2e7d32}
+  .f{background:#f9f9f9;padding:20px;text-align:center;font-size:12px;color:#666}
+</style></head><body>
+<div class="c">
+  <div class="h"><h1>✅ ¡Oferta Publicada!</h1></div>
+  <div class="b">
+    <p>Hola <strong>$nombreIFTS</strong>,</p>
+    <p>Tu oferta laboral fue <strong>aprobada</strong> y ya está visible para todos los alumnos de ComunidadIFTS.</p>
+    <div class="box">
+      <p><strong>Oferta:</strong> $tituloOferta</p>
+      <p><strong>Estado:</strong> Publicada ✅</p>
+    </div>
+    <p>Los alumnos interesados podrán postularse y recibirás una notificación por cada postulación.</p>
+  </div>
+  <div class="f"><p>Correo automático de ComunidadIFTS. No respondas este mensaje.</p></div>
+</div>
+</body></html>
+HTML;
+    }
+
+    private function plantillaOfertaRechazada(string $nombreIFTS, string $tituloOferta, string $motivo): string {
+        $motivoHTML = $motivo ? "<p><strong>Motivo:</strong> " . htmlspecialchars($motivo) . "</p>" : "";
+        return <<<HTML
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#f4f4f4;margin:0;padding:20px}
+  .c{max-width:600px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.1);overflow:hidden}
+  .h{background:#c62828;color:#fff;padding:30px;text-align:center}
+  .h h1{margin:0;font-size:22px}
+  .b{padding:30px}
+  .box{background:#ffebee;border-left:4px solid #c62828;padding:15px;margin:20px 0}
+  .box p{margin:6px 0;color:#333}
+  .box strong{color:#c62828}
+  .f{background:#f9f9f9;padding:20px;text-align:center;font-size:12px;color:#666}
+</style></head><body>
+<div class="c">
+  <div class="h"><h1>Oferta no aprobada</h1></div>
+  <div class="b">
+    <p>Hola <strong>$nombreIFTS</strong>,</p>
+    <p>Lamentamos informarte que tu oferta laboral no fue aprobada para su publicación.</p>
+    <div class="box">
+      <p><strong>Oferta:</strong> $tituloOferta</p>
+      $motivoHTML
+    </div>
+    <p>Si tenés dudas, contactate con el administrador de ComunidadIFTS.</p>
+  </div>
+  <div class="f"><p>Correo automático de ComunidadIFTS. No respondas este mensaje.</p></div>
+</div>
+</body></html>
+HTML;
+    }
+
+    private function plantillaPostulacionAlumno(string $nombreAlumno, string $tituloOferta, string $nombreIFTS): string {
+        return <<<HTML
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#f4f4f4;margin:0;padding:20px}
+  .c{max-width:600px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.1);overflow:hidden}
+  .h{background:linear-gradient(135deg,#006633,#008844);color:#fff;padding:30px;text-align:center}
+  .h h1{margin:0;font-size:22px}
+  .b{padding:30px}
+  .box{background:#f9f9f9;border-left:4px solid #006633;padding:15px;margin:20px 0}
+  .box p{margin:6px 0;color:#333}
+  .box strong{color:#006633}
+  .f{background:#f9f9f9;padding:20px;text-align:center;font-size:12px;color:#666}
+</style></head><body>
+<div class="c">
+  <div class="h"><h1>📩 Postulación Recibida</h1></div>
+  <div class="b">
+    <p>Hola <strong>$nombreAlumno</strong>,</p>
+    <p>Tu postulación fue enviada exitosamente. La institución revisará tu CV y te contactará si avanza tu candidatura.</p>
+    <div class="box">
+      <p><strong>Oferta:</strong> $tituloOferta</p>
+      <p><strong>Institución:</strong> $nombreIFTS</p>
+    </div>
+    <p>Te notificaremos ante cualquier novedad. ¡Mucha suerte!</p>
+  </div>
+  <div class="f"><p>Correo automático de ComunidadIFTS. No respondas este mensaje.</p></div>
+</div>
+</body></html>
+HTML;
+    }
+
+    private function plantillaNuevaPostulacionIFTS(string $nombreIFTS, string $tituloOferta, string $alumnoNombre, string $alumnoEmail, string $alumnoTel, string $cvUrl): string {
+        return <<<HTML
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#f4f4f4;margin:0;padding:20px}
+  .c{max-width:600px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.1);overflow:hidden}
+  .h{background:linear-gradient(135deg,#006633,#008844);color:#fff;padding:30px;text-align:center}
+  .h h1{margin:0;font-size:22px}
+  .b{padding:30px}
+  .box{background:#f9f9f9;border-left:4px solid #006633;padding:15px;margin:20px 0}
+  .box p{margin:6px 0;color:#333}
+  .box strong{color:#006633}
+  .btn{display:inline-block;background:#006633;color:#fff;text-decoration:none;padding:12px 28px;border-radius:5px;margin-top:16px;font-weight:bold}
+  .f{background:#f9f9f9;padding:20px;text-align:center;font-size:12px;color:#666}
+</style></head><body>
+<div class="c">
+  <div class="h"><h1>🎓 Nueva Postulación</h1></div>
+  <div class="b">
+    <p>Hola <strong>$nombreIFTS</strong>,</p>
+    <p>Recibiste una nueva postulación para tu oferta laboral.</p>
+    <div class="box">
+      <p><strong>Oferta:</strong> $tituloOferta</p>
+      <p><strong>Postulante:</strong> $alumnoNombre</p>
+      <p><strong>Email:</strong> $alumnoEmail</p>
+      <p><strong>Teléfono:</strong> $alumnoTel</p>
+    </div>
+    <p>Podés descargar el CV del postulante haciendo clic en el botón:</p>
+    <center><a href="$cvUrl" class="btn">Descargar CV</a></center>
+  </div>
+  <div class="f"><p>Correo automático de ComunidadIFTS. No respondas este mensaje.</p></div>
+</div>
+</body></html>
+HTML;
+    }
+
     /**
      * Plantilla HTML para notificación de rechazo
      */

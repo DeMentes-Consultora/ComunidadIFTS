@@ -123,8 +123,8 @@ No se requieren modificaciones al schema.
 | ID  | Nombre                 | Permisos                                      |
 |-----|------------------------|-----------------------------------------------|
 | 1   | AdministradorComunidad | Gestión usuarios, edición IFTS, todas las funciones |
-| 2   | Alumno regular         | Solo lectura                                  |
-| 7   | AdministradorIFTS      | Edición IFTS de su institución                |
+| 2   | Alumno                 | Solo lectura                                  |
+| 3   | AdministradorIFTS      | Edición IFTS de su institución                |
 
 ## 🎯 Uso del Sistema
 

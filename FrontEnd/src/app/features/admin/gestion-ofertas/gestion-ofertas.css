@@ -1,0 +1,143 @@
+.gestion-ofertas-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+mat-card {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+mat-card-header {
+  background: linear-gradient(135deg, #006633 0%, #008844 100%);
+  color: white;
+  padding: 20px;
+  margin: -16px -16px 20px -16px;
+  border-radius: 4px 4px 0 0;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-vista {
+  border-color: rgba(255, 255, 255, 0.75) !important;
+  color: #fff !important;
+}
+
+mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+mat-card-title mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #666;
+  gap: 16px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #666;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #4caf50;
+  margin-bottom: 16px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.count-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.ofertas-table {
+  width: 100%;
+}
+
+.cell-stack {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.info-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #888;
+  vertical-align: middle;
+}
+
+.oferta-cell {
+  padding: 8px 0;
+}
+
+.oferta-cell strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.oferta-texto {
+  font-size: 13px;
+  color: #777;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.acciones-cell {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .gestion-ofertas-container {
+    padding: 12px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

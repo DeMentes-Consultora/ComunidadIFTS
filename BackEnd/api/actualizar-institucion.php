@@ -3,7 +3,7 @@
  * API: Actualizar institución existente
  * Endpoint: PUT /api/actualizar-institucion.php
  * 
- * Permisos: Solo roles ID 1 (AdministradorComunidad) y ID 7 (AdministradorIFTS)
+ * Permisos: Solo roles ID 1 (AdministradorComunidad) y ID 3 (AdministradorIFTS)
  */
 
 require_once __DIR__ . '/../config/cors.php';
@@ -29,8 +29,8 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
     exit;
 }
 
-// Verificar permisos: solo roles 1 y 7 pueden actualizar IFTS
-$rolesPermitidos = [1, 7];
+// Verificar permisos: solo roles 1 y 3 pueden actualizar IFTS
+$rolesPermitidos = [1, 3];
 if (!in_array($_SESSION['id_rol'], $rolesPermitidos)) {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'No tiene permisos para modificar instituciones']);

@@ -5,12 +5,10 @@
  * 
  * Sistema de Roles (por ID):
  * - ID 1: AdministradorComunidad (permisos totales)
- * - ID 2: Alumno regular (solo lectura por defecto)
- * - ID 3: Alumno no regular
- * - ID 4: Alumno recibido
- * - ID 7: AdministradorIFTS (puede editar IFTS)
+ * - ID 2: Alumno (solo lectura por defecto)
+ * - ID 3: AdministradorIFTS (puede editar IFTS)
  * 
- * Permisos de edición IFTS: Solo roles ID 1 y 7
+ * Permisos de edición IFTS: Solo roles ID 1 y 3
  */
 
 require_once __DIR__ . '/../config/cors.php';

@@ -23,7 +23,7 @@ function validarAccesoAdmin()
         exit;
     }
 
-    $rolesPermitidos = [1, 3, 7];
+    $rolesPermitidos = [1, 3];
     if (!isset($_SESSION['id_rol']) || !in_array((int)$_SESSION['id_rol'], $rolesPermitidos, true)) {
         http_response_code(403);
         echo json_encode(['success' => false, 'message' => 'No tiene permisos para gestionar carreras']);

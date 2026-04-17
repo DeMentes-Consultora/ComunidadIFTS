@@ -7,18 +7,16 @@ Este proyecto utiliza un **sistema de roles basado en IDs** en lugar de nombres 
 | ID | Nombre del Rol | Permisos |
 |----|----------------|----------|
 | 1 | AdministradorComunidad | Control total del sistema, puede crear/editar/eliminar IFTS y gestionar usuarios |
-| 2 | Alumno regular | Solo lectura, puede navegar y ver información de IFTS |
-| 3 | Alumno no regular (dejó la carrera) | Solo lectura |
-| 4 | Alumno recibido | Solo lectura |
-| 7 | AdministradorIFTS | Puede crear/editar IFTS de su institución |
+| 2 | Alumno | Solo lectura, puede navegar y ver información de IFTS |
+| 3 | AdministradorIFTS | Puede crear/editar IFTS de su institución |
 
 ## Permisos por Funcionalidad
 
 ### IFTS (Instituciones)
 
-**Roles que pueden CREAR y EDITAR:** `[1, 7]`
+**Roles que pueden CREAR y EDITAR:** `[1, 3]`
 - AdministradorComunidad (ID 1)
-- AdministradorIFTS (ID 7)
+- AdministradorIFTS (ID 3)
 
 **Roles de SOLO LECTURA:** Cualquier otro ID
 
@@ -31,8 +29,8 @@ Este proyecto utiliza un **sistema de roles basado en IDs** en lugar de nombres 
 private verificarPermisos(): void {
   const usuarioActual = this.authService.getCurrentUser();
   if (usuarioActual) {
-    // Solo los roles 1 y 7 pueden editar IFTS
-    this.canEdit = [1, 7].includes(usuarioActual.id_rol);
+    // Solo los roles 1 y 3 pueden editar IFTS
+    this.canEdit = [1, 3].includes(usuarioActual.id_rol);
   }
 }
 ```
@@ -41,7 +39,7 @@ private verificarPermisos(): void {
 
 ```php
 // En guardar-institucion.php y actualizar-institucion.php
-$rolesPermitidos = [1, 7];
+$rolesPermitidos = [1, 3];
 if (!in_array($_SESSION['id_rol'], $rolesPermitidos)) {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'No tiene permisos para modificar instituciones']);
@@ -85,17 +83,15 @@ CREATE TABLE `rol` (
 -- Datos de roles
 INSERT INTO `rol` VALUES
 (1, 'AdministradorComunidad', 1, 0),
-(2, 'Alumno regular', 1, 0),
-(3, 'Alumno no regular (dejó la carrera)', 1, 0),
-(4, 'Alumno recibido', 1, 0),
-(7, 'AdministradorIFTS', 1, 0);
+(2, 'Alumno', 1, 0),
+(3, 'AdministradorIFTS', 1, 0);
 ```
 
 ## Buenas Prácticas
 
 ### ✅ HACER
 - Usar IDs en consultas SQL: `WHERE id_rol = 1`
-- Usar arrays de IDs para permisos: `[1, 7].includes(id_rol)`
+- Usar arrays de IDs para permisos: `[1, 3].includes(id_rol)`
 - Documentar qué permisos tiene cada ID
 
 ### ❌ NO HACER
