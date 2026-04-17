@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 17-04-2026 a las 00:36:50
+-- Tiempo de generación: 17-04-2026 a las 04:00:45
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -22,8 +22,8 @@ SET time_zone = "+00:00";
 --
 
 -- --------------------------------------------------------
-
---
+CREATE DATABASE IF NOT EXISTS `comunidad_ifts` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `comunidad_ifts`;
 -- Estructura de tabla para la tabla `bolsadetrabajo`
 --
 
@@ -38,6 +38,13 @@ CREATE TABLE `bolsadetrabajo` (
   `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
   `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `bolsadetrabajo`
+--
+
+INSERT INTO `bolsadetrabajo` (`id_bolsaDeTrabajo`, `id_institucion`, `id_usuario`, `tituloOferta`, `textoOferta`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, 3, 21, 'oferta laboral de prueba', 'descripción de oferta laboral de prueba', 1, 0, '2026-04-17 01:08:24', '2026-04-17 01:09:36');
 
 -- --------------------------------------------------------
 
@@ -420,6 +427,13 @@ CREATE TABLE `postulacion` (
   `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `postulacion`
+--
+
+INSERT INTO `postulacion` (`id_postulacion`, `id_bolsaDeTrabajo`, `id_usuario`, `cv_url`, `cv_public_id`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, 1, 19, 'https://res.cloudinary.com/dm8ds67tb/raw/upload/v1776388807/ComunidadIFTS/CVs/CVs/php6FBD_evfhey.tmp', 'ComunidadIFTS/CVs/CVs/php6FBD_evfhey.tmp', 0, '2026-04-17 01:20:07', '2026-04-17 01:20:07');
+
 -- --------------------------------------------------------
 
 --
@@ -468,7 +482,7 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id_usuario`, `email`, `clave`, `id_rol`, `id_persona`, `id_institucion`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, 'seba@gmail.com', '$2y$10$Tb.mgWSOKMVKkQM4hpt.kuqZwNRy/wYgY4WIJzPbUCuNDCDGJTnTC', 1, 1, 1, 1, 0, '2026-02-25 23:53:22', '2026-02-26 03:03:10'),
+(1, 'seba@gmail.com', '$2y$12$6iOiuuGdcf3QY.KII.EwTujjzTI3jUUxjL4f3rlyWr6WAUvGyNOd2', 1, 1, 1, 1, 0, '2026-02-25 23:53:22', '2026-04-17 01:42:26'),
 (2, 'test507238115@mail.com', '$2y$10$ZbO25iUGI7.4wfZOjKbv5Osag0DGvr9t4rRw9oy.X1CTHpP6fMKGC', 2, 2, 1, 1, 0, '2026-02-25 23:54:32', '2026-02-26 00:16:11'),
 (3, 'test1864180326@mail.com', '$2y$10$f/nEWTe0RvjsEH7MQaN3ZesPM88yGpcqtrS36OyUtKbQUhUxVH1km', 2, 3, 1, 1, 0, '2026-02-25 23:58:22', '2026-02-26 00:16:04'),
 (4, 'test1364295098@mail.com', '$2y$10$NpGAF9WJHAUqd/SSO/EMZuOa9dIVUBCqqbHQXTZoykgQSDFWXDgKi', 2, 4, 1, 1, 0, '2026-02-25 23:59:25', '2026-02-26 00:15:56'),
@@ -483,12 +497,12 @@ INSERT INTO `usuario` (`id_usuario`, `email`, `clave`, `id_rol`, `id_persona`, `
 (13, 'sebaminotti@gmail.com', '$2y$10$yrb7XSIm1FISbp0eEzDc0OhY9OYm9YxpIvUJIU73YawHRmBVeVu6y', 2, 13, 3, 1, 0, '2026-02-26 03:00:33', '2026-03-13 15:20:11'),
 (14, 'dementesconsultora2025@gmail.com', '$2y$10$O4hHfJSOH8sQ2t2SwOjnU.Pr5qi/.PdGhm7pNrMUN.L7iu06/eQa2', 1, 14, 1, 1, 0, '2026-03-13 12:50:34', '2026-03-13 14:06:38'),
 (15, 'lesmuchachosdelinapifts@gmail.com', '$2y$10$j5pc/WJyzfxQgBJSOz4RqeBB1MiYSxZCgK4VqgsJsbU3UxUh6fTG2', 2, 15, 1, 1, 0, '2026-03-13 14:33:55', '2026-03-13 15:15:10'),
-(16, 'losmuchachosdelinapifts@gmail.com', '$2y$10$ZZysVBEqJbRNHCT9jZMvxeRBzHbqqbMuxi1dhmlkO.bow7k1mvNjm', 1, 16, 2, 1, 0, '2026-03-13 15:17:03', '2026-03-13 15:18:50'),
+(16, 'losmuchachosdelinapifts@gmail.com', '$2y$10$ZZysVBEqJbRNHCT9jZMvxeRBzHbqqbMuxi1dhmlkO.bow7k1mvNjm', 2, 16, 2, 1, 0, '2026-03-13 15:17:03', '2026-04-17 01:22:58'),
 (17, 'sminotti@gmail.com', '$2y$10$L3mpNFklv4C2Z4I6cgf9e.xJcoLalV6F05bZ520upSD/v/JcXPSqG', 1, 17, 1, 1, 0, '2026-03-13 15:22:26', '2026-03-13 15:35:45'),
 (18, 'seb@gmail.com', '$2y$10$UhkPI9fR0FG/SuP1rKVC5O.TCHOkjsmfFX9ZdfwH1o85cAl.Qrs8e', 1, 18, 6, 1, 0, '2026-03-13 17:29:18', '2026-03-13 17:48:31'),
-(19, 'mino@gmail.com', '$2y$10$rFCJ2WVPayAWbi0JkJE6KudkElZRI.HVkbb/ai9LY9aXLMvniQode', 2, 19, 5, 1, 0, '2026-03-13 17:49:33', '2026-03-13 18:07:34'),
+(19, 'mino@gmail.com', '$2y$12$6iOiuuGdcf3QY.KII.EwTujjzTI3jUUxjL4f3rlyWr6WAUvGyNOd2', 2, 19, 5, 1, 0, '2026-03-13 17:49:33', '2026-04-17 01:02:28'),
 (20, 'sebas@gmail.com', '$2y$10$PguAEskHTJUTMqB2kh28v.DRU3.UYFrv4fJHHe6ONNYNq6Errz.AG', 2, 20, 5, 1, 0, '2026-03-13 18:18:35', '2026-03-13 18:29:07'),
-(21, 'sebastianminotti@gmail.com', '$2y$10$r0Tf23UJ27Xt5rMMBEG/KOjwD.y95yDlgzdDvG.JtwnRAlXQ4gw1q', 2, 21, 3, 1, 0, '2026-03-13 18:30:06', '2026-03-13 18:39:03');
+(21, 'sebastianminotti@gmail.com', '$2y$12$6iOiuuGdcf3QY.KII.EwTujjzTI3jUUxjL4f3rlyWr6WAUvGyNOd2', 3, 21, 3, 1, 0, '2026-03-13 18:30:06', '2026-04-17 01:05:46');
 
 --
 -- Índices para tablas volcadas
@@ -586,7 +600,7 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `bolsadetrabajo`
 --
 ALTER TABLE `bolsadetrabajo`
-  MODIFY `id_bolsaDeTrabajo` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_bolsaDeTrabajo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `carrera`
@@ -640,7 +654,7 @@ ALTER TABLE `persona`
 -- AUTO_INCREMENT de la tabla `postulacion`
 --
 ALTER TABLE `postulacion`
-  MODIFY `id_postulacion` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_postulacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`

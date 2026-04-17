@@ -1,5 +1,9 @@
 # 🚀 Guía de Despliegue - ComunidadIFTS en InfinityFree
 
+**Última actualización**: 16 de Abril 2026  
+**Status Build**: ✅ LISTO PARA DEPLOY (QA PASS 7/7)  
+**Instrucciones detalladas**: Ver `DEPLOY_INSTRUCCIONES_16-ABRIL-2026.md`
+
 ## 📋 Información de la Cuenta
 
 - **Hosting**: InfinityFree
