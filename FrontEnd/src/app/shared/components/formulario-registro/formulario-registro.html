@@ -51,6 +51,30 @@
     <mat-error *ngIf="form.get('id_institucion')?.hasError('required')">Seleccioná una institución</mat-error>
   </mat-form-field>
 
+  <div class="row">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Carrera</mat-label>
+      <mat-select formControlName="id_carrera">
+        <mat-option *ngIf="!form.get('id_institucion')?.value" disabled>Primero seleccioná una institución</mat-option>
+        <mat-option *ngIf="form.get('id_institucion')?.value && carrerasDisponibles.length === 0" disabled>No hay carreras cargadas para esa institución</mat-option>
+        <mat-option *ngFor="let carrera of carrerasDisponibles" [value]="carrera.id">
+          {{ carrera.nombre }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('id_carrera')?.hasError('required')">Seleccioná una carrera</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Año de cursada</mat-label>
+      <mat-select formControlName="anio_cursada">
+        <mat-option *ngFor="let anio of aniosCursada" [value]="anio">
+          {{ anio }}° año
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('anio_cursada')?.hasError('required')">Seleccioná el año de cursada</mat-error>
+    </mat-form-field>
+  </div>
+
   <mat-form-field appearance="outline" class="full-width">
     <mat-label>Email</mat-label>
     <input matInput type="email" formControlName="email" title="Email" placeholder="tu.email@ejemplo.com" />

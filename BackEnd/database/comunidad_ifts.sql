@@ -479,6 +479,8 @@ CREATE TABLE `usuario` (
   `id_rol` int(11) NOT NULL,
   `id_persona` int(11) NOT NULL,
   `id_institucion` int(11) NOT NULL,
+  `id_carrera` int(11) DEFAULT NULL,
+  `anio_cursada` tinyint(1) DEFAULT NULL,
   `habilitado` int(11) NOT NULL DEFAULT 1,
   `cancelado` int(11) NOT NULL DEFAULT 0,
   `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -605,7 +607,8 @@ ALTER TABLE `usuario`
   ADD UNIQUE KEY `email` (`email`),
   ADD KEY `fk_id_rol` (`id_rol`),
   ADD KEY `fk_id_persona` (`id_persona`),
-  ADD KEY `fk_id_ifts` (`id_institucion`);
+  ADD KEY `fk_id_ifts` (`id_institucion`),
+  ADD KEY `idx_usuario_carrera` (`id_carrera`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -706,6 +709,12 @@ ALTER TABLE `bolsadetrabajo`
 ALTER TABLE `postulacion`
   ADD CONSTRAINT `fk_postulacion_alumno` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_postulacion_oferta` FOREIGN KEY (`id_bolsaDeTrabajo`) REFERENCES `bolsadetrabajo` (`id_bolsaDeTrabajo`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  ADD CONSTRAINT `fk_usuario_carrera` FOREIGN KEY (`id_carrera`) REFERENCES `carrera` (`id_carrera`) ON DELETE SET NULL ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

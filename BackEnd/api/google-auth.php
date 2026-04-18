@@ -246,8 +246,10 @@ try {
     $fechaNacimiento = trim($payload['fecha_nacimiento'] ?? '');
     $telefono = trim($payload['telefono'] ?? '');
     $idInstitucion = (int)($payload['id_institucion'] ?? 0);
+    $idCarrera = (int)($payload['id_carrera'] ?? 0);
+    $anioCursada = (int)($payload['anio_cursada'] ?? 0);
 
-    if ($nombre === '' || $apellido === '' || $dni === '' || $fechaNacimiento === '' || $telefono === '' || $idInstitucion <= 0) {
+    if ($nombre === '' || $apellido === '' || $dni === '' || $fechaNacimiento === '' || $telefono === '' || $idInstitucion <= 0 || $idCarrera <= 0 || $anioCursada <= 0) {
         http_response_code(400);
         echo safe_json_encode([
             'success' => false,
@@ -314,6 +316,26 @@ try {
         exit;
     }
 
+    if (!Institucion::tieneCarreraActiva($pdo, $idInstitucion, $idCarrera)) {
+        $pdo->rollBack();
+        http_response_code(400);
+        echo safe_json_encode([
+            'success' => false,
+            'message' => 'La carrera seleccionada no pertenece a la institución elegida'
+        ]);
+        exit;
+    }
+
+    if ($anioCursada < 1 || $anioCursada > 5) {
+        $pdo->rollBack();
+        http_response_code(400);
+        echo safe_json_encode([
+            'success' => false,
+            'message' => 'El año de cursada no es válido'
+        ]);
+        exit;
+    }
+
     $idRolAlumno = Rol::obtenerRolAlumnoActivo($pdo);
     if ($idRolAlumno === null) {
         $pdo->rollBack();
@@ -358,6 +380,8 @@ try {
         $persona->getIdPersona(),
         $idRolAlumno,
         $idInstitucion,
+        $idCarrera,
+        $anioCursada,
         null,
         0,
         0,

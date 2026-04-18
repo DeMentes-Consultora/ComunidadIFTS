@@ -11,7 +11,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { AuthUser, GoogleIdentity, GoogleRegisterRequest } from '../../models/auth.model';
-import { Institucion } from '../../models/institucion.model';
+import { Carrera, Institucion } from '../../models/institucion.model';
 import { InstitucionesService } from '../../services/instituciones.service';
 
 @Component({
@@ -37,6 +37,8 @@ export class FormularioRegistroComponent implements OnInit {
   @Output() cancel = new EventEmitter<void>();
 
   instituciones: Institucion[] = [];
+  carrerasDisponibles: Carrera[] = [];
+  aniosCursada = [1, 2, 3, 4, 5];
   cargando = false;
   cargandoInstituciones = false;
   error: string | null = null;
@@ -62,6 +64,8 @@ export class FormularioRegistroComponent implements OnInit {
       fecha_nacimiento: ['', [Validators.required]],
       telefono: ['', [Validators.required, Validators.minLength(8)]],
       id_institucion: ['', [Validators.required]],
+      id_carrera: ['', [Validators.required]],
+      anio_cursada: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       clave: ['', [Validators.required, Validators.minLength(6)]],
       confirmar_clave: ['', [Validators.required]]
@@ -76,6 +80,10 @@ export class FormularioRegistroComponent implements OnInit {
       if (this.googleFlowActivo) {
         this.actualizarAyudaFlujoGoogle();
       }
+    });
+
+    this.form.get('id_institucion')?.valueChanges.subscribe((idInstitucion) => {
+      this.actualizarCarrerasDisponibles(Number(idInstitucion ?? 0));
     });
   }
 
@@ -121,6 +129,8 @@ export class FormularioRegistroComponent implements OnInit {
       fecha_nacimiento: this.form.value.fecha_nacimiento ?? '',
       telefono: this.form.value.telefono ?? '',
       id_institucion: Number(this.form.value.id_institucion ?? 0),
+      id_carrera: Number(this.form.value.id_carrera ?? 0),
+      anio_cursada: Number(this.form.value.anio_cursada ?? 0),
       email: this.form.value.email ?? '',
       clave: this.form.value.clave ?? '',
       confirmar_clave: this.form.value.confirmar_clave ?? ''
@@ -246,7 +256,9 @@ export class FormularioRegistroComponent implements OnInit {
       dni: (this.form.value.dni ?? '').trim(),
       fecha_nacimiento: (this.form.value.fecha_nacimiento ?? '').trim(),
       telefono: (this.form.value.telefono ?? '').trim(),
-      id_institucion: Number(this.form.value.id_institucion ?? 0)
+      id_institucion: Number(this.form.value.id_institucion ?? 0),
+      id_carrera: Number(this.form.value.id_carrera ?? 0),
+      anio_cursada: Number(this.form.value.anio_cursada ?? 0)
     };
 
     if (this.googleFotoPerfilUrl) {
@@ -259,7 +271,9 @@ export class FormularioRegistroComponent implements OnInit {
       payload.dni === '' ||
       payload.fecha_nacimiento === '' ||
       payload.telefono === '' ||
-      payload.id_institucion <= 0
+      payload.id_institucion <= 0 ||
+      payload.id_carrera <= 0 ||
+      payload.anio_cursada <= 0
     ) {
       return null;
     }
@@ -278,7 +292,9 @@ export class FormularioRegistroComponent implements OnInit {
       { key: 'dni', label: 'DNI' },
       { key: 'fecha_nacimiento', label: 'Fecha de nacimiento' },
       { key: 'telefono', label: 'Telefono' },
-      { key: 'id_institucion', label: 'Institucion' }
+      { key: 'id_institucion', label: 'Institucion' },
+      { key: 'id_carrera', label: 'Carrera' },
+      { key: 'anio_cursada', label: 'Año de cursada' }
     ].filter((field) => this.estaCampoFaltante(field.key)).map((field) => field.label);
   }
 
@@ -339,6 +355,10 @@ export class FormularioRegistroComponent implements OnInit {
       return Number(value ?? 0) <= 0;
     }
 
+    if (key === 'id_carrera' || key === 'anio_cursada') {
+      return Number(value ?? 0) <= 0;
+    }
+
     return String(value ?? '').trim() === '';
   }
 
@@ -375,5 +395,19 @@ export class FormularioRegistroComponent implements OnInit {
     this.form.get('confirmar_clave')?.setValue('');
     this.form.get('clave')?.updateValueAndValidity();
     this.form.get('confirmar_clave')?.updateValueAndValidity();
+  }
+
+  private actualizarCarrerasDisponibles(idInstitucion: number): void {
+    const institucion = this.instituciones.find((item) => item.id === idInstitucion) ?? null;
+    this.carrerasDisponibles = institucion?.carreras ?? [];
+
+    const idCarreraActual = Number(this.form.get('id_carrera')?.value ?? 0);
+    const carreraSigueDisponible = this.carrerasDisponibles.some((carrera) => carrera.id === idCarreraActual);
+
+    if (!carreraSigueDisponible) {
+      this.form.get('id_carrera')?.setValue('');
+    }
+
+    this.cdr.markForCheck();
   }
 }

@@ -1,0 +1,338 @@
+.perfil-page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.page-header mat-icon {
+  color: #006633;
+  font-size: 34px;
+  width: 34px;
+  height: 34px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #111827;
+}
+
+.page-header p {
+  margin: 4px 0 0;
+  color: #4b5563;
+}
+
+.loading-state,
+.empty-state {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.perfil-layout {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.perfil-card {
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.principal-card {
+  padding: 24px;
+}
+
+.avatar-wrap {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  margin: 0 auto 18px;
+}
+
+.avatar-image,
+.avatar-fallback {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #d7f0de;
+  background: #f3f4f6;
+}
+
+.avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-fallback mat-icon {
+  font-size: 74px;
+  width: 74px;
+  height: 74px;
+  color: #006633;
+}
+
+.avatar-upload {
+  position: absolute;
+  right: 2px;
+  bottom: 6px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.avatar-upload mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #006633;
+}
+
+.principal-card h2 {
+  margin: 0;
+  text-align: center;
+  color: #111827;
+}
+
+.email-line {
+  margin: 8px 0 12px;
+  text-align: center;
+  color: #4b5563;
+}
+
+.perfil-badge {
+  display: inline-flex;
+  margin: 0 auto 16px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #e8f5e9;
+  color: #006633;
+  font-weight: 600;
+}
+
+.principal-card mat-divider {
+  margin: 18px 0;
+}
+
+.datos-block h3 {
+  margin: 0 0 12px;
+  color: #006633;
+  font-size: 1rem;
+}
+
+.academico-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.academico-head h3 {
+  margin: 0;
+}
+
+.mini-btn {
+  border-color: #cfe5d6;
+}
+
+.academico-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.academico-editor label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #111827;
+  font-weight: 600;
+}
+
+.academico-editor select {
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  background: #fff;
+  color: #111827;
+}
+
+.academico-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.dato-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f1f3;
+}
+
+.dato-item strong {
+  color: #111827;
+}
+
+.dato-item span {
+  color: #4b5563;
+  text-align: right;
+}
+
+.postulaciones-card {
+  padding: 24px;
+}
+
+.section-head {
+  margin-bottom: 18px;
+}
+
+.section-head h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  color: #111827;
+}
+
+.section-head p {
+  margin: 6px 0 0;
+  color: #6b7280;
+}
+
+.postulaciones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.postulacion-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 18px;
+  background: #fcfcfd;
+}
+
+.postulacion-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.institucion-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #006633;
+  font-weight: 600;
+}
+
+.institucion-chip mat-icon {
+  color: #006633;
+}
+
+.institucion-logo {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  padding: 2px;
+}
+
+.fecha-postulacion {
+  color: #6b7280;
+  font-size: 0.92rem;
+}
+
+.postulacion-item h4 {
+  margin: 0 0 8px;
+  color: #111827;
+  font-size: 1.1rem;
+}
+
+.postulacion-item p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.postulacion-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.cv-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #006633;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.cv-link:hover {
+  text-decoration: underline;
+}
+
+.empty-state mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #c0c4cc;
+}
+
+@media (max-width: 1024px) {
+  .perfil-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .perfil-page {
+    padding: 16px;
+  }
+
+  .postulacion-top,
+  .postulacion-actions,
+  .dato-item,
+  .academico-head,
+  .academico-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dato-item span {
+    text-align: left;
+  }
+}

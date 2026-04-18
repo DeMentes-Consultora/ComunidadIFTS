@@ -81,6 +81,10 @@
     <!-- Alumnos (rol 2) -->
     <ng-container *ngIf="(currentUser$ | async)?.id_rol === 2">
       <mat-divider></mat-divider>
+      <a mat-button routerLink="/perfil" (click)="closeSidenavPanel()" class="nav-link">
+        <mat-icon>account_circle</mat-icon>
+        Mi perfil
+      </a>
       <a mat-button routerLink="/bolsa-trabajo" (click)="closeSidenavPanel()" class="nav-link">
         <mat-icon>work</mat-icon>
         Bolsa de trabajo

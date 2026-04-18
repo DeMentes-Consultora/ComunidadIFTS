@@ -61,6 +61,47 @@ export interface PostularseResponse {
   id_postulacion?: number;
 }
 
+export interface PerfilAlumnoPostulacion {
+  id_bolsaDeTrabajo: number;
+  id_postulacion?: number;
+  tituloOferta: string;
+  textoOferta: string;
+  nombre_ifts: string;
+  email_ifts: string;
+  logo_ifts?: string | null;
+  fecha_postulacion: string;
+  cv_url?: string | null;
+}
+
+export interface PerfilAlumnoUsuario {
+  id_usuario: number;
+  email: string;
+  id_rol: number;
+  nombre_rol: string;
+  id_persona: number;
+  id_institucion: number;
+  id_carrera?: number | null;
+  anio_cursada?: number | null;
+  nombre_institucion: string;
+  nombre_carrera?: string | null;
+  nombre: string;
+  apellido: string;
+  dni: string;
+  telefono: string;
+  edad: number;
+  fecha_nacimiento: string;
+  foto_perfil_url?: string | null;
+}
+
+export interface PerfilAlumnoResponse {
+  success: boolean;
+  message?: string;
+  data: {
+    usuario: PerfilAlumnoUsuario;
+    postulaciones: PerfilAlumnoPostulacion[];
+  };
+}
+
 // ---- Service ----
 
 @Injectable({ providedIn: 'root' })
@@ -110,6 +151,29 @@ export class BolsaTrabajoService {
     return this.http.post<PostularseResponse>(
       `${this.base}/postularse.php`,
       formData,
+      { withCredentials: true }
+    );
+  }
+
+  obtenerPerfilAlumno(): Observable<PerfilAlumnoResponse> {
+    return this.http.get<PerfilAlumnoResponse>(
+      `${this.base}/perfil-alumno.php`,
+      { withCredentials: true }
+    );
+  }
+
+  cancelarPostulacion(id_postulacion: number): Observable<{ success: boolean; message?: string }> {
+    return this.http.post<{ success: boolean; message?: string }>(
+      `${this.base}/cancelar-postulacion.php`,
+      { id_postulacion },
+      { withCredentials: true }
+    );
+  }
+
+  actualizarDatosAcademicos(id_carrera: number, anio_cursada: number): Observable<{ success: boolean; message?: string; data?: PerfilAlumnoUsuario | null }> {
+    return this.http.post<{ success: boolean; message?: string; data?: PerfilAlumnoUsuario | null }>(
+      `${this.base}/actualizar-datos-academicos.php`,
+      { id_carrera, anio_cursada },
       { withCredentials: true }
     );
   }

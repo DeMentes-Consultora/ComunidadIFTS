@@ -399,6 +399,21 @@ class Institucion {
         return (bool)$stmt->fetch();
     }
 
+    public static function tieneCarreraActiva($pdo, $idInstitucion, $idCarrera) {
+        $stmt = $pdo->prepare(
+            "SELECT ic.id_institucion_carrera
+             FROM institucion_carrera ic
+             INNER JOIN carrera c ON ic.id_carrera = c.id_carrera
+             WHERE ic.id_institucion = ?
+               AND ic.id_carrera = ?
+               AND ic.cancelado = 0
+               AND c.cancelado = 0
+             LIMIT 1"
+        );
+        $stmt->execute([$idInstitucion, $idCarrera]);
+        return (bool)$stmt->fetch();
+    }
+
     public static function obtenerConLogoPorId($pdo, $id) {
         $stmt = $pdo->prepare('SELECT id_institucion, logo_ifts FROM institucion WHERE id_institucion = ? LIMIT 1');
         $stmt->execute([$id]);

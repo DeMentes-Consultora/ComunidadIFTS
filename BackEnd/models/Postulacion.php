@@ -55,6 +55,7 @@ class Postulacion {
      */
     public static function obtenerOfertasDeAlumno(PDO $pdo, int $idUsuario): array {
         $sql = "SELECT
+                    ps.id_postulacion,
                     b.id_bolsaDeTrabajo,
                     b.tituloOferta,
                     b.textoOferta,
@@ -105,5 +106,52 @@ class Postulacion {
         $stmt = $pdo->prepare($sql);
         $ok = $stmt->execute([$idOferta, $idUsuario, $cvUrl, $cvPublicId]);
         return $ok ? (int)$pdo->lastInsertId() : null;
+    }
+
+    /**
+     * Busca una postulacion existente de un alumno para una oferta,
+     * incluso si fue cancelada previamente.
+     */
+    public static function obtenerPorOfertaYUsuario(PDO $pdo, int $idOferta, int $idUsuario): ?array {
+        $stmt = $pdo->prepare(
+            "SELECT id_postulacion, cancelado, cv_url, cv_public_id
+             FROM postulacion
+             WHERE id_bolsaDeTrabajo = ? AND id_usuario = ?
+             LIMIT 1"
+        );
+        $stmt->execute([$idOferta, $idUsuario]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    /**
+     * Reactiva una postulacion cancelada para permitir que el alumno vuelva a verla
+     * o vuelva a postularse sin chocar con la clave unica.
+     */
+    public static function reactivarPostulacion(PDO $pdo, int $idPostulacion, ?string $cvUrl, ?string $cvPublicId): bool {
+        $stmt = $pdo->prepare(
+            "UPDATE postulacion
+             SET cancelado = 0,
+                 cv_url = ?,
+                 cv_public_id = ?
+             WHERE id_postulacion = ?"
+        );
+
+        return $stmt->execute([$cvUrl, $cvPublicId, $idPostulacion]);
+    }
+
+    /**
+     * Cancela una postulacion del propio alumno para ocultarla de su perfil.
+     */
+    public static function cancelarDeAlumno(PDO $pdo, int $idPostulacion, int $idUsuario): bool {
+        $stmt = $pdo->prepare(
+            "UPDATE postulacion
+             SET cancelado = 1
+             WHERE id_postulacion = ? AND id_usuario = ? AND cancelado = 0"
+        );
+
+        $stmt->execute([$idPostulacion, $idUsuario]);
+        return $stmt->rowCount() > 0;
     }
 }

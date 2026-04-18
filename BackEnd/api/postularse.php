@@ -100,8 +100,10 @@ try {
         exit;
     }
 
-    // Verificar que el alumno no esté ya postulado
-    if (Postulacion::yaPostulado($pdo, $idOferta, $idUsuario)) {
+    // Verificar si ya existe una postulacion activa o cancelada
+    $postulacionExistente = Postulacion::obtenerPorOfertaYUsuario($pdo, $idOferta, $idUsuario);
+
+    if ($postulacionExistente && (int)$postulacionExistente['cancelado'] === 0) {
         http_response_code(409);
         echo json_encode(['success' => false, 'message' => 'Ya estás postulado a esta oferta']);
         exit;
@@ -123,7 +125,18 @@ try {
     // Guardar postulación en DB
     $pdo->beginTransaction();
 
-    $idPostulacion = Postulacion::crearPostulacion($pdo, $idOferta, $idUsuario, $cvUrl, $cvPublicId);
+    if ($postulacionExistente && (int)$postulacionExistente['cancelado'] === 1) {
+        $ok = Postulacion::reactivarPostulacion(
+            $pdo,
+            (int)$postulacionExistente['id_postulacion'],
+            $cvUrl,
+            $cvPublicId
+        );
+
+        $idPostulacion = $ok ? (int)$postulacionExistente['id_postulacion'] : null;
+    } else {
+        $idPostulacion = Postulacion::crearPostulacion($pdo, $idOferta, $idUsuario, $cvUrl, $cvPublicId);
+    }
 
     if (!$idPostulacion) {
         $pdo->rollBack();

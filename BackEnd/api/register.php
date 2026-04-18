@@ -73,10 +73,13 @@ try {
     $clave = trim($payload['clave'] ?? '');
     $confirmarClave = trim($payload['confirmar_clave'] ?? '');
     $idInstitucion = (int)($payload['id_institucion'] ?? 0);
+    $idCarrera = (int)($payload['id_carrera'] ?? 0);
+    $anioCursada = (int)($payload['anio_cursada'] ?? 0);
 
     if (
         $nombre === '' || $apellido === '' || $dni === '' || $fechaNacimiento === '' ||
-        $telefono === '' || $email === '' || $clave === '' || $confirmarClave === '' || $idInstitucion <= 0
+        $telefono === '' || $email === '' || $clave === '' || $confirmarClave === '' ||
+        $idInstitucion <= 0 || $idCarrera <= 0 || $anioCursada <= 0
     ) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Todos los campos son obligatorios']);
@@ -127,6 +130,20 @@ try {
         exit;
     }
 
+    if (!Institucion::tieneCarreraActiva($pdo, $idInstitucion, $idCarrera)) {
+        $pdo->rollBack();
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'La carrera seleccionada no pertenece a la institución elegida']);
+        exit;
+    }
+
+    if ($anioCursada < 1 || $anioCursada > 5) {
+        $pdo->rollBack();
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'El año de cursada no es válido']);
+        exit;
+    }
+
     if (Usuario::emailExiste($pdo, $email)) {
         $pdo->rollBack();
         http_response_code(409);
@@ -163,6 +180,8 @@ try {
         $persona->getIdPersona(),
         $idRolAlumno,
         $idInstitucion,
+        $idCarrera,
+        $anioCursada,
         null,      // id_usuario
         0,         // habilitado = 0 (pendiente de aprobación)
         0          // cancelado = 0

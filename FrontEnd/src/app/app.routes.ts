@@ -54,6 +54,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/bolsa-trabajo/bolsa-trabajo').then(m => m.BolsaTrabajo)
   },
   {
+    path: 'perfil',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: [2] },
+    loadComponent: () => import('./features/perfil-alumno/perfil-alumno').then(m => m.PerfilAlumno)
+  },
+  {
     path: 'crear-oferta',
     canActivate: [authGuard, roleGuard],
     data: { roles: [3] },

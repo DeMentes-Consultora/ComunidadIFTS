@@ -1,0 +1,159 @@
+<div class="perfil-page">
+  <div class="page-header">
+    <mat-icon>account_circle</mat-icon>
+    <div>
+      <h1>Mi perfil</h1>
+      <p>Consultá tus datos y las ofertas laborales en las que estás postulado.</p>
+    </div>
+  </div>
+
+  @if (cargando) {
+    <div class="loading-state">
+      <mat-progress-spinner mode="indeterminate" diameter="52"></mat-progress-spinner>
+      <p>Cargando perfil...</p>
+    </div>
+  } @else if (usuario) {
+    <div class="perfil-layout">
+      <section class="perfil-sidebar">
+        <mat-card class="perfil-card principal-card">
+          <div class="avatar-wrap">
+            @if (usuario.foto_perfil_url) {
+              <img [src]="usuario.foto_perfil_url" alt="Foto de perfil" class="avatar-image" />
+            } @else {
+              <div class="avatar-fallback">
+                <mat-icon>person</mat-icon>
+              </div>
+            }
+
+            <label class="avatar-upload" for="fotoPerfilInput" title="Cambiar foto de perfil">
+              <mat-icon>edit</mat-icon>
+            </label>
+            <input id="fotoPerfilInput" type="file" accept="image/*" hidden (change)="actualizarFotoPerfil($event)" />
+          </div>
+
+          <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>
+          <p class="email-line">{{ usuario.email }}</p>
+          <span class="perfil-badge">Alumno</span>
+
+          <mat-divider></mat-divider>
+
+          <div class="datos-block">
+            <h3>Datos personales</h3>
+            <div class="dato-item"><strong>DNI:</strong><span>{{ usuario.dni || '-' }}</span></div>
+            <div class="dato-item"><strong>Teléfono:</strong><span>{{ usuario.telefono || '-' }}</span></div>
+            <div class="dato-item"><strong>Fecha de nacimiento:</strong><span>{{ formatearFecha(usuario.fecha_nacimiento) }}</span></div>
+            <div class="dato-item"><strong>Edad:</strong><span>{{ usuario.edad || '-' }}</span></div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="datos-block">
+            <div class="academico-head">
+              <h3>Datos académicos</h3>
+              @if (!editandoAcademicos) {
+                <button mat-stroked-button type="button" class="mini-btn" (click)="iniciarEdicionAcademica()">
+                  <mat-icon>edit</mat-icon>
+                  Editar
+                </button>
+              }
+            </div>
+            <div class="dato-item"><strong>IFTS:</strong><span>{{ usuario.nombre_institucion || '-' }}</span></div>
+
+            @if (editandoAcademicos) {
+              <div class="academico-editor">
+                <label>
+                  <span>Carrera</span>
+                  <select [(ngModel)]="idCarreraSeleccionada">
+                    <option [ngValue]="null">Seleccioná una carrera</option>
+                    @for (carrera of carrerasDisponibles; track carrera.id) {
+                      <option [ngValue]="carrera.id">{{ carrera.nombre }}</option>
+                    }
+                  </select>
+                </label>
+
+                <label>
+                  <span>Año de cursada</span>
+                  <select [(ngModel)]="anioCursadaSeleccionado">
+                    <option [ngValue]="null">Seleccioná el año</option>
+                    @for (anio of aniosCursada; track anio) {
+                      <option [ngValue]="anio">{{ anio }}° año</option>
+                    }
+                  </select>
+                </label>
+
+                <div class="academico-actions">
+                  <button mat-button type="button" (click)="cancelarEdicionAcademica()">Cancelar</button>
+                  <button mat-flat-button color="primary" type="button" [disabled]="guardandoAcademicos || !idCarreraSeleccionada || !anioCursadaSeleccionado" (click)="guardarDatosAcademicos()">
+                    {{ guardandoAcademicos ? 'Guardando...' : 'Guardar' }}
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <div class="dato-item"><strong>Carrera:</strong><span>{{ usuario.nombre_carrera || '-' }}</span></div>
+              <div class="dato-item"><strong>Año:</strong><span>{{ usuario.anio_cursada ? (usuario.anio_cursada + '° año') : '-' }}</span></div>
+            }
+          </div>
+        </mat-card>
+      </section>
+
+      <section class="perfil-content">
+        <mat-card class="perfil-card postulaciones-card">
+          <div class="section-head">
+            <div>
+              <h3>Mis postulaciones</h3>
+              <p>Solo se muestran ofertas todavía activas y publicadas.</p>
+            </div>
+          </div>
+
+          @if (postulaciones.length === 0) {
+            <div class="empty-state">
+              <mat-icon>work_off</mat-icon>
+              <h4>No tenés postulaciones visibles</h4>
+              <p>Si una oferta fue deshabilitada, desaparece automáticamente de esta lista.</p>
+            </div>
+          } @else {
+            <div class="postulaciones-list">
+              @for (postulacion of postulaciones; track postulacion.id_postulacion ?? postulacion.id_bolsaDeTrabajo) {
+                <article class="postulacion-item">
+                  <div class="postulacion-top">
+                    <div class="institucion-chip">
+                      @if (postulacion.logo_ifts) {
+                        <img [src]="postulacion.logo_ifts" alt="Logo IFTS" class="institucion-logo" />
+                      } @else {
+                        <mat-icon>school</mat-icon>
+                      }
+                      <span>{{ postulacion.nombre_ifts }}</span>
+                    </div>
+                    <span class="fecha-postulacion">Postulado el {{ formatearFecha(postulacion.fecha_postulacion) }}</span>
+                  </div>
+
+                  <h4>{{ postulacion.tituloOferta }}</h4>
+                  <p>{{ postulacion.textoOferta }}</p>
+
+                  <div class="postulacion-actions">
+                    @if (postulacion.cv_url) {
+                      <a class="cv-link" [href]="postulacion.cv_url" target="_blank" rel="noopener noreferrer">
+                        <mat-icon>description</mat-icon>
+                        Ver CV enviado
+                      </a>
+                    }
+
+                    <button
+                      mat-stroked-button
+                      color="warn"
+                      type="button"
+                      [disabled]="eliminandoId === postulacion.id_postulacion"
+                      (click)="quitarPostulacion(postulacion)">
+                      <mat-icon>delete_outline</mat-icon>
+                      {{ eliminandoId === postulacion.id_postulacion ? 'Quitando...' : 'Quitar de mi perfil' }}
+                    </button>
+                  </div>
+                </article>
+              }
+            </div>
+          }
+        </mat-card>
+      </section>
+    </div>
+  }
+</div>

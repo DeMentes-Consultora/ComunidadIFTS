@@ -10,6 +10,8 @@ class Usuario {
     private $idRol;
     private $idPersona;
     private $idInstitucion;
+    private $idCarrera;
+    private $anioCursada;
     private $habilitado;
     private $cancelado;
     private $idCreate;
@@ -25,6 +27,7 @@ class Usuario {
     private $fotoPerfilUrl;
     private $fotoPerfilPublicId;
     private $nombreInstitucion;
+    private $nombreCarrera;
 
     public function __construct(
         $email,
@@ -32,6 +35,8 @@ class Usuario {
         $idPersona,
         $idRol,
         $idInstitucion,
+        $idCarrera = null,
+        $anioCursada = null,
         $idUsuario = null,
         $habilitado = 1,
         $cancelado = 0,
@@ -45,6 +50,8 @@ class Usuario {
         $this->idRol = $idRol;
         $this->idPersona = $idPersona;
         $this->idInstitucion = $idInstitucion;
+        $this->idCarrera = $idCarrera !== null ? (int)$idCarrera : null;
+        $this->anioCursada = $anioCursada !== null ? (int)$anioCursada : null;
         $this->habilitado = (int)$habilitado;
         $this->cancelado = (int)$cancelado;
         $this->idCreate = $idCreate;
@@ -57,6 +64,8 @@ class Usuario {
     public function getIdRol() { return $this->idRol; }
     public function getIdPersona() { return $this->idPersona; }
     public function getIdInstitucion() { return $this->idInstitucion; }
+    public function getIdCarrera() { return $this->idCarrera; }
+    public function getAnioCursada() { return $this->anioCursada; }
     public function getHabilitado() { return $this->habilitado; }
     public function getCancelado() { return $this->cancelado; }
     public function getIdCreate() { return $this->idCreate; }
@@ -72,12 +81,15 @@ class Usuario {
     public function getFotoPerfilUrl() { return $this->fotoPerfilUrl; }
     public function getFotoPerfilPublicId() { return $this->fotoPerfilPublicId; }
     public function getNombreInstitucion() { return $this->nombreInstitucion; }
+    public function getNombreCarrera() { return $this->nombreCarrera; }
 
     public function setEmail($email) { $this->email = $email; }
     public function setClave($clave) { $this->clave = password_hash($clave, PASSWORD_DEFAULT); }
     public function setIdRol($idRol) { $this->idRol = (int)$idRol; }
     public function setIdPersona($idPersona) { $this->idPersona = (int)$idPersona; }
     public function setIdInstitucion($idInstitucion) { $this->idInstitucion = (int)$idInstitucion; }
+    public function setIdCarrera($idCarrera) { $this->idCarrera = $idCarrera !== null ? (int)$idCarrera : null; }
+    public function setAnioCursada($anioCursada) { $this->anioCursada = $anioCursada !== null ? (int)$anioCursada : null; }
     public function setHabilitado($habilitado) { $this->habilitado = (int)$habilitado; }
     public function setCancelado($cancelado) { $this->cancelado = (int)$cancelado; }
 
@@ -86,8 +98,8 @@ class Usuario {
     }
 
     public function guardar($pdo) {
-        $sql = "INSERT INTO usuario (email, clave, id_rol, id_persona, id_institucion, habilitado, cancelado)
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO usuario (email, clave, id_rol, id_persona, id_institucion, id_carrera, anio_cursada, habilitado, cancelado)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $pdo->prepare($sql);
         $ok = $stmt->execute([
@@ -96,6 +108,8 @@ class Usuario {
             $this->idRol,
             $this->idPersona,
             $this->idInstitucion,
+            $this->idCarrera,
+            $this->anioCursada,
             $this->habilitado,
             $this->cancelado
         ]);
@@ -115,7 +129,10 @@ class Usuario {
             'nombre_rol' => $this->nombreRol,
             'id_persona' => $this->idPersona,
             'id_institucion' => $this->idInstitucion,
+            'id_carrera' => $this->idCarrera,
+            'anio_cursada' => $this->anioCursada,
             'nombre_institucion' => $this->nombreInstitucion,
+            'nombre_carrera' => $this->nombreCarrera,
             'nombre' => $this->nombre,
             'apellido' => $this->apellido,
             'dni' => $this->dni,
@@ -141,11 +158,13 @@ class Usuario {
                     p.fecha_nacimiento,
                     p.foto_perfil_url,
                     p.foto_perfil_public_id,
-                    i.nombre_ifts
+                    i.nombre_ifts,
+                    c.nombre_carrera
                 FROM usuario u
                 INNER JOIN rol r ON u.id_rol = r.id_rol
                 INNER JOIN persona p ON u.id_persona = p.id_persona
                 INNER JOIN institucion i ON u.id_institucion = i.id_institucion
+                LEFT JOIN carrera c ON u.id_carrera = c.id_carrera
                 WHERE u.email = ?
                   AND u.habilitado = 1
                   AND u.cancelado = 0
@@ -167,6 +186,8 @@ class Usuario {
             $row['id_persona'],
             $row['id_rol'],
             $row['id_institucion'],
+            $row['id_carrera'] ?? null,
+            $row['anio_cursada'] ?? null,
             $row['id_usuario'],
             $row['habilitado'],
             $row['cancelado'],
@@ -185,6 +206,7 @@ class Usuario {
         $usuario->fotoPerfilUrl = $row['foto_perfil_url'] ?? null;
         $usuario->fotoPerfilPublicId = $row['foto_perfil_public_id'] ?? null;
         $usuario->nombreInstitucion = $row['nombre_ifts'] ?? null;
+        $usuario->nombreCarrera = $row['nombre_carrera'] ?? null;
 
         return $usuario;
     }
@@ -278,11 +300,13 @@ class Usuario {
                     p.fecha_nacimiento,
                     p.foto_perfil_url,
                     p.foto_perfil_public_id,
-                    i.nombre_ifts
+                    i.nombre_ifts,
+                    c.nombre_carrera
                 FROM usuario u
                 INNER JOIN rol r ON u.id_rol = r.id_rol
                 INNER JOIN persona p ON u.id_persona = p.id_persona
                 INNER JOIN institucion i ON u.id_institucion = i.id_institucion
+                LEFT JOIN carrera c ON u.id_carrera = c.id_carrera
                 WHERE u.id_usuario = ?
                   AND u.habilitado = 1
                   AND u.cancelado = 0
@@ -304,6 +328,8 @@ class Usuario {
             $row['id_persona'],
             $row['id_rol'],
             $row['id_institucion'],
+            $row['id_carrera'] ?? null,
+            $row['anio_cursada'] ?? null,
             $row['id_usuario'],
             $row['habilitado'],
             $row['cancelado'],
@@ -322,6 +348,7 @@ class Usuario {
         $usuario->fotoPerfilUrl = $row['foto_perfil_url'] ?? null;
         $usuario->fotoPerfilPublicId = $row['foto_perfil_public_id'] ?? null;
         $usuario->nombreInstitucion = $row['nombre_ifts'] ?? null;
+        $usuario->nombreCarrera = $row['nombre_carrera'] ?? null;
 
         return $usuario;
     }
@@ -334,6 +361,16 @@ class Usuario {
     public static function rechazarPorId($pdo, $idUsuario) {
         $stmt = $pdo->prepare("UPDATE usuario SET cancelado = 1 WHERE id_usuario = ?");
         return $stmt->execute([$idUsuario]);
+    }
+
+    public static function actualizarDatosAcademicos($pdo, $idUsuario, $idCarrera, $anioCursada) {
+        $stmt = $pdo->prepare(
+            "UPDATE usuario
+             SET id_carrera = ?, anio_cursada = ?
+             WHERE id_usuario = ? AND cancelado = 0"
+        );
+
+        return $stmt->execute([$idCarrera, $anioCursada, $idUsuario]);
     }
 
     public static function obtenerRegistradosAprobados($pdo) {

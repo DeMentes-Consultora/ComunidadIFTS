@@ -10,6 +10,8 @@ export interface RegisterRequest {
   fecha_nacimiento: string;
   telefono: string;
   id_institucion: number;
+  id_carrera: number;
+  anio_cursada: number;
   email: string;
   clave: string;
   confirmar_clave: string;
@@ -22,7 +24,10 @@ export interface AuthUser {
   nombre_rol: string;
   id_persona: number;
   id_institucion: number;
+  id_carrera?: number | null;
+  anio_cursada?: number | null;
   nombre_institucion: string;
+  nombre_carrera?: string | null;
   nombre: string;
   apellido: string;
   dni: string;
@@ -77,5 +82,7 @@ export interface GoogleRegisterRequest {
   fecha_nacimiento: string;
   telefono: string;
   id_institucion: number;
+  id_carrera: number;
+  anio_cursada: number;
   foto_perfil_url?: string;
 }
