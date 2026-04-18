@@ -16,7 +16,7 @@ import {
 export class SiteCustomizationService {
   private readonly apiUrl = `${environment.apiUrl}/site-customization.php`;
   private readonly statsUrl = `${environment.apiUrl}/dashboard-stats.php`;
-  private readonly siteConfigSubject = new BehaviorSubject<SiteCustomizationConfig>({
+  private readonly defaultConfig: SiteCustomizationConfig = {
     navbar: {
       id_navbar: null,
       brand_text: '',
@@ -32,12 +32,31 @@ export class SiteCustomizationService {
       habilitado: 1,
     },
     carousel: [],
-  });
+  };
+  private readonly siteConfigSubject = new BehaviorSubject<SiteCustomizationConfig>(this.defaultConfig);
   private loaded = false;
 
   readonly siteConfig$ = this.siteConfigSubject.asObservable();
 
   constructor(private http: HttpClient) {}
+
+  private normalizeConfig(config: Partial<SiteCustomizationConfig> | null | undefined): SiteCustomizationConfig {
+    const navbar = config?.navbar ?? {};
+    const sidebar = config?.sidebar ?? {};
+    const carousel = Array.isArray(config?.carousel) ? config!.carousel : [];
+
+    return {
+      navbar: {
+        ...this.defaultConfig.navbar,
+        ...navbar,
+      },
+      sidebar: {
+        ...this.defaultConfig.sidebar,
+        ...sidebar,
+      },
+      carousel,
+    };
+  }
 
   loadPublicConfig(force = false): Observable<SiteCustomizationConfig> {
     if (this.loaded && !force) {
@@ -46,10 +65,10 @@ export class SiteCustomizationService {
 
     return this.http.get<SiteCustomizationResponse<SiteCustomizationConfig>>(this.apiUrl).pipe(
       map((response) => {
-        if (!response.success || !response.data) {
+        if (!response.success) {
           throw new Error(response.message || 'No fue posible obtener la configuracion publica');
         }
-        return response.data;
+        return this.normalizeConfig(response.data);
       }),
       tap((config) => {
         this.loaded = true;
@@ -61,10 +80,10 @@ export class SiteCustomizationService {
   getAdminConfig(): Observable<SiteCustomizationConfig> {
     return this.http.get<SiteCustomizationResponse<SiteCustomizationConfig>>(`${this.apiUrl}?scope=admin`, { withCredentials: true }).pipe(
       map((response) => {
-        if (!response.success || !response.data) {
+        if (!response.success) {
           throw new Error(response.message || 'No fue posible obtener la configuracion de administracion');
         }
-        return response.data;
+        return this.normalizeConfig(response.data);
       })
     );
   }
@@ -98,10 +117,10 @@ export class SiteCustomizationService {
 
     return this.http.post<SiteCustomizationResponse<SiteCustomizationConfig>>(this.apiUrl, formData, { withCredentials: true }).pipe(
       map((response) => {
-        if (!response.success || !response.data) {
+        if (!response.success) {
           throw new Error(response.message || 'No fue posible guardar la configuracion del sitio');
         }
-        return response.data;
+        return this.normalizeConfig(response.data);
       }),
       tap((adminConfig) => {
         this.loaded = true;

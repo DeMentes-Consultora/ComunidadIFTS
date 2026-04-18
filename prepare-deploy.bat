@@ -130,7 +130,7 @@ echo.
 echo 4. Importar la base de datos:
 echo    - Accede a phpMyAdmin desde VistaPanel
 echo    - Selecciona: if0_41035439_comunidad_ifts
-echo    - Importa: BackEnd/database/if0_41035439_comunidad_ifts.sql
+echo    - Importa: BackEnd/database/comunidad_ifts.sql
 echo.
 echo 5. Verifica el despliegue:
 echo    https://comunidadifts.infinityfreeapp.com/check-server.php

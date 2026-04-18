@@ -114,6 +114,8 @@ try {
     $sidebarLogoPublicId = trim((string)($sidebarActual['logo_public_id'] ?? ''));
     $sidebarLogoUrl = trim((string)($sidebarActual['logo_url'] ?? ''));
     $removeSidebarLogo = !empty($sidebarPayload['remove_logo']);
+    $navbarLogoSelected = !empty($navbarPayload['logo_selected']);
+    $sidebarLogoSelected = !empty($sidebarPayload['logo_selected']);
 
     if ($removeNavbarLogo && $navbarLogoPublicId !== '') {
         $cloudinary->delete($navbarLogoPublicId, 'image');
@@ -121,7 +123,21 @@ try {
         $navbarLogoUrl = '';
     }
 
-    if (!empty($_FILES['navbar_logo']) && (int)($_FILES['navbar_logo']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+    $navbarFileError = (int)($_FILES['navbar_logo']['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($navbarLogoSelected && $navbarFileError !== UPLOAD_ERR_OK) {
+        respond(400, [
+            'success' => false,
+            'message' => 'Se selecciono un logo de navbar pero el servidor no recibio el archivo.',
+            'details' => [
+                'field' => 'navbar_logo',
+                'upload_error_code' => $navbarFileError,
+                'upload_max_filesize' => ini_get('upload_max_filesize'),
+                'post_max_size' => ini_get('post_max_size'),
+            ],
+        ]);
+    }
+
+    if (!empty($_FILES['navbar_logo']) && $navbarFileError === UPLOAD_ERR_OK) {
         $folderNavbar = $mediaFolders['navbar']['logo'] ?? 'ComunidadIFTS/navbar';
         $uploadLogo = $cloudinary->uploadFromFileArray($_FILES['navbar_logo'], $folderNavbar, 'image');
         if (empty($uploadLogo['success'])) {
@@ -146,7 +162,21 @@ try {
         $sidebarLogoUrl = '';
     }
 
-    if (!empty($_FILES['sidebar_logo']) && (int)($_FILES['sidebar_logo']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+    $sidebarFileError = (int)($_FILES['sidebar_logo']['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($sidebarLogoSelected && $sidebarFileError !== UPLOAD_ERR_OK) {
+        respond(400, [
+            'success' => false,
+            'message' => 'Se selecciono un logo de sidebar pero el servidor no recibio el archivo.',
+            'details' => [
+                'field' => 'sidebar_logo',
+                'upload_error_code' => $sidebarFileError,
+                'upload_max_filesize' => ini_get('upload_max_filesize'),
+                'post_max_size' => ini_get('post_max_size'),
+            ],
+        ]);
+    }
+
+    if (!empty($_FILES['sidebar_logo']) && $sidebarFileError === UPLOAD_ERR_OK) {
         $folderSidebar = $mediaFolders['sidebar']['logo'] ?? 'ComunidadIFTS/sidebar';
         $uploadSidebarLogo = $cloudinary->uploadFromFileArray($_FILES['sidebar_logo'], $folderSidebar, 'image');
         if (empty($uploadSidebarLogo['success'])) {

@@ -218,10 +218,12 @@ export class AdminDashboard implements OnInit {
       navbar: {
         brand_text: this.navbarForm.getRawValue().brand_text.trim(),
         remove_logo: this.removeNavbarLogo(),
+        logo_selected: !!this.navbarLogoFile(),
       },
       sidebar: {
         brand_text: this.sidebarForm.getRawValue().brand_text.trim(),
         remove_logo: this.removeSidebarLogo(),
+        logo_selected: !!this.sidebarLogoFile(),
       },
       carousel: this.reordenarSlides(this.carouselSlides()).map((slide, index) => ({
         id_carrousel: slide.id_carrousel,

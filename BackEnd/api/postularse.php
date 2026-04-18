@@ -14,6 +14,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/Mailer.php';
 require_once __DIR__ . '/../models/BolsaTrabajo.php';
 require_once __DIR__ . '/../models/Postulacion.php';
+require_once __DIR__ . '/../models/Usuario.php';
 require_once __DIR__ . '/../services/CloudinaryService.php';
 
 header('Content-Type: application/json');
@@ -133,25 +134,36 @@ try {
 
     $pdo->commit();
 
-    // Datos del alumno para los mails
+    // Traer datos completos del alumno desde DB para no depender solo de la sesion.
+    $usuarioAlumno = Usuario::buscarPorId($pdo, $idUsuario);
+
     $datosAlumno = [
-        'nombre'   => $_SESSION['nombre'] ?? '',
-        'apellido' => $_SESSION['apellido'] ?? '',
-        'email'    => $_SESSION['email'] ?? '',
-        'telefono' => $_SESSION['telefono'] ?? ''
+        'nombre'   => method_exists($usuarioAlumno, 'getNombre') ? (string)$usuarioAlumno->getNombre() : ((string)($_SESSION['nombre'] ?? '')),
+        'apellido' => method_exists($usuarioAlumno, 'getApellido') ? (string)$usuarioAlumno->getApellido() : ((string)($_SESSION['apellido'] ?? '')),
+        'email'    => method_exists($usuarioAlumno, 'getEmail') ? (string)$usuarioAlumno->getEmail() : ((string)($_SESSION['email'] ?? '')),
+        'telefono' => method_exists($usuarioAlumno, 'getTelefono') ? (string)$usuarioAlumno->getTelefono() : ((string)($_SESSION['telefono'] ?? ''))
     ];
 
     $emailIFTS  = $oferta['email_ifts'] ?? '';
     $nombreIFTS = $oferta['nombre_ifts'] ?? '';
     $titulo     = $oferta['tituloOferta'] ?? '';
 
-    // Mail 1: a la institución con link al CV
+    $mailIftsEnviado = false;
+    $mailAlumnoEnviado = false;
+    $mailIftsError = null;
+    $mailAlumnoError = null;
+
+    // Mail 1: a la institucion con link al CV
     if ($emailIFTS !== '' && $cvUrl) {
         try {
             $mailer = new Mailer();
-            $mailer->notificarNuevaPostulacionIFTS($emailIFTS, $nombreIFTS, $titulo, $datosAlumno, $cvUrl);
+            $mailIftsEnviado = $mailer->notificarNuevaPostulacionIFTS($emailIFTS, $nombreIFTS, $titulo, $datosAlumno, $cvUrl);
+            if (!$mailIftsEnviado) {
+                $mailIftsError = $mailer->getLastError();
+            }
         } catch (Exception $e) {
-            error_log("Error mail postulacion IFTS: " . $e->getMessage());
+            $mailIftsError = $e->getMessage();
+            error_log("Error mail postulacion IFTS: " . $mailIftsError);
         }
     }
 
@@ -162,17 +174,35 @@ try {
     if ($emailAlumno !== '') {
         try {
             $mailer = new Mailer();
-            $mailer->notificarPostulacionAlumno($emailAlumno, $nombreAlumno, $titulo, $nombreIFTS);
+            $mailAlumnoEnviado = $mailer->notificarPostulacionAlumno($emailAlumno, $nombreAlumno, $titulo, $nombreIFTS);
+            if (!$mailAlumnoEnviado) {
+                $mailAlumnoError = $mailer->getLastError();
+            }
         } catch (Exception $e) {
-            error_log("Error mail postulacion alumno: " . $e->getMessage());
+            $mailAlumnoError = $e->getMessage();
+            error_log("Error mail postulacion alumno: " . $mailAlumnoError);
         }
+    } else {
+        $mailAlumnoError = 'El usuario no tiene email disponible para notificacion';
+        error_log('Error mail postulacion alumno: ' . $mailAlumnoError);
     }
 
-    echo json_encode([
+    $response = [
         'success'        => true,
         'message'        => '¡Te postulaste exitosamente! Recibirás un correo de confirmación.',
-        'id_postulacion' => $idPostulacion
-    ]);
+        'id_postulacion' => $idPostulacion,
+        'mail' => [
+            'alumno_enviado' => $mailAlumnoEnviado,
+            'ifts_enviado' => $mailIftsEnviado
+        ]
+    ];
+
+    if (($_ENV['APP_DEBUG'] ?? 'false') === 'true') {
+        $response['mail']['alumno_error'] = $mailAlumnoError;
+        $response['mail']['ifts_error'] = $mailIftsError;
+    }
+
+    echo json_encode($response);
 } catch (Exception $e) {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();

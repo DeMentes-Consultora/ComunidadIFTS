@@ -176,6 +176,20 @@ php -S localhost:8000 -t .
 
 ## Scripts de Mantenimiento
 
+### Test de mail de postulacion (alumno)
+
+Permite verificar de forma aislada si el envio SMTP del correo de confirmacion al alumno funciona.
+
+```bash
+php scripts/test_postulacion_mail.php --to=alumno@correo.com --nombre="Alumno Test"
+```
+
+Opcionalmente podes indicar archivo de entorno y datos del correo:
+
+```bash
+php scripts/test_postulacion_mail.php --to=alumno@correo.com --env-file=.env.production --titulo="Oferta QA" --ifts="IFTS 15"
+```
+
 ### Limpiar logos huerfanos en Cloudinary
 
 Compara los logos de la carpeta Cloudinary de instituciones contra los logos en uso en tabla `institucion` y elimina solo los no referenciados.

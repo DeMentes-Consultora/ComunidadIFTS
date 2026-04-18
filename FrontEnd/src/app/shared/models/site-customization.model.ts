@@ -50,10 +50,12 @@ export interface SiteCustomizationSavePayload {
   navbar: {
     brand_text: string;
     remove_logo?: boolean;
+    logo_selected?: boolean;
   };
   sidebar: {
     brand_text: string;
     remove_logo?: boolean;
+    logo_selected?: boolean;
   };
   carousel: Array<{
     id_carrousel?: number | null;

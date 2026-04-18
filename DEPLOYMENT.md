@@ -111,7 +111,7 @@ Nota:
 
 1. Haz clic en la pestaña **Importar**
 2. Haz clic en **Seleccionar archivo**
-3. Navega a: `BackEnd/database/if0_41035439_comunidad_ifts.sql`
+3. Navega a: `BackEnd/database/comunidad_ifts.sql`
 4. Haz clic en **Ejecutar** (botón al final de la página)
 5. Espera a que termine la importación
 6. Deberías ver un mensaje de éxito
