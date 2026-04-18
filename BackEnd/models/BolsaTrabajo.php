@@ -20,25 +20,25 @@ class BolsaTrabajo {
      */
     public static function obtenerPendientes(PDO $pdo): array {
         $sql = "SELECT
-                    b.id_bolsaDeTrabajo,
-                    b.tituloOferta,
-                    b.textoOferta,
-                    b.habilitado,
-                    b.cancelado,
-                    b.idCreate AS fecha_creacion,
-                    i.id_institucion,
-                    i.nombre_ifts,
-                    i.email_ifts,
-                    u.id_usuario AS id_usuario_creador,
-                    p.nombre AS nombre_creador,
-                    p.apellido AS apellido_creador
-                FROM bolsadetrabajo b
-                INNER JOIN institucion i ON b.id_institucion = i.id_institucion
-                INNER JOIN usuario u ON b.id_usuario = u.id_usuario
-                INNER JOIN persona p ON u.id_persona = p.id_persona
-                WHERE b.habilitado = 0
-                  AND b.cancelado = 0
-                ORDER BY b.idCreate DESC";
+                b.id_bolsaDeTrabajo,
+                b.tituloOferta,
+                b.textoOferta,
+                b.habilitado,
+                b.cancelado,
+                b.idCreate AS fecha_creacion,
+                i.id_institucion,
+                i.nombre_ifts,
+                i.email_ifts,
+                u.id_usuario AS id_usuario_creador,
+                p.nombre AS nombre_creador,
+                p.apellido AS apellido_creador
+            FROM bolsadetrabajo b
+            INNER JOIN institucion i ON b.id_institucion = i.id_institucion
+            INNER JOIN usuario u ON b.id_usuario = u.id_usuario
+            INNER JOIN persona p ON u.id_persona = p.id_persona
+            WHERE b.habilitado = 0
+              AND b.cancelado = 0
+            ORDER BY b.idCreate DESC";
 
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
@@ -64,7 +64,7 @@ class BolsaTrabajo {
                        AND ps.cancelado = 0) AS total_postulaciones
                 FROM bolsadetrabajo b
                 INNER JOIN institucion i ON b.id_institucion = i.id_institucion
-                WHERE b.habilitado = 1
+                                WHERE b.habilitado = 1
                   AND b.cancelado = 0
                 ORDER BY b.idCreate DESC";
 

@@ -63,7 +63,8 @@ try {
         'data'    => $ofertas,
         'total'   => count($ofertas)
     ]);
-} catch (Exception $e) {
+} catch (Throwable $e) {
+    error_log('Error ofertas-pendientes.php: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,
