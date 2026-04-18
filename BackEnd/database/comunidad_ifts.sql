@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 17-04-2026 a las 17:23:55
+-- Tiempo de generación: 18-04-2026 a las 23:52:50
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -20,9 +20,27 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `comunidad_ifts`
 --
-CREATE DATABASE IF NOT EXISTS `comunidad_ifts` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
 -- --------------------------------------------------------
-USE `comunidad_ifts`;
+
+--
+-- Estructura de tabla para la tabla `bolsadetrabajo`
+--
+
+CREATE TABLE `bolsadetrabajo` (
+  `id_bolsaDeTrabajo` int(11) NOT NULL,
+  `id_institucion` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `tituloOferta` varchar(255) NOT NULL,
+  `textoOferta` text NOT NULL,
+  `habilitado` int(1) NOT NULL DEFAULT 0,
+  `cancelado` int(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
 --
 -- Estructura de tabla para la tabla `carrera`
 --
@@ -385,6 +403,23 @@ INSERT INTO `persona` (`id_persona`, `apellido`, `nombre`, `edad`, `dni`, `fecha
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `postulacion`
+--
+
+CREATE TABLE `postulacion` (
+  `id_postulacion` int(11) NOT NULL,
+  `id_bolsaDeTrabajo` int(11) NOT NULL COMMENT 'FK a bolsadetrabajo',
+  `id_usuario` int(11) NOT NULL COMMENT 'Alumno que se postula',
+  `cv_url` varchar(512) DEFAULT NULL COMMENT 'URL pública del CV en Cloudinary',
+  `cv_public_id` varchar(512) DEFAULT NULL COMMENT 'Public ID en Cloudinary para borrado',
+  `cancelado` int(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `rol`
 --
 
@@ -428,7 +463,7 @@ CREATE TABLE `sidebar` (
 --
 
 INSERT INTO `sidebar` (`id_sidebar`, `brand_text`, `foto_perfil_public_id`, `foto_perfil_url`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, 'Comunidad IFTS', NULL, NULL, 1, 0, '2026-04-17 15:22:41', '2026-04-17 15:22:41');
+(1, 'Menu', 'ComunidadIFTS/sidebar/phpA00B_ijscjs', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776547540/ComunidadIFTS/sidebar/phpA00B_ijscjs.png', 1, 0, '2026-04-17 15:22:41', '2026-04-18 21:25:46');
 
 -- --------------------------------------------------------
 
@@ -479,6 +514,15 @@ INSERT INTO `usuario` (`id_usuario`, `email`, `clave`, `id_rol`, `id_persona`, `
 --
 -- Índices para tablas volcadas
 --
+
+--
+-- Indices de la tabla `bolsadetrabajo`
+--
+ALTER TABLE `bolsadetrabajo`
+  ADD PRIMARY KEY (`id_bolsaDeTrabajo`),
+  ADD KEY `idx_bolsa_institucion` (`id_institucion`),
+  ADD KEY `idx_bolsa_usuario` (`id_usuario`),
+  ADD KEY `idx_bolsa_estado` (`habilitado`,`cancelado`);
 
 --
 -- Indices de la tabla `carrera`
@@ -533,6 +577,14 @@ ALTER TABLE `persona`
   ADD PRIMARY KEY (`id_persona`);
 
 --
+-- Indices de la tabla `postulacion`
+--
+ALTER TABLE `postulacion`
+  ADD PRIMARY KEY (`id_postulacion`),
+  ADD UNIQUE KEY `uq_postulacion` (`id_bolsaDeTrabajo`,`id_usuario`),
+  ADD KEY `fk_postulacion_alumno` (`id_usuario`);
+
+--
 -- Indices de la tabla `rol`
 --
 ALTER TABLE `rol`
@@ -557,6 +609,12 @@ ALTER TABLE `usuario`
 --
 -- AUTO_INCREMENT de las tablas volcadas
 --
+
+--
+-- AUTO_INCREMENT de la tabla `bolsadetrabajo`
+--
+ALTER TABLE `bolsadetrabajo`
+  MODIFY `id_bolsaDeTrabajo` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `carrera`
@@ -607,6 +665,12 @@ ALTER TABLE `persona`
   MODIFY `id_persona` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
+-- AUTO_INCREMENT de la tabla `postulacion`
+--
+ALTER TABLE `postulacion`
+  MODIFY `id_postulacion` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `rol`
 --
 ALTER TABLE `rol`
@@ -623,6 +687,24 @@ ALTER TABLE `sidebar`
 --
 ALTER TABLE `usuario`
   MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `bolsadetrabajo`
+--
+ALTER TABLE `bolsadetrabajo`
+  ADD CONSTRAINT `fk_bolsa_institucion` FOREIGN KEY (`id_institucion`) REFERENCES `institucion` (`id_institucion`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_bolsa_usuario_creador` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `postulacion`
+--
+ALTER TABLE `postulacion`
+  ADD CONSTRAINT `fk_postulacion_alumno` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_postulacion_oferta` FOREIGN KEY (`id_bolsaDeTrabajo`) REFERENCES `bolsadetrabajo` (`id_bolsaDeTrabajo`) ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
