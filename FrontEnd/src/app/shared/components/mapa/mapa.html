@@ -1,15 +1,17 @@
 <section class="map-wrapper">
-  <header class="map-header">
-    <div>
-      <p class="eyebrow">Mapa interactivo</p>
-      <h1>Institutos IFTS</h1>
-      <p class="sub">Visualiza las sedes y consulta datos básicos.</p>
-    </div>
-  </header>
-
   <div class="map-layout">
     <!-- Panel Izquierdo (30%) - Información y Formulario -->
     <aside class="info-panel">
+
+      <!-- Encabezado del mapa (dentro del panel, al nivel del mapa) -->
+      <header class="map-header">
+        <div>
+          <p class="eyebrow">Mapa interactivo</p>
+          <h1>Institutos IFTS</h1>
+          <p class="sub">Visualiza las sedes y consulta datos básicos.</p>
+        </div>
+      </header>
+
       <!-- Buscador de direcciones -->
       <app-buscador-direccion
         *ngIf="map"
@@ -21,7 +23,12 @@
 
       <!-- Información de la Institución Seleccionada -->
       <div *ngIf="institucionSeleccionada" class="institucion-info">
-        <h3>{{ institucionSeleccionada.nombre }}</h3>
+        <div class="institucion-title-row">
+          @if (institucionSeleccionada.logo) {
+            <img [src]="institucionSeleccionada.logo" alt="Logo institución" class="institucion-logo-inline" />
+          }
+          <h3>{{ institucionSeleccionada.nombre }}</h3>
+        </div>
 
         <!-- Información en modo lectura -->
         <div class="info-details">
@@ -29,6 +36,7 @@
             <label>Dirección:</label>
             <p>{{ institucionSeleccionada.direccion }}</p>
           </div>
+
           <div class="info-item">
             <label>Teléfono:</label>
             <p>{{ institucionSeleccionada.telefono }}</p>
@@ -57,11 +65,6 @@
                   <mat-chip-option>{{ carrera.nombre }}</mat-chip-option>
                 }
               </div>
-            </div>
-          }
-          @if (institucionSeleccionada.logo) {
-            <div class="info-item">
-              <img [src]="institucionSeleccionada.logo" alt="Logo" class="institucion-logo" />
             </div>
           }
         </div>

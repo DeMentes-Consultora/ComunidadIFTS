@@ -10,6 +10,50 @@
   padding: 0;
 }
 
+/* Strip de indicadores */
+.stats-strip {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 28px 24px;
+  background: #f0f7ff;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  border-radius: 12px;
+  padding: 20px 28px;
+  min-width: 140px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  gap: 6px;
+  border-top: 3px solid #006633;
+  flex: 1 1 140px;
+  max-width: 200px;
+}
+
+.stat-icon {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #006633;
+  line-height: 1.1;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #4b5563;
+  text-align: center;
+  line-height: 1.3;
+}
+
 .mapa-section {
   width: 100%;
   padding: 0;
@@ -20,7 +64,22 @@
   .home-container {
     gap: 0;
   }
+
+  .stats-strip {
+    gap: 10px;
+    padding: 18px 12px;
+  }
+
+  .stat-card {
+    padding: 14px 16px;
+    min-width: 120px;
+  }
+
+  .stat-number {
+    font-size: 1.6rem;
+  }
 }
+
 
 /* Hero Section */
 .hero-section {

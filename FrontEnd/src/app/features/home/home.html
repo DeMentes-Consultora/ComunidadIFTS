@@ -4,6 +4,35 @@
     <app-carrusel></app-carrusel>
   </section>
 
+  <!-- Indicadores generales -->
+  <section class="stats-strip">
+    <div class="stat-card">
+      <span class="stat-icon">🏫</span>
+      <span class="stat-number">{{ stats.instituciones }}</span>
+      <span class="stat-label">Instituciones</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">📚</span>
+      <span class="stat-number">{{ stats.carreras }}</span>
+      <span class="stat-label">Carreras</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">🎓</span>
+      <span class="stat-number">{{ stats.alumnos }}</span>
+      <span class="stat-label">Alumnos registrados</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">💼</span>
+      <span class="stat-number">{{ stats.ofertas_publicadas }}</span>
+      <span class="stat-label">Ofertas laborales</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">✋</span>
+      <span class="stat-number">{{ stats.postulantes }}</span>
+      <span class="stat-label">Postulantes</span>
+    </div>
+  </section>
+
   <!-- Sección del mapa (cargado lazily al entrar en viewport) -->
   <section class="mapa-section">
     @defer (on viewport) { <!-- Carga el componente del mapa solo cuando entra en el viewport/ lo carga a medida que el usuario hace scroll/ se acerca a la ubicacion -->

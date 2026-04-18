@@ -8,20 +8,35 @@ Options -Indexes
 
 # Proteger archivo .env
 <Files .env>
-    Order allow,deny
-    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
 </Files>
 
 # Proteger archivos .git
 <FilesMatch "^\.git">
-    Order allow,deny
-    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
 </FilesMatch>
 
 # Proteger composer.json y lock
 <FilesMatch "^composer\.(json|lock)$">
-    Order allow,deny
-    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
 </FilesMatch>
 
 # Configurar tipo MIME para archivos JSON

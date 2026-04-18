@@ -1,10 +1,16 @@
 .map-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
   padding: 16px;
   position: relative;
   height: 100vh;
+}
+
+/* Header ahora vive dentro del info-panel */
+.map-header {
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .map-header .eyebrow {
@@ -70,8 +76,25 @@
   margin: 0;
   font-size: 20px;
   color: #111827;
+}
+
+.institucion-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding-bottom: 8px;
   border-bottom: 2px solid #006633;
+}
+
+.institucion-logo-inline {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  padding: 3px;
+  background: #f9fafb;
+  flex-shrink: 0;
 }
 
 /* Botones de acción (50% cada uno) */
@@ -122,15 +145,6 @@
 
 .info-item a:hover {
   text-decoration: underline;
-}
-
-.info-item img.institucion-logo {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  padding: 4px;
-  background: #f9fafb;
 }
 
 .carreras-list {
@@ -221,6 +235,11 @@
 
   .map-header h1 {
     font-size: 22px;
+  }
+
+  .institucion-logo-inline {
+    width: 40px;
+    height: 40px;
   }
 
   .map-header .sub {
