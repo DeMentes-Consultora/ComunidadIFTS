@@ -10,7 +10,6 @@ require_once __DIR__ . '/../models/Institucion.php';
 require_once __DIR__ . '/../models/Persona.php';
 require_once __DIR__ . '/../models/Rol.php';
 require_once __DIR__ . '/../models/Usuario.php';
-require_once __DIR__ . '/../services/CloudinaryService.php';
 
 header('Content-Type: application/json');
 
@@ -58,6 +57,9 @@ function validarTokenGoogle($idToken)
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         $responseBody = curl_exec($ch);
+        if ($responseBody === false) {
+            error_log('Google Auth tokeninfo curl fallo: ' . curl_error($ch));
+        }
         curl_close($ch);
     }
 
@@ -68,6 +70,9 @@ function validarTokenGoogle($idToken)
             ]
         ]);
         $responseBody = @file_get_contents($url, false, $context);
+        if ($responseBody === false) {
+            error_log('Google Auth tokeninfo file_get_contents fallo');
+        }
     }
 
     if ($responseBody === false) {
@@ -85,6 +90,13 @@ function subirFotoGoogleACloudinary(string $fotoUrl): ?array
     }
 
     try {
+        $cloudinaryServicePath = __DIR__ . '/../services/CloudinaryService.php';
+        if (!is_file($cloudinaryServicePath)) {
+            error_log('Google Auth: no se encontro CloudinaryService.php');
+            return null;
+        }
+        require_once $cloudinaryServicePath;
+
         $mediaFolders = require __DIR__ . '/../config/media-folders.php';
         $cloudinary = new CloudinaryService($mediaFolders['base'] ?? 'ComunidadIFTS');
         $folderFoto = $mediaFolders['perfiles']['foto'] ?? 'ComunidadIFTS/perfiles';
@@ -114,6 +126,10 @@ try {
     }
 
     $payload = json_decode(file_get_contents('php://input'), true);
+    if (!is_array($payload)) {
+        error_log('Google Auth: payload JSON invalido o vacio');
+        $payload = [];
+    }
 
     $mode = trim($payload['mode'] ?? 'login');
     $idToken = trim($payload['id_token'] ?? '');
@@ -129,6 +145,7 @@ try {
 
     $tokenData = validarTokenGoogle($idToken);
     if (!$tokenData || isset($tokenData['error_description'])) {
+        error_log('Google Auth: token invalido o no verificable');
         http_response_code(401);
         echo safe_json_encode([
             'success' => false,
@@ -139,6 +156,7 @@ try {
 
     $googleClientId = trim($_ENV['GOOGLE_CLIENT_ID'] ?? '');
     if ($googleClientId !== '' && ($tokenData['aud'] ?? '') !== $googleClientId) {
+        error_log('Google Auth: aud no coincide con GOOGLE_CLIENT_ID');
         http_response_code(401);
         echo safe_json_encode([
             'success' => false,
