@@ -1,0 +1,155 @@
+<section class="perfil-institucion-container">
+  @if (cargando) {
+    <div class="loading-wrap">
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+      <p>Cargando perfil institucional...</p>
+    </div>
+  } @else {
+    <div class="layout-grid">
+      <mat-card class="left-panel">
+        <div class="logo-wrap">
+          @if (logoPreviewUrl) {
+            <img [src]="logoPreviewUrl" alt="Logo de la institución" class="logo-img" />
+          } @else if (institucion?.logo) {
+            <img [src]="institucion?.logo" alt="Logo de la institución" class="logo-img" />
+          } @else {
+            <div class="logo-fallback">
+              <mat-icon>apartment</mat-icon>
+            </div>
+          }
+        </div>
+
+        <h2 class="inst-name">{{ institucion?.nombre || 'Institución' }}</h2>
+
+        @if (!puedeEditarInstitucion) {
+          <p class="scope-note">Vista global: todas las instituciones, ofertas y postulaciones.</p>
+        }
+
+        <div class="datos-wrap">
+          @if (!editando) {
+            <div class="dato-item">
+              <mat-icon>mail</mat-icon>
+              <span>{{ institucion?.email || 'Sin email' }}</span>
+            </div>
+            <div class="dato-item">
+              <mat-icon>location_on</mat-icon>
+              <span>{{ institucion?.direccion || 'Sin dirección' }}</span>
+            </div>
+            <div class="dato-item">
+              <mat-icon>phone</mat-icon>
+              <span>{{ institucion?.telefono || 'Sin teléfono' }}</span>
+            </div>
+
+            @if (puedeEditarInstitucion) {
+              <button mat-stroked-button class="btn-editar" (click)="iniciarEdicion()">
+                <mat-icon>edit</mat-icon>
+                Editar datos
+              </button>
+            }
+          } @else {
+            <div class="logo-upload-row">
+              <label class="logo-label" for="logoInput">Cambiar logo</label>
+              <input id="logoInput" type="file" accept="image/*" (change)="seleccionarLogo($event)" />
+              @if (logoFile) {
+                <span class="file-name">{{ logoFile.name }}</span>
+              }
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nombre institución</mat-label>
+              <input matInput [(ngModel)]="form.nombre" placeholder="Ingresá el nombre de la institución" title="Nombre de la institución" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" [(ngModel)]="form.email" placeholder="Ingresá el email de contacto" title="Email de contacto" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Dirección</mat-label>
+              <input matInput [(ngModel)]="form.direccion" placeholder="Ingresá la dirección" title="Dirección de la institución" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Teléfono</mat-label>
+              <input matInput [(ngModel)]="form.telefono" placeholder="Ingresá el teléfono" title="Teléfono de contacto" />
+            </mat-form-field>
+
+            <div class="edit-actions">
+              <button mat-stroked-button (click)="cancelarEdicion()" [disabled]="guardando">Cancelar</button>
+              <button mat-flat-button color="primary" (click)="guardarCambios()" [disabled]="guardando || !form.nombre.trim() || !form.email.trim()">
+                Guardar
+              </button>
+            </div>
+          }
+        </div>
+      </mat-card>
+
+      <div class="right-panel">
+        <div class="stats-row">
+          <mat-card class="stat-card">
+            <p class="stat-title">Ofertas publicadas</p>
+            <p class="stat-value">{{ resumen.total_ofertas_publicadas }}</p>
+          </mat-card>
+
+          <mat-card class="stat-card">
+            <p class="stat-title">Postulantes totales</p>
+            <p class="stat-value">{{ resumen.total_postulantes }}</p>
+          </mat-card>
+        </div>
+
+        <mat-card class="tabla-card">
+          <h3>Postulaciones en ofertas publicadas</h3>
+
+          @if (postulaciones.length === 0) {
+            <div class="empty-state">
+              <mat-icon>inbox</mat-icon>
+              <p>No hay postulaciones para mostrar.</p>
+            </div>
+          } @else {
+            <div class="table-responsive">
+              <table class="postulaciones-table">
+                <thead>
+                  <tr>
+                    <th>N°</th>
+                    <th>Título de oferta</th>
+                    <th>Apellido del postulante</th>
+                    <th>IFTS</th>
+                    <th>Mail</th>
+                    <th>CV</th>
+                    <th>Foto perfil</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of postulaciones; track item.id_postulacion; let i = $index) {
+                    <tr>
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ item.tituloOferta }}</td>
+                      <td>{{ item.apellido_postulante }}</td>
+                      <td>{{ item.nombre_ifts }}</td>
+                      <td>{{ item.email_postulante }}</td>
+                      <td>
+                        @if (item.cv_url) {
+                          <a class="link-cv" [href]="item.cv_url" target="_blank" rel="noopener noreferrer">Descargar CV</a>
+                        } @else {
+                          <span class="muted">Sin CV</span>
+                        }
+                      </td>
+                      <td>
+                        @if (item.foto_perfil_url) {
+                          <img [src]="item.foto_perfil_url" alt="Foto perfil" class="foto-mini" />
+                        } @else {
+                          <span class="muted">Sin foto</span>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </mat-card>
+      </div>
+    </div>
+  }
+</section>

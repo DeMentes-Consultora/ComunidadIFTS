@@ -1,0 +1,219 @@
+.perfil-institucion-container {
+  max-width: 1200px;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+}
+
+.loading-wrap {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8rem;
+  color: #4f4f4f;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1rem;
+}
+
+.left-panel {
+  padding: 1rem;
+  height: fit-content;
+}
+
+.logo-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.logo-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #d7d7d7;
+}
+
+.logo-fallback {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #f3f3f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7a7a7a;
+}
+
+.logo-fallback mat-icon {
+  font-size: 44px;
+  width: 44px;
+  height: 44px;
+}
+
+.inst-name {
+  margin-top: 0.9rem;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.scope-note {
+  margin: 0.45rem 0 0;
+  text-align: center;
+  color: #707070;
+  font-size: 0.85rem;
+}
+
+.datos-wrap {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dato-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #3f3f3f;
+}
+
+.btn-editar {
+  margin-top: 0.5rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.logo-upload-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.logo-label {
+  font-size: 0.9rem;
+  color: #5f5f5f;
+}
+
+.file-name {
+  font-size: 0.82rem;
+  color: #4a4a4a;
+  word-break: break-all;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(170px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  padding: 1rem;
+}
+
+.stat-title {
+  margin: 0;
+  color: #707070;
+  font-size: 0.92rem;
+}
+
+.stat-value {
+  margin: 0.35rem 0 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e5aa5;
+}
+
+.tabla-card {
+  padding: 1rem;
+}
+
+.tabla-card h3 {
+  margin: 0 0 0.75rem;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.postulaciones-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.postulaciones-table th,
+.postulaciones-table td {
+  border-bottom: 1px solid #ececec;
+  padding: 0.55rem;
+  text-align: left;
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+.postulaciones-table th {
+  color: #4b4b4b;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.link-cv {
+  color: #1e5aa5;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link-cv:hover {
+  text-decoration: underline;
+}
+
+.foto-mini {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #d4d4d4;
+}
+
+.muted {
+  color: #8b8b8b;
+}
+
+.empty-state {
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #7a7a7a;
+}
+
+@media (max-width: 960px) {
+  .layout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+}

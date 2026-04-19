@@ -102,6 +102,57 @@ export interface PerfilAlumnoResponse {
   };
 }
 
+export interface PerfilInstitucionData {
+  id: number;
+  nombre: string;
+  direccion?: string | null;
+  telefono?: string | null;
+  email?: string | null;
+  logo?: string | null;
+}
+
+export interface PerfilInstitucionResumen {
+  total_ofertas_publicadas: number;
+  total_postulantes: number;
+}
+
+export interface PerfilInstitucionPostulacion {
+  id_postulacion: number;
+  id_bolsaDeTrabajo: number;
+  tituloOferta: string;
+  apellido_postulante: string;
+  nombre_postulante: string;
+  nombre_ifts: string;
+  email_postulante: string;
+  cv_url?: string | null;
+  foto_perfil_url?: string | null;
+}
+
+export interface PerfilInstitucionResponse {
+  success: boolean;
+  message?: string;
+  data: {
+    institucion: PerfilInstitucionData;
+    puede_editar_institucion?: boolean;
+    resumen: PerfilInstitucionResumen;
+    postulaciones: PerfilInstitucionPostulacion[];
+  };
+}
+
+export interface ActualizarInstitucionPayload {
+  id: number;
+  nombre: string;
+  direccion?: string | null;
+  telefono?: string | null;
+  email?: string | null;
+}
+
+export interface ActualizarInstitucionResponse {
+  success: boolean;
+  message?: string;
+  data?: PerfilInstitucionData;
+}
+
 // ---- Service ----
 
 @Injectable({ providedIn: 'root' })
@@ -174,6 +225,32 @@ export class BolsaTrabajoService {
     return this.http.post<{ success: boolean; message?: string; data?: PerfilAlumnoUsuario | null }>(
       `${this.base}/actualizar-datos-academicos.php`,
       { id_carrera, anio_cursada },
+      { withCredentials: true }
+    );
+  }
+
+  obtenerPerfilInstitucion(): Observable<PerfilInstitucionResponse> {
+    return this.http.get<PerfilInstitucionResponse>(
+      `${this.base}/perfil-institucion.php`,
+      { withCredentials: true }
+    );
+  }
+
+  actualizarInstitucion(payload: ActualizarInstitucionPayload, logoFile?: File | null): Observable<ActualizarInstitucionResponse> {
+    const formData = new FormData();
+    formData.append('id', String(payload.id));
+    formData.append('nombre', payload.nombre ?? '');
+    formData.append('email', payload.email ?? '');
+    formData.append('direccion', payload.direccion ?? '');
+    formData.append('telefono', payload.telefono ?? '');
+
+    if (logoFile) {
+      formData.append('logo_file', logoFile);
+    }
+
+    return this.http.post<ActualizarInstitucionResponse>(
+      `${this.base}/actualizar-institucion.php`,
+      formData,
       { withCredentials: true }
     );
   }

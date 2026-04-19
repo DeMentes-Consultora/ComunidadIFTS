@@ -41,6 +41,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/gestion-ofertas/gestion-ofertas').then(m => m.GestionOfertas)
       },
       {
+        path: 'panel-ofertas-global',
+        loadComponent: () => import('./features/perfil-institucion/perfil-institucion').then(m => m.PerfilInstitucion)
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'
@@ -64,6 +68,12 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: [3] },
     loadComponent: () => import('./features/bolsa-trabajo/crear-oferta/crear-oferta').then(m => m.CrearOferta)
+  },
+  {
+    path: 'perfil-institucion',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: [3] },
+    loadComponent: () => import('./features/perfil-institucion/perfil-institucion').then(m => m.PerfilInstitucion)
   },
   {
     path: '**',

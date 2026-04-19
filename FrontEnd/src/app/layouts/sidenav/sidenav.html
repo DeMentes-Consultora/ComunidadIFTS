@@ -64,6 +64,11 @@
         Bolsa de trabajo
       </a>
 
+      <a mat-button routerLink="/admin/panel-ofertas-global" (click)="closeSidenavPanel()" class="nav-link">
+        <mat-icon>query_stats</mat-icon>
+        Panel global ofertas
+      </a>
+
       <mat-divider></mat-divider>
     </ng-container>
 
@@ -71,6 +76,10 @@
     <ng-container *ngIf="(currentUser$ | async)?.id_rol === 3">
       <mat-divider></mat-divider>
       <h3 class="section-title">Mi institución</h3>
+      <a mat-button routerLink="/perfil-institucion" (click)="closeSidenavPanel()" class="nav-link">
+        <mat-icon>account_circle</mat-icon>
+        Mi perfil
+      </a>
       <a mat-button routerLink="/crear-oferta" (click)="closeSidenavPanel()" class="nav-link">
         <mat-icon>post_add</mat-icon>
         Publicar oferta laboral

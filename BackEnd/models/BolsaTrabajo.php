@@ -157,4 +157,112 @@ class BolsaTrabajo {
         );
         return $stmt->execute([$id]);
     }
+
+    /**
+     * Resumen de la actividad de ofertas PUBLICADAS de una institucion.
+     */
+    public static function obtenerResumenPublicadasPorInstitucion(PDO $pdo, int $idInstitucion): array {
+        $sql = "SELECT
+                    COUNT(DISTINCT b.id_bolsaDeTrabajo) AS total_ofertas_publicadas,
+                    COUNT(ps.id_postulacion) AS total_postulantes
+                FROM bolsadetrabajo b
+                LEFT JOIN postulacion ps
+                       ON ps.id_bolsaDeTrabajo = b.id_bolsaDeTrabajo
+                      AND ps.cancelado = 0
+                WHERE b.id_institucion = ?
+                  AND b.habilitado = 1
+                  AND b.cancelado = 0";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$idInstitucion]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+        return [
+            'total_ofertas_publicadas' => (int)($row['total_ofertas_publicadas'] ?? 0),
+            'total_postulantes' => (int)($row['total_postulantes'] ?? 0),
+        ];
+    }
+
+    /**
+     * Postulaciones activas de ofertas PUBLICADAS de una institucion.
+     */
+    public static function obtenerPostulacionesPublicadasPorInstitucion(PDO $pdo, int $idInstitucion): array {
+        $sql = "SELECT
+                    ps.id_postulacion,
+                    b.id_bolsaDeTrabajo,
+                    b.tituloOferta,
+                    p.apellido AS apellido_postulante,
+                    p.nombre AS nombre_postulante,
+                    i.nombre_ifts,
+                    u.email AS email_postulante,
+                    ps.cv_url,
+                    p.foto_perfil_url
+                FROM bolsadetrabajo b
+                INNER JOIN institucion i ON i.id_institucion = b.id_institucion
+                INNER JOIN postulacion ps
+                        ON ps.id_bolsaDeTrabajo = b.id_bolsaDeTrabajo
+                       AND ps.cancelado = 0
+                INNER JOIN usuario u ON u.id_usuario = ps.id_usuario
+                INNER JOIN persona p ON p.id_persona = u.id_persona
+                WHERE b.id_institucion = ?
+                  AND b.habilitado = 1
+                  AND b.cancelado = 0
+                ORDER BY b.idCreate DESC, ps.idCreate DESC";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$idInstitucion]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Resumen global de ofertas publicadas y postulaciones activas.
+     */
+    public static function obtenerResumenPublicadasGlobal(PDO $pdo): array {
+        $sql = "SELECT
+                    COUNT(DISTINCT b.id_bolsaDeTrabajo) AS total_ofertas_publicadas,
+                    COUNT(ps.id_postulacion) AS total_postulantes
+                FROM bolsadetrabajo b
+                LEFT JOIN postulacion ps
+                       ON ps.id_bolsaDeTrabajo = b.id_bolsaDeTrabajo
+                      AND ps.cancelado = 0
+                WHERE b.habilitado = 1
+                  AND b.cancelado = 0";
+
+        $stmt = $pdo->query($sql);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+        return [
+            'total_ofertas_publicadas' => (int)($row['total_ofertas_publicadas'] ?? 0),
+            'total_postulantes' => (int)($row['total_postulantes'] ?? 0),
+        ];
+    }
+
+    /**
+     * Postulaciones activas de todas las ofertas publicadas.
+     */
+    public static function obtenerPostulacionesPublicadasGlobal(PDO $pdo): array {
+        $sql = "SELECT
+                    ps.id_postulacion,
+                    b.id_bolsaDeTrabajo,
+                    b.tituloOferta,
+                    p.apellido AS apellido_postulante,
+                    p.nombre AS nombre_postulante,
+                    i.nombre_ifts,
+                    u.email AS email_postulante,
+                    ps.cv_url,
+                    p.foto_perfil_url
+                FROM bolsadetrabajo b
+                INNER JOIN institucion i ON i.id_institucion = b.id_institucion
+                INNER JOIN postulacion ps
+                        ON ps.id_bolsaDeTrabajo = b.id_bolsaDeTrabajo
+                       AND ps.cancelado = 0
+                INNER JOIN usuario u ON u.id_usuario = ps.id_usuario
+                INNER JOIN persona p ON p.id_persona = u.id_persona
+                WHERE b.habilitado = 1
+                  AND b.cancelado = 0
+                ORDER BY b.idCreate DESC, ps.idCreate DESC";
+
+        $stmt = $pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
