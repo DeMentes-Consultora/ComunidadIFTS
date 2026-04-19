@@ -95,7 +95,7 @@ class Materia
     public static function asociarACarrera($pdo, $idCarrera, $idMateria)
     {
         $stmtExiste = $pdo->prepare(
-            "SELECT id_carrera_materia
+            "SELECT id_carreraMateria
              FROM carrera_materia
              WHERE id_carrera = ? AND id_materia = ?
              LIMIT 1"
@@ -106,16 +106,16 @@ class Materia
         if ($row) {
             $stmtReactivar = $pdo->prepare(
                 "UPDATE carrera_materia
-                 SET cancelado = 0, habilitado = 1
-                 WHERE id_carrera_materia = ?"
+                 SET cancelado = 0
+                 WHERE id_carreraMateria = ?"
             );
 
-            return $stmtReactivar->execute([$row['id_carrera_materia']]);
+            return $stmtReactivar->execute([$row['id_carreraMateria']]);
         }
 
         $stmtInsert = $pdo->prepare(
-            "INSERT INTO carrera_materia (id_carrera, id_materia, habilitado, cancelado)
-             VALUES (?, ?, 1, 0)"
+            "INSERT INTO carrera_materia (id_carrera, id_materia, cancelado)
+             VALUES (?, ?, 0)"
         );
 
         return $stmtInsert->execute([$idCarrera, $idMateria]);
@@ -125,7 +125,7 @@ class Materia
     {
         $stmt = $pdo->prepare(
             "UPDATE carrera_materia
-             SET cancelado = 1, habilitado = 0
+             SET cancelado = 1
              WHERE id_carrera = ? AND id_materia = ?"
         );
 

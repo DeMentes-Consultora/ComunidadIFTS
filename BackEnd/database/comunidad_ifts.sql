@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 18-04-2026 a las 23:52:50
+-- Tiempo de generación: 19-04-2026 a las 17:03:50
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -22,11 +22,10 @@ SET time_zone = "+00:00";
 --
 
 -- --------------------------------------------------------
-CREATE DATABASE IF NOT EXISTS `comunidad_ifts` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE comunidad_ifts;
+
 --
 -- Estructura de tabla para la tabla `bolsadetrabajo`
-
+--
 
 CREATE TABLE `bolsadetrabajo` (
   `id_bolsaDeTrabajo` int(11) NOT NULL,
@@ -121,7 +120,7 @@ CREATE TABLE `carrera_materia` (
   `id_carreraMateria` int(11) NOT NULL,
   `id_carrera` int(11) NOT NULL,
   `id_materia` int(11) NOT NULL,
-  `habiltado` int(11) NOT NULL DEFAULT 1,
+  `habilitado` int(11) NOT NULL DEFAULT 1,
   `cancelado` int(11) NOT NULL DEFAULT 0,
   `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
   `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -414,6 +413,7 @@ CREATE TABLE `postulacion` (
   `cv_url` varchar(512) DEFAULT NULL COMMENT 'URL pública del CV en Cloudinary',
   `cv_public_id` varchar(512) DEFAULT NULL COMMENT 'Public ID en Cloudinary para borrado',
   `cancelado` int(1) NOT NULL DEFAULT 0,
+  `habilitado` int(1) NOT NULL DEFAULT 0,
   `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
   `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -491,28 +491,28 @@ CREATE TABLE `usuario` (
 -- Volcado de datos para la tabla `usuario`
 --
 
-INSERT INTO `usuario` (`id_usuario`, `email`, `clave`, `id_rol`, `id_persona`, `id_institucion`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, 'seba@gmail.com', '$2y$10$Tb.mgWSOKMVKkQM4hpt.kuqZwNRy/wYgY4WIJzPbUCuNDCDGJTnTC', 1, 1, 1, 1, 0, '2026-02-25 23:53:22', '2026-02-26 03:03:10'),
-(2, 'test507238115@mail.com', '$2y$10$ZbO25iUGI7.4wfZOjKbv5Osag0DGvr9t4rRw9oy.X1CTHpP6fMKGC', 2, 2, 1, 1, 0, '2026-02-25 23:54:32', '2026-02-26 00:16:11'),
-(3, 'test1864180326@mail.com', '$2y$10$f/nEWTe0RvjsEH7MQaN3ZesPM88yGpcqtrS36OyUtKbQUhUxVH1km', 2, 3, 1, 1, 0, '2026-02-25 23:58:22', '2026-02-26 00:16:04'),
-(4, 'test1364295098@mail.com', '$2y$10$NpGAF9WJHAUqd/SSO/EMZuOa9dIVUBCqqbHQXTZoykgQSDFWXDgKi', 2, 4, 1, 1, 0, '2026-02-25 23:59:25', '2026-02-26 00:15:56'),
-(5, 'test1181805928@mail.com', '$2y$10$GFCawr7umar8fmW1pjWoueTBnM8SXwusQ.7E6S1IHdy1uol0hBnri', 2, 5, 1, 1, 0, '2026-02-26 00:00:07', '2026-02-26 00:15:50'),
-(6, 'test1508581466@mail.com', '$2y$10$GapybKH7bnfAFI2fWaBoEuKvxBkNQmgCSwwqVY7nSEfmAudZQ9D6u', 2, 6, 1, 1, 0, '2026-02-26 00:02:44', '2026-02-26 00:15:45'),
-(7, 'prueba@gmail.com', '$2y$10$sMLI7OocA0YLOByvaPS5bu49GTzPMaGaoAC4AU/QYr5q81RWS1W8i', 2, 7, 1, 1, 0, '2026-02-26 00:19:47', '2026-02-26 00:20:39'),
-(8, 'nuevo1342950043@mail.com', '$2y$10$rex5SJ0czhrKkObKCDABBeiJJebihjYfSsh/HuSuxt31rKsrz/q8i', 2, 8, 1, 0, 1, '2026-02-26 00:22:28', '2026-02-26 00:24:44'),
-(9, 'form650866515@mail.com', '$2y$10$wZe1dl0jYNX7DQFUDHYMNubd94Zw4FWQEmBxX4Cl9Zpjh/P83TdEi', 2, 9, 1, 1, 0, '2026-02-26 00:23:36', '2026-02-26 00:24:35'),
-(10, 'nuevo@hotmail.com', '$2y$10$Eig3F9EaRK6LhLRGnBuOeO.9uZHyn2sMD7A5N418gIsfJtKKIOuHy', 2, 10, 1, 1, 0, '2026-02-26 00:26:05', '2026-02-26 00:26:36'),
-(11, 'nminotti@gmail.com_', '$2y$10$OW/BzlwyUIUIwRyC39iOr.xCAwsiJ8/Vpmjb3imURM3eG874ZsPRm', 2, 11, 3, 1, 0, '2026-02-26 02:50:46', '2026-03-13 15:20:30'),
-(12, 'confirmacion30020726@mail.com', '$2y$10$BW0.iaiOusJyyysqekJAned/q5NXL0yx7aepaeUVnk5dq4crfbG2m', 2, 12, 1, 0, 1, '2026-02-26 02:55:08', '2026-02-26 03:04:19'),
-(13, 'sebaminotti@gmail.com', '$2y$10$yrb7XSIm1FISbp0eEzDc0OhY9OYm9YxpIvUJIU73YawHRmBVeVu6y', 2, 13, 3, 1, 0, '2026-02-26 03:00:33', '2026-03-13 15:20:11'),
-(14, 'dementesconsultora2025@gmail.com', '$2y$10$O4hHfJSOH8sQ2t2SwOjnU.Pr5qi/.PdGhm7pNrMUN.L7iu06/eQa2', 1, 14, 1, 1, 0, '2026-03-13 12:50:34', '2026-03-13 14:06:38'),
-(15, 'lesmuchachosdelinapifts@gmail.com', '$2y$10$j5pc/WJyzfxQgBJSOz4RqeBB1MiYSxZCgK4VqgsJsbU3UxUh6fTG2', 2, 15, 1, 1, 0, '2026-03-13 14:33:55', '2026-03-13 15:15:10'),
-(16, 'losmuchachosdelinapifts@gmail.com', '$2y$10$ZZysVBEqJbRNHCT9jZMvxeRBzHbqqbMuxi1dhmlkO.bow7k1mvNjm', 1, 16, 2, 1, 0, '2026-03-13 15:17:03', '2026-03-13 15:18:50'),
-(17, 'sminotti@gmail.com', '$2y$10$L3mpNFklv4C2Z4I6cgf9e.xJcoLalV6F05bZ520upSD/v/JcXPSqG', 1, 17, 1, 1, 0, '2026-03-13 15:22:26', '2026-03-13 15:35:45'),
-(18, 'seb@gmail.com', '$2y$10$UhkPI9fR0FG/SuP1rKVC5O.TCHOkjsmfFX9ZdfwH1o85cAl.Qrs8e', 1, 18, 6, 1, 0, '2026-03-13 17:29:18', '2026-03-13 17:48:31'),
-(19, 'mino@gmail.com', '$2y$10$rFCJ2WVPayAWbi0JkJE6KudkElZRI.HVkbb/ai9LY9aXLMvniQode', 2, 19, 5, 1, 0, '2026-03-13 17:49:33', '2026-03-13 18:07:34'),
-(20, 'sebas@gmail.com', '$2y$10$PguAEskHTJUTMqB2kh28v.DRU3.UYFrv4fJHHe6ONNYNq6Errz.AG', 2, 20, 5, 1, 0, '2026-03-13 18:18:35', '2026-03-13 18:29:07'),
-(21, 'sebastianminotti@gmail.com', '$2y$10$r0Tf23UJ27Xt5rMMBEG/KOjwD.y95yDlgzdDvG.JtwnRAlXQ4gw1q', 2, 21, 3, 1, 0, '2026-03-13 18:30:06', '2026-03-13 18:39:03');
+INSERT INTO `usuario` (`id_usuario`, `email`, `clave`, `id_rol`, `id_persona`, `id_institucion`, `id_carrera`, `anio_cursada`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, 'seba@gmail.com', '$2y$10$Tb.mgWSOKMVKkQM4hpt.kuqZwNRy/wYgY4WIJzPbUCuNDCDGJTnTC', 1, 1, 1, NULL, NULL, 1, 0, '2026-02-25 23:53:22', '2026-02-26 03:03:10'),
+(2, 'test507238115@mail.com', '$2y$10$ZbO25iUGI7.4wfZOjKbv5Osag0DGvr9t4rRw9oy.X1CTHpP6fMKGC', 2, 2, 1, NULL, NULL, 1, 0, '2026-02-25 23:54:32', '2026-02-26 00:16:11'),
+(3, 'test1864180326@mail.com', '$2y$10$f/nEWTe0RvjsEH7MQaN3ZesPM88yGpcqtrS36OyUtKbQUhUxVH1km', 2, 3, 1, NULL, NULL, 1, 0, '2026-02-25 23:58:22', '2026-02-26 00:16:04'),
+(4, 'test1364295098@mail.com', '$2y$10$NpGAF9WJHAUqd/SSO/EMZuOa9dIVUBCqqbHQXTZoykgQSDFWXDgKi', 2, 4, 1, NULL, NULL, 1, 0, '2026-02-25 23:59:25', '2026-02-26 00:15:56'),
+(5, 'test1181805928@mail.com', '$2y$10$GFCawr7umar8fmW1pjWoueTBnM8SXwusQ.7E6S1IHdy1uol0hBnri', 2, 5, 1, NULL, NULL, 1, 0, '2026-02-26 00:00:07', '2026-02-26 00:15:50'),
+(6, 'test1508581466@mail.com', '$2y$10$GapybKH7bnfAFI2fWaBoEuKvxBkNQmgCSwwqVY7nSEfmAudZQ9D6u', 2, 6, 1, NULL, NULL, 1, 0, '2026-02-26 00:02:44', '2026-02-26 00:15:45'),
+(7, 'prueba@gmail.com', '$2y$10$sMLI7OocA0YLOByvaPS5bu49GTzPMaGaoAC4AU/QYr5q81RWS1W8i', 2, 7, 1, 1, 3, 1, 0, '2026-02-26 00:19:47', '2026-04-19 05:49:55'),
+(8, 'nuevo1342950043@mail.com', '$2y$10$rex5SJ0czhrKkObKCDABBeiJJebihjYfSsh/HuSuxt31rKsrz/q8i', 2, 8, 1, NULL, NULL, 0, 1, '2026-02-26 00:22:28', '2026-02-26 00:24:44'),
+(9, 'form650866515@mail.com', '$2y$10$wZe1dl0jYNX7DQFUDHYMNubd94Zw4FWQEmBxX4Cl9Zpjh/P83TdEi', 2, 9, 1, NULL, NULL, 1, 0, '2026-02-26 00:23:36', '2026-02-26 00:24:35'),
+(10, 'nuevo@hotmail.com', '$2y$10$Eig3F9EaRK6LhLRGnBuOeO.9uZHyn2sMD7A5N418gIsfJtKKIOuHy', 2, 10, 1, NULL, NULL, 1, 0, '2026-02-26 00:26:05', '2026-02-26 00:26:36'),
+(11, 'nminotti@gmail.com_', '$2y$10$OW/BzlwyUIUIwRyC39iOr.xCAwsiJ8/Vpmjb3imURM3eG874ZsPRm', 2, 11, 3, NULL, NULL, 1, 0, '2026-02-26 02:50:46', '2026-03-13 15:20:30'),
+(12, 'confirmacion30020726@mail.com', '$2y$10$BW0.iaiOusJyyysqekJAned/q5NXL0yx7aepaeUVnk5dq4crfbG2m', 2, 12, 1, NULL, NULL, 0, 1, '2026-02-26 02:55:08', '2026-02-26 03:04:19'),
+(13, 'sebaminotti@gmail.com', '$2y$10$yrb7XSIm1FISbp0eEzDc0OhY9OYm9YxpIvUJIU73YawHRmBVeVu6y', 2, 13, 3, NULL, NULL, 1, 0, '2026-02-26 03:00:33', '2026-03-13 15:20:11'),
+(14, 'dementesconsultora2025@gmail.com', '$2y$10$O4hHfJSOH8sQ2t2SwOjnU.Pr5qi/.PdGhm7pNrMUN.L7iu06/eQa2', 1, 14, 1, NULL, NULL, 1, 0, '2026-03-13 12:50:34', '2026-03-13 14:06:38'),
+(15, 'lesmuchachosdelinapifts@gmail.com', '$2y$10$j5pc/WJyzfxQgBJSOz4RqeBB1MiYSxZCgK4VqgsJsbU3UxUh6fTG2', 2, 15, 1, NULL, NULL, 1, 0, '2026-03-13 14:33:55', '2026-03-13 15:15:10'),
+(16, 'losmuchachosdelinapifts@gmail.com', '$2y$10$ZZysVBEqJbRNHCT9jZMvxeRBzHbqqbMuxi1dhmlkO.bow7k1mvNjm', 1, 16, 2, NULL, NULL, 1, 0, '2026-03-13 15:17:03', '2026-03-13 15:18:50'),
+(17, 'sminotti@gmail.com', '$2y$10$L3mpNFklv4C2Z4I6cgf9e.xJcoLalV6F05bZ520upSD/v/JcXPSqG', 1, 17, 1, NULL, NULL, 1, 0, '2026-03-13 15:22:26', '2026-03-13 15:35:45'),
+(18, 'seb@gmail.com', '$2y$10$UhkPI9fR0FG/SuP1rKVC5O.TCHOkjsmfFX9ZdfwH1o85cAl.Qrs8e', 1, 18, 6, NULL, NULL, 1, 0, '2026-03-13 17:29:18', '2026-03-13 17:48:31'),
+(19, 'mino@gmail.com', '$2y$10$rFCJ2WVPayAWbi0JkJE6KudkElZRI.HVkbb/ai9LY9aXLMvniQode', 2, 19, 5, NULL, NULL, 1, 0, '2026-03-13 17:49:33', '2026-03-13 18:07:34'),
+(20, 'sebas@gmail.com', '$2y$10$PguAEskHTJUTMqB2kh28v.DRU3.UYFrv4fJHHe6ONNYNq6Errz.AG', 2, 20, 5, NULL, NULL, 1, 0, '2026-03-13 18:18:35', '2026-03-13 18:29:07'),
+(21, 'sebastianminotti@gmail.com', '$2y$10$r0Tf23UJ27Xt5rMMBEG/KOjwD.y95yDlgzdDvG.JtwnRAlXQ4gw1q', 2, 21, 3, NULL, NULL, 1, 0, '2026-03-13 18:30:06', '2026-03-13 18:39:03');
 
 --
 -- Índices para tablas volcadas
