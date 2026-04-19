@@ -12,6 +12,29 @@ require_once __DIR__ . '/../services/CloudinaryService.php';
 
 header('Content-Type: application/json');
 
+function uploadErrorText(int $code): string {
+    switch ($code) {
+        case UPLOAD_ERR_OK:
+            return 'OK';
+        case UPLOAD_ERR_INI_SIZE:
+            return 'El archivo supera upload_max_filesize';
+        case UPLOAD_ERR_FORM_SIZE:
+            return 'El archivo supera MAX_FILE_SIZE del formulario';
+        case UPLOAD_ERR_PARTIAL:
+            return 'El archivo se subio parcialmente';
+        case UPLOAD_ERR_NO_FILE:
+            return 'No se envio archivo';
+        case UPLOAD_ERR_NO_TMP_DIR:
+            return 'Falta carpeta temporal en servidor';
+        case UPLOAD_ERR_CANT_WRITE:
+            return 'No se pudo escribir archivo temporal';
+        case UPLOAD_ERR_EXTENSION:
+            return 'Una extension de PHP bloqueo la subida';
+        default:
+            return 'Error de subida desconocido';
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode([
@@ -48,11 +71,18 @@ try {
     }
 
     $fotoFile = $_FILES['foto_perfil'] ?? $_FILES['foto'] ?? null;
-    if (!$fotoFile || (($fotoFile['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK)) {
+    $uploadErrorCode = (int)($fotoFile['error'] ?? UPLOAD_ERR_NO_FILE);
+    if (!$fotoFile || $uploadErrorCode !== UPLOAD_ERR_OK) {
         http_response_code(400);
         echo json_encode([
             'success' => false,
-            'message' => 'Debes enviar un archivo valido en foto_perfil'
+            'message' => 'Debes enviar un archivo valido en foto_perfil',
+            'details' => [
+                'upload_error_code' => $uploadErrorCode,
+                'upload_error_text' => uploadErrorText($uploadErrorCode),
+                'upload_max_filesize' => ini_get('upload_max_filesize'),
+                'post_max_size' => ini_get('post_max_size')
+            ]
         ]);
         exit;
     }
@@ -64,16 +94,33 @@ try {
 
     $fotoActual = Persona::obtenerFotoPerfilPorId($pdo, $idPersona);
 
-    $cloudinary = new CloudinaryService($mediaFolders['base'] ?? 'ComunidadIFTS');
+    try {
+        $cloudinary = new CloudinaryService($mediaFolders['base'] ?? 'ComunidadIFTS');
+    } catch (Throwable $e) {
+        error_log('Cloudinary init fallo (actualizar-foto-perfil): ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'No se pudo inicializar Cloudinary en el servidor',
+            'error' => ($_ENV['APP_DEBUG'] ?? false) ? $e->getMessage() : null,
+        ]);
+        exit;
+    }
     $folderFoto = $mediaFolders['perfiles']['foto'] ?? 'ComunidadIFTS/perfiles';
 
     $upload = $cloudinary->uploadFromFileArray($fotoFile, $folderFoto, 'image');
     if (empty($upload['success'])) {
+        error_log('Cloudinary upload fallo (actualizar-foto-perfil): ' . ($upload['error'] ?? $upload['message'] ?? 'sin detalle'));
         http_response_code(500);
         echo json_encode([
             'success' => false,
             'message' => $upload['message'] ?? 'No fue posible subir la foto de perfil',
-            'error' => ($_ENV['APP_DEBUG'] ?? false) ? ($upload['error'] ?? null) : null
+            'error' => ($_ENV['APP_DEBUG'] ?? false) ? ($upload['error'] ?? null) : null,
+            'details' => [
+                'tmp_name_exists' => is_file((string)($fotoFile['tmp_name'] ?? '')),
+                'file_size_bytes' => (int)($fotoFile['size'] ?? 0),
+                'mime' => (string)($fotoFile['type'] ?? ''),
+            ]
         ]);
         exit;
     }
@@ -110,6 +157,7 @@ try {
         ]
     ]);
 } catch (Throwable $e) {
+    error_log('Error actualizar-foto-perfil.php: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,

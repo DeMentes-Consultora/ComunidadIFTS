@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 19-04-2026 a las 17:03:50
+-- Tiempo de generación: 19-04-2026 a las 20:33:16
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -20,9 +20,9 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `comunidad_ifts`
 --
-
+CREATE DATABASE IF NOT EXISTS `comunidad_ifts` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 -- --------------------------------------------------------
-
+USE `comunidad_ifts`;
 --
 -- Estructura de tabla para la tabla `bolsadetrabajo`
 --
@@ -38,6 +38,17 @@ CREATE TABLE `bolsadetrabajo` (
   `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
   `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `bolsadetrabajo`
+--
+
+INSERT INTO `bolsadetrabajo` (`id_bolsaDeTrabajo`, `id_institucion`, `id_usuario`, `tituloOferta`, `textoOferta`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, 3, 11, 'Nueva oferta laboral_1', 'adfsdfsfdsgasfgdadsfg', 1, 0, '2026-04-19 16:06:03', '2026-04-19 16:08:06'),
+(2, 3, 11, 'Nueva oferta laboral_2', 'dfsdfsdfsfdsfd', 1, 0, '2026-04-19 16:06:20', '2026-04-19 17:30:20'),
+(3, 3, 11, 'Nueva oferta laboral 3', 'sfsdfgsdgfdsgdfgdfgdfg', 1, 0, '2026-04-19 16:06:35', '2026-04-19 16:20:26'),
+(4, 1, 12, 'oferta del IFTS12', 'descripcion de la oferta IFTS 12', 1, 0, '2026-04-19 17:28:50', '2026-04-19 17:30:12'),
+(5, 1, 12, 'Oferta 2 del IFTS12', 'descripcion de la oferta 2 del IFTS12', 1, 0, '2026-04-19 17:29:13', '2026-04-19 17:30:08');
 
 -- --------------------------------------------------------
 
@@ -126,6 +137,15 @@ CREATE TABLE `carrera_materia` (
   `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `carrera_materia`
+--
+
+INSERT INTO `carrera_materia` (`id_carreraMateria`, `id_carrera`, `id_materia`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, 1, 1, 1, 0, '2026-04-19 15:27:24', '2026-04-19 15:27:24'),
+(2, 25, 2, 1, 0, '2026-04-19 15:28:53', '2026-04-19 15:28:53'),
+(3, 27, 3, 1, 0, '2026-04-19 15:29:14', '2026-04-19 15:29:14');
+
 -- --------------------------------------------------------
 
 --
@@ -152,7 +172,8 @@ CREATE TABLE `carrousel` (
 
 INSERT INTO `carrousel` (`id_carrousel`, `titulo`, `descripcion`, `enlace`, `orden_visual`, `foto_perfil_public_id`, `foto_perfil_url`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
 (1, 'Bienvenido a Comunidad IFTS', 'Conecta con todos los Institutos Superiores de Tecnologia de Buenos Aires', '#', 1, 'ComunidadIFTS/carrusel/php86D5_sydagd', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776363189/ComunidadIFTS/carrusel/php86D5_sydagd.png', 1, 0, '2026-04-14 15:50:23', '2026-04-16 18:13:12'),
-(2, 'IFTS y comunidad', 'Descubre carreras, instituciones y oportunidades para crecer profesionalmente', '#', 2, 'ComunidadIFTS/carrusel/php8792_bpidkr', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776363190/ComunidadIFTS/carrusel/php8792_bpidkr.png', 1, 0, '2026-04-14 15:50:23', '2026-04-16 18:13:12');
+(2, 'IFTS y comunidad', 'Descubre carreras, instituciones y oportunidades para crecer profesionalmente', '#', 2, 'ComunidadIFTS/carrusel/php8792_bpidkr', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776363190/ComunidadIFTS/carrusel/php8792_bpidkr.png', 1, 0, '2026-04-14 15:50:23', '2026-04-16 18:13:12'),
+(3, 'Estudia sistemas en el IFTS12', 'Modelo vitual y presencial', 'https://ifts12online.com.ar/', 3, 'ComunidadIFTS/carrusel/php6226_c9t5zf', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776612847/ComunidadIFTS/carrusel/php6226_c9t5zf.jpg', 1, 0, '2026-04-19 15:34:08', '2026-04-19 15:34:08');
 
 -- --------------------------------------------------------
 
@@ -239,7 +260,6 @@ CREATE TABLE `institucion_carrera` (
 --
 
 INSERT INTO `institucion_carrera` (`id_institucion_carrera`, `id_institucion`, `id_carrera`, `habiltado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, 1, 1, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (2, 5, 1, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (3, 7, 1, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (4, 8, 1, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
@@ -247,19 +267,15 @@ INSERT INTO `institucion_carrera` (`id_institucion_carrera`, `id_institucion`, `
 (6, 20, 1, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (7, 22, 1, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (8, 23, 1, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
-(9, 1, 2, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (10, 5, 2, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (11, 7, 2, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (12, 10, 2, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (13, 17, 2, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (14, 33, 2, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
-(15, 1, 3, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
-(16, 1, 4, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (17, 2, 5, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (18, 2, 6, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (19, 2, 7, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (20, 2, 8, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
-(22, 1, 10, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (23, 5, 12, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (24, 7, 12, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (25, 8, 12, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
@@ -310,7 +326,12 @@ INSERT INTO `institucion_carrera` (`id_institucion_carrera`, `id_institucion`, `
 (71, 32, 50, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (72, 34, 51, 1, 0, '2026-03-04 23:22:52', '2026-03-04 23:22:52'),
 (73, 11, 20, 1, 0, '2026-03-06 00:46:33', '2026-03-06 00:46:33'),
-(76, 3, 9, 1, 0, '2026-04-14 13:43:06', '2026-04-14 13:43:06');
+(76, 3, 9, 1, 0, '2026-04-14 13:43:06', '2026-04-14 13:43:06'),
+(83, 1, 3, 1, 0, '2026-04-19 15:08:24', '2026-04-19 15:08:24'),
+(84, 1, 1, 1, 0, '2026-04-19 15:08:24', '2026-04-19 15:08:24'),
+(85, 1, 2, 1, 0, '2026-04-19 15:08:24', '2026-04-19 15:08:24'),
+(86, 1, 10, 1, 0, '2026-04-19 15:08:24', '2026-04-19 15:08:24'),
+(87, 1, 4, 1, 0, '2026-04-19 15:08:24', '2026-04-19 15:08:24');
 
 -- --------------------------------------------------------
 
@@ -326,6 +347,15 @@ CREATE TABLE `materia` (
   `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
   `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `materia`
+--
+
+INSERT INTO `materia` (`id_materia`, `nombre_materia`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, 'Nueva carrera', 0, 1, '2026-04-19 15:08:41', '2026-04-19 15:09:03'),
+(2, 'nueva materia', 1, 0, '2026-04-19 15:18:36', '2026-04-19 15:18:36'),
+(3, 'Nueva materia 2', 1, 0, '2026-04-19 15:29:09', '2026-04-19 15:29:09');
 
 -- --------------------------------------------------------
 
@@ -349,7 +379,7 @@ CREATE TABLE `navbar` (
 --
 
 INSERT INTO `navbar` (`id_navbar`, `brand_text`, `foto_perfil_public_id`, `foto_perfil_url`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, '', 'ComunidadIFTS/navbar/php2585_mdlpuq', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776430687/ComunidadIFTS/navbar/php2585_mdlpuq.png', 1, 0, '2026-04-14 15:50:23', '2026-04-17 12:58:09');
+(1, 'Todo en un solo lugar', 'ComunidadIFTS/navbar/php2585_mdlpuq', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776430687/ComunidadIFTS/navbar/php2585_mdlpuq.png', 1, 0, '2026-04-14 15:50:23', '2026-04-19 15:31:00');
 
 -- --------------------------------------------------------
 
@@ -387,7 +417,7 @@ INSERT INTO `persona` (`id_persona`, `apellido`, `nombre`, `edad`, `dni`, `fecha
 (7, 'prueba', 'prueba', 47, '26523654', '1978-05-16', '1156523654', NULL, NULL, 1, 0, '2026-02-26 00:19:47', '2026-02-26 00:19:47'),
 (8, 'Nuevo', 'Test', 25, '64533288', '2000-05-10', '1112345678', NULL, NULL, 1, 0, '2026-02-26 00:22:28', '2026-02-26 00:22:28'),
 (9, 'Test', 'Form', 25, '58800111', '2000-05-10', '1112345678', NULL, NULL, 1, 0, '2026-02-26 00:23:36', '2026-02-26 00:23:36'),
-(10, 'nuevo', 'nuevo', 26, '23654256', '2000-02-02', '1152365478', NULL, NULL, 1, 0, '2026-02-26 00:26:05', '2026-02-26 00:26:05'),
+(10, 'nuevo', 'nuevo', 26, '23654256', '2000-02-02', '1152365478', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776614615/ComunidadIFTS/perfiles/php5A15_iwjibt.jpg', 'ComunidadIFTS/perfiles/php5A15_iwjibt', 1, 0, '2026-02-26 00:26:05', '2026-04-19 16:03:36'),
 (11, 'nuevo', 'otroNuevo', 47, '12532569', '1978-10-16', '115236987', NULL, NULL, 1, 0, '2026-02-26 02:50:46', '2026-02-26 02:50:46'),
 (12, 'Pendiente', 'Mail', 25, '49254786', '2000-05-10', '1112345678', NULL, NULL, 1, 0, '2026-02-26 02:55:08', '2026-02-26 02:55:08'),
 (13, 'registro', 'registro', 47, '12523654', '1978-10-16', '1123654789', NULL, NULL, 1, 0, '2026-02-26 03:00:33', '2026-02-26 03:00:33'),
@@ -418,6 +448,18 @@ CREATE TABLE `postulacion` (
   `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `postulacion`
+--
+
+INSERT INTO `postulacion` (`id_postulacion`, `id_bolsaDeTrabajo`, `id_usuario`, `cv_url`, `cv_public_id`, `cancelado`, `habilitado`, `idCreate`, `idUpdate`) VALUES
+(1, 3, 10, 'https://res.cloudinary.com/dm8ds67tb/raw/upload/v1776614955/ComunidadIFTS/CVs/CVs/php8CB7_yal1tu.tmp', 'ComunidadIFTS/CVs/CVs/php8CB7_yal1tu.tmp', 0, 0, '2026-04-19 16:09:16', '2026-04-19 16:09:16'),
+(2, 2, 10, 'https://res.cloudinary.com/dm8ds67tb/raw/upload/v1776614974/ComunidadIFTS/CVs/CVs/phpD7BB_hgr8ww.tmp', 'ComunidadIFTS/CVs/CVs/phpD7BB_hgr8ww.tmp', 1, 0, '2026-04-19 16:09:35', '2026-04-19 16:10:30'),
+(3, 1, 10, 'https://res.cloudinary.com/dm8ds67tb/raw/upload/v1776615002/ComunidadIFTS/CVs/CVs/php36A5_nfzlnr.tmp', 'ComunidadIFTS/CVs/CVs/php36A5_nfzlnr.tmp', 0, 0, '2026-04-19 16:10:03', '2026-04-19 16:10:03'),
+(4, 3, 9, 'https://res.cloudinary.com/dm8ds67tb/raw/upload/v1776619177/ComunidadIFTS/CVs/CVs/phpF6B7_avzogf.tmp', 'ComunidadIFTS/CVs/CVs/phpF6B7_avzogf.tmp', 0, 0, '2026-04-19 17:19:37', '2026-04-19 17:19:37'),
+(5, 4, 9, 'https://res.cloudinary.com/dm8ds67tb/raw/upload/v1776619969/ComunidadIFTS/CVs/CVs/php8CF_bq5ez9.tmp', 'ComunidadIFTS/CVs/CVs/php8CF_bq5ez9.tmp', 0, 0, '2026-04-19 17:32:49', '2026-04-19 17:32:49'),
+(6, 2, 9, 'https://res.cloudinary.com/dm8ds67tb/raw/upload/v1776619995/ComunidadIFTS/CVs/CVs/php7296_qbxbuo.tmp', 'ComunidadIFTS/CVs/CVs/php7296_qbxbuo.tmp', 0, 0, '2026-04-19 17:33:15', '2026-04-19 17:33:15');
+
 -- --------------------------------------------------------
 
 --
@@ -438,7 +480,7 @@ CREATE TABLE `rol` (
 --
 
 INSERT INTO `rol` (`id_rol`, `nombre_rol`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, 'Administrador', 1, 0, '2026-02-25 23:16:00', '2026-02-25 23:16:00'),
+(1, 'AdministradorComunidad', 1, 0, '2026-02-25 23:16:00', '2026-04-19 17:37:46'),
 (2, 'Alumno', 1, 0, '2026-02-25 23:16:00', '2026-02-25 23:16:00'),
 (3, 'AdministradorIFTS', 1, 0, '2026-02-25 23:16:00', '2026-02-25 23:16:00');
 
@@ -464,7 +506,7 @@ CREATE TABLE `sidebar` (
 --
 
 INSERT INTO `sidebar` (`id_sidebar`, `brand_text`, `foto_perfil_public_id`, `foto_perfil_url`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, 'Menu', 'ComunidadIFTS/sidebar/phpA00B_ijscjs', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776547540/ComunidadIFTS/sidebar/phpA00B_ijscjs.png', 1, 0, '2026-04-17 15:22:41', '2026-04-18 21:25:46');
+(1, 'Menu', 'ComunidadIFTS/sidebar/phpA00B_ijscjs', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776547540/ComunidadIFTS/sidebar/phpA00B_ijscjs.png', 1, 0, '2026-04-17 15:22:41', '2026-04-19 15:32:00');
 
 -- --------------------------------------------------------
 
@@ -492,7 +534,7 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id_usuario`, `email`, `clave`, `id_rol`, `id_persona`, `id_institucion`, `id_carrera`, `anio_cursada`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, 'seba@gmail.com', '$2y$10$Tb.mgWSOKMVKkQM4hpt.kuqZwNRy/wYgY4WIJzPbUCuNDCDGJTnTC', 1, 1, 1, NULL, NULL, 1, 0, '2026-02-25 23:53:22', '2026-02-26 03:03:10'),
+(1, 'administrador@gmail.com', '$2y$10$Tb.mgWSOKMVKkQM4hpt.kuqZwNRy/wYgY4WIJzPbUCuNDCDGJTnTC', 1, 1, 1, NULL, NULL, 1, 0, '2026-02-25 23:53:22', '2026-04-19 15:06:15'),
 (2, 'test507238115@mail.com', '$2y$10$ZbO25iUGI7.4wfZOjKbv5Osag0DGvr9t4rRw9oy.X1CTHpP6fMKGC', 2, 2, 1, NULL, NULL, 1, 0, '2026-02-25 23:54:32', '2026-02-26 00:16:11'),
 (3, 'test1864180326@mail.com', '$2y$10$f/nEWTe0RvjsEH7MQaN3ZesPM88yGpcqtrS36OyUtKbQUhUxVH1km', 2, 3, 1, NULL, NULL, 1, 0, '2026-02-25 23:58:22', '2026-02-26 00:16:04'),
 (4, 'test1364295098@mail.com', '$2y$10$NpGAF9WJHAUqd/SSO/EMZuOa9dIVUBCqqbHQXTZoykgQSDFWXDgKi', 2, 4, 1, NULL, NULL, 1, 0, '2026-02-25 23:59:25', '2026-02-26 00:15:56'),
@@ -500,10 +542,10 @@ INSERT INTO `usuario` (`id_usuario`, `email`, `clave`, `id_rol`, `id_persona`, `
 (6, 'test1508581466@mail.com', '$2y$10$GapybKH7bnfAFI2fWaBoEuKvxBkNQmgCSwwqVY7nSEfmAudZQ9D6u', 2, 6, 1, NULL, NULL, 1, 0, '2026-02-26 00:02:44', '2026-02-26 00:15:45'),
 (7, 'prueba@gmail.com', '$2y$10$sMLI7OocA0YLOByvaPS5bu49GTzPMaGaoAC4AU/QYr5q81RWS1W8i', 2, 7, 1, 1, 3, 1, 0, '2026-02-26 00:19:47', '2026-04-19 05:49:55'),
 (8, 'nuevo1342950043@mail.com', '$2y$10$rex5SJ0czhrKkObKCDABBeiJJebihjYfSsh/HuSuxt31rKsrz/q8i', 2, 8, 1, NULL, NULL, 0, 1, '2026-02-26 00:22:28', '2026-02-26 00:24:44'),
-(9, 'form650866515@mail.com', '$2y$10$wZe1dl0jYNX7DQFUDHYMNubd94Zw4FWQEmBxX4Cl9Zpjh/P83TdEi', 2, 9, 1, NULL, NULL, 1, 0, '2026-02-26 00:23:36', '2026-02-26 00:24:35'),
-(10, 'nuevo@hotmail.com', '$2y$10$Eig3F9EaRK6LhLRGnBuOeO.9uZHyn2sMD7A5N418gIsfJtKKIOuHy', 2, 10, 1, NULL, NULL, 1, 0, '2026-02-26 00:26:05', '2026-02-26 00:26:36'),
-(11, 'nminotti@gmail.com_', '$2y$10$OW/BzlwyUIUIwRyC39iOr.xCAwsiJ8/Vpmjb3imURM3eG874ZsPRm', 2, 11, 3, NULL, NULL, 1, 0, '2026-02-26 02:50:46', '2026-03-13 15:20:30'),
-(12, 'confirmacion30020726@mail.com', '$2y$10$BW0.iaiOusJyyysqekJAned/q5NXL0yx7aepaeUVnk5dq4crfbG2m', 2, 12, 1, NULL, NULL, 0, 1, '2026-02-26 02:55:08', '2026-02-26 03:04:19'),
+(9, 'alumno2@gmail.com', '$2y$10$Eig3F9EaRK6LhLRGnBuOeO.9uZHyn2sMD7A5N418gIsfJtKKIOuHy', 2, 9, 1, 2, 1, 1, 0, '2026-02-26 00:23:36', '2026-04-19 17:27:07'),
+(10, 'alumno1@hotmail.com', '$2y$10$Eig3F9EaRK6LhLRGnBuOeO.9uZHyn2sMD7A5N418gIsfJtKKIOuHy', 2, 10, 1, 1, 3, 1, 0, '2026-02-26 00:26:05', '2026-04-19 17:17:35'),
+(11, 'administradorIFTS3@gmail.com', '$2y$10$OW/BzlwyUIUIwRyC39iOr.xCAwsiJ8/Vpmjb3imURM3eG874ZsPRm', 3, 11, 3, NULL, NULL, 1, 0, '2026-02-26 02:50:46', '2026-04-19 17:26:10'),
+(12, 'administradorIFTS1@gmail.com', '$2y$10$OW/BzlwyUIUIwRyC39iOr.xCAwsiJ8/Vpmjb3imURM3eG874ZsPRm', 3, 12, 1, NULL, NULL, 1, 0, '2026-02-26 02:55:08', '2026-04-19 17:27:28'),
 (13, 'sebaminotti@gmail.com', '$2y$10$yrb7XSIm1FISbp0eEzDc0OhY9OYm9YxpIvUJIU73YawHRmBVeVu6y', 2, 13, 3, NULL, NULL, 1, 0, '2026-02-26 03:00:33', '2026-03-13 15:20:11'),
 (14, 'dementesconsultora2025@gmail.com', '$2y$10$O4hHfJSOH8sQ2t2SwOjnU.Pr5qi/.PdGhm7pNrMUN.L7iu06/eQa2', 1, 14, 1, NULL, NULL, 1, 0, '2026-03-13 12:50:34', '2026-03-13 14:06:38'),
 (15, 'lesmuchachosdelinapifts@gmail.com', '$2y$10$j5pc/WJyzfxQgBJSOz4RqeBB1MiYSxZCgK4VqgsJsbU3UxUh6fTG2', 2, 15, 1, NULL, NULL, 1, 0, '2026-03-13 14:33:55', '2026-03-13 15:15:10'),
@@ -618,7 +660,7 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `bolsadetrabajo`
 --
 ALTER TABLE `bolsadetrabajo`
-  MODIFY `id_bolsaDeTrabajo` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_bolsaDeTrabajo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `carrera`
@@ -630,13 +672,13 @@ ALTER TABLE `carrera`
 -- AUTO_INCREMENT de la tabla `carrera_materia`
 --
 ALTER TABLE `carrera_materia`
-  MODIFY `id_carreraMateria` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_carreraMateria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `carrousel`
 --
 ALTER TABLE `carrousel`
-  MODIFY `id_carrousel` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_carrousel` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `institucion`
@@ -648,13 +690,13 @@ ALTER TABLE `institucion`
 -- AUTO_INCREMENT de la tabla `institucion_carrera`
 --
 ALTER TABLE `institucion_carrera`
-  MODIFY `id_institucion_carrera` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
+  MODIFY `id_institucion_carrera` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- AUTO_INCREMENT de la tabla `materia`
 --
 ALTER TABLE `materia`
-  MODIFY `id_materia` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_materia` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `navbar`
@@ -672,7 +714,7 @@ ALTER TABLE `persona`
 -- AUTO_INCREMENT de la tabla `postulacion`
 --
 ALTER TABLE `postulacion`
-  MODIFY `id_postulacion` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_postulacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`

@@ -1,6 +1,10 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+$autoloadPath = __DIR__ . '/../vendor/autoload.php';
+if (!is_file($autoloadPath)) {
+    throw new RuntimeException('No se encontro vendor/autoload.php para CloudinaryService');
+}
+require_once $autoloadPath;
 
 use Cloudinary\Api\Admin\AdminApi;
 use Cloudinary\Api\Upload\UploadApi;

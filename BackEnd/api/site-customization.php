@@ -3,7 +3,6 @@
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/SiteCustomizationModel.php';
-require_once __DIR__ . '/../services/CloudinaryService.php';
 
 header('Content-Type: application/json');
 
@@ -57,6 +56,30 @@ function parsePayload(): array
     return [];
 }
 
+function uploadErrorText(int $code): string
+{
+    switch ($code) {
+        case UPLOAD_ERR_OK:
+            return 'OK';
+        case UPLOAD_ERR_INI_SIZE:
+            return 'El archivo supera upload_max_filesize';
+        case UPLOAD_ERR_FORM_SIZE:
+            return 'El archivo supera MAX_FILE_SIZE del formulario';
+        case UPLOAD_ERR_PARTIAL:
+            return 'El archivo se subio parcialmente';
+        case UPLOAD_ERR_NO_FILE:
+            return 'No se envio archivo';
+        case UPLOAD_ERR_NO_TMP_DIR:
+            return 'Falta carpeta temporal en servidor';
+        case UPLOAD_ERR_CANT_WRITE:
+            return 'No se pudo escribir archivo temporal';
+        case UPLOAD_ERR_EXTENSION:
+            return 'Una extension de PHP bloqueo la subida';
+        default:
+            return 'Error de subida desconocido';
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
         $scope = trim((string)($_GET['scope'] ?? 'public'));
@@ -75,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 : SiteCustomizationModel::obtenerConfiguracionPublica($pdo),
         ]);
     } catch (Throwable $e) {
+        error_log('Error GET site-customization.php: ' . $e->getMessage());
         respond(500, [
             'success' => false,
             'message' => 'Error interno del servidor',
@@ -93,6 +117,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 try {
     requireAdminSession();
 
+    $cloudinaryServicePath = __DIR__ . '/../services/CloudinaryService.php';
+    if (!is_file($cloudinaryServicePath)) {
+        respond(500, [
+            'success' => false,
+            'message' => 'No se encontro el servicio de Cloudinary en el servidor',
+        ]);
+    }
+    require_once $cloudinaryServicePath;
+
     $payload = parsePayload();
     $navbarPayload = is_array($payload['navbar'] ?? null) ? $payload['navbar'] : [];
     $sidebarPayload = is_array($payload['sidebar'] ?? null) ? $payload['sidebar'] : [];
@@ -103,7 +136,16 @@ try {
     $configActual = SiteCustomizationModel::obtenerConfiguracionAdmin($pdo);
 
     $mediaFolders = require __DIR__ . '/../config/media-folders.php';
-    $cloudinary = new CloudinaryService($mediaFolders['base'] ?? 'ComunidadIFTS');
+    try {
+        $cloudinary = new CloudinaryService($mediaFolders['base'] ?? 'ComunidadIFTS');
+    } catch (Throwable $e) {
+        error_log('Cloudinary init fallo (site-customization): ' . $e->getMessage());
+        respond(500, [
+            'success' => false,
+            'message' => 'No se pudo inicializar Cloudinary en el servidor',
+            'error' => ($_ENV['APP_DEBUG'] ?? false) ? $e->getMessage() : null,
+        ]);
+    }
 
     $navbarActual = $configActual['navbar'];
     $navbarLogoPublicId = trim((string)($navbarActual['logo_public_id'] ?? ''));
@@ -131,6 +173,7 @@ try {
             'details' => [
                 'field' => 'navbar_logo',
                 'upload_error_code' => $navbarFileError,
+                'upload_error_text' => uploadErrorText($navbarFileError),
                 'upload_max_filesize' => ini_get('upload_max_filesize'),
                 'post_max_size' => ini_get('post_max_size'),
             ],
@@ -170,6 +213,7 @@ try {
             'details' => [
                 'field' => 'sidebar_logo',
                 'upload_error_code' => $sidebarFileError,
+                'upload_error_text' => uploadErrorText($sidebarFileError),
                 'upload_max_filesize' => ini_get('upload_max_filesize'),
                 'post_max_size' => ini_get('post_max_size'),
             ],
@@ -297,6 +341,8 @@ try {
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
+
+    error_log('Error site-customization.php: ' . $e->getMessage());
 
     respond(500, [
         'success' => false,

@@ -195,21 +195,26 @@ try {
 
         // Si el usuario no tenia foto y Google provee una, se completa automaticamente.
         if (($usuario->getFotoPerfilUrl() ?? '') === '' && $fotoPerfilGoogle !== '') {
-            $fotoCloudinary = subirFotoGoogleACloudinary($fotoPerfilGoogle);
-            if ($fotoCloudinary) {
-                Persona::actualizarFotoPerfil(
-                    $pdo,
-                    $usuario->getIdPersona(),
-                    $fotoCloudinary['url'],
-                    $fotoCloudinary['public_id']
-                );
-            } else {
-                Persona::actualizarFotoPerfil($pdo, $usuario->getIdPersona(), $fotoPerfilGoogle, null);
-            }
+            try {
+                $fotoCloudinary = subirFotoGoogleACloudinary($fotoPerfilGoogle);
+                if ($fotoCloudinary) {
+                    Persona::actualizarFotoPerfil(
+                        $pdo,
+                        $usuario->getIdPersona(),
+                        $fotoCloudinary['url'],
+                        $fotoCloudinary['public_id']
+                    );
+                } else {
+                    Persona::actualizarFotoPerfil($pdo, $usuario->getIdPersona(), $fotoPerfilGoogle, null);
+                }
 
-            $usuarioRefrescado = Usuario::buscarPorEmail($pdo, $email);
-            if ($usuarioRefrescado) {
-                $usuario = $usuarioRefrescado;
+                $usuarioRefrescado = Usuario::buscarPorEmail($pdo, $email);
+                if ($usuarioRefrescado) {
+                    $usuario = $usuarioRefrescado;
+                }
+            } catch (Throwable $e) {
+                // No bloquear login por problemas de foto en producción.
+                error_log('Google Auth: no se pudo persistir foto de perfil en login: ' . $e->getMessage());
             }
         }
 
@@ -359,16 +364,21 @@ try {
     }
 
     if ($fotoPerfilGoogle !== '') {
-        $fotoCloudinary = subirFotoGoogleACloudinary($fotoPerfilGoogle);
-        if ($fotoCloudinary) {
-            Persona::actualizarFotoPerfil(
-                $pdo,
-                $persona->getIdPersona(),
-                $fotoCloudinary['url'],
-                $fotoCloudinary['public_id']
-            );
-        } else {
-            Persona::actualizarFotoPerfil($pdo, $persona->getIdPersona(), $fotoPerfilGoogle, null);
+        try {
+            $fotoCloudinary = subirFotoGoogleACloudinary($fotoPerfilGoogle);
+            if ($fotoCloudinary) {
+                Persona::actualizarFotoPerfil(
+                    $pdo,
+                    $persona->getIdPersona(),
+                    $fotoCloudinary['url'],
+                    $fotoCloudinary['public_id']
+                );
+            } else {
+                Persona::actualizarFotoPerfil($pdo, $persona->getIdPersona(), $fotoPerfilGoogle, null);
+            }
+        } catch (Throwable $e) {
+            // No bloquear registro por problemas de foto.
+            error_log('Google Auth: no se pudo persistir foto de perfil en registro: ' . $e->getMessage());
         }
     }
 
@@ -453,6 +463,8 @@ try {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
+
+    error_log('Google Auth fatal: ' . $e->getMessage());
 
     http_response_code(500);
     echo safe_json_encode([
