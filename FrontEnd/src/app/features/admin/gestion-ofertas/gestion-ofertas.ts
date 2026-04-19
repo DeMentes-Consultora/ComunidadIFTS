@@ -165,6 +165,13 @@ export class GestionOfertas implements OnInit {
   togglePublicada(oferta: OfertaLaboral, habilitado: boolean): void {
     if (!habilitado) {
       // Deshabilitar oferta publicada
+      // Optimistic update: remover de la lista inmediatamente
+      const indexAntes = this.ofertasPublicadas.findIndex(o => o.id_bolsaDeTrabajo === oferta.id_bolsaDeTrabajo);
+      const backup = this.ofertasPublicadas[indexAntes];
+      
+      this.ofertasPublicadas.splice(indexAntes, 1);
+      this.cdr.markForCheck();
+      
       this.bolsaService.gestionarOferta({
         id_bolsaDeTrabajo: oferta.id_bolsaDeTrabajo,
         accion: 'deshabilitar'
@@ -172,17 +179,26 @@ export class GestionOfertas implements OnInit {
         next: (res) => {
           if (res.success) {
             this.mostrarMensaje(`Oferta deshabilitada`, 'info');
-            // Recargar publicadas
-            this.ofertasPublicadas = [];
-            this.cargarPublicadas();
           } else {
             this.mostrarMensaje(res.message || 'Error', 'error');
+            // Restaurar si hay error
+            if (backup) {
+              this.ofertasPublicadas.splice(indexAntes, 0, backup);
+              this.cdr.markForCheck();
+            }
           }
         },
-        error: () => this.mostrarMensaje('Error al deshabilitar la oferta', 'error')
+        error: (err) => {
+          this.mostrarMensaje(err?.error?.message || 'Error al deshabilitar la oferta', 'error');
+          // Restaurar si hay error
+          if (backup) {
+            this.ofertasPublicadas.splice(indexAntes, 0, backup);
+            this.cdr.markForCheck();
+          }
+        }
       });
     } else {
-      // Re-publicar (aprobar)
+      // Re-publicar (aprobar) - pero esto solo ocurre si la oferta vuelve a ser habilitada desde otra vista
       this.aprobarOferta(oferta);
     }
   }

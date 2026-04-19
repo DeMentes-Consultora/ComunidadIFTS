@@ -54,6 +54,8 @@ class BolsaTrabajo {
                     b.id_bolsaDeTrabajo,
                     b.tituloOferta,
                     b.textoOferta,
+                    b.habilitado,
+                    b.cancelado,
                     b.idCreate AS fecha_creacion,
                     i.id_institucion,
                     i.nombre_ifts,
