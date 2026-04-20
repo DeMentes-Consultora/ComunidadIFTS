@@ -36,6 +36,7 @@ export interface AuthUser {
   fecha_nacimiento: string;
   foto_perfil_url?: string | null;
   foto_perfil_public_id?: string | null;
+  logo_ifts?: string | null;
   habilitado: number;
   cancelado: number;
 }

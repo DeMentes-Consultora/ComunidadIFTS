@@ -81,6 +81,7 @@ if "%INCLUDE_VENDOR%"=="1" (
 xcopy /E /I /Y BackEnd\config "%DEPLOY_DIR%\config" >nul
 xcopy /E /I /Y BackEnd\api "%DEPLOY_DIR%\api" >nul
 xcopy /E /I /Y BackEnd\models "%DEPLOY_DIR%\models" >nul
+xcopy /E /I /Y BackEnd\services "%DEPLOY_DIR%\services" >nul
 copy /Y BackEnd\.htaccess "%DEPLOY_DIR%\" >nul
 copy /Y BackEnd\check-server.php "%DEPLOY_DIR%\" >nul
 copy /Y BackEnd\.env.production "%DEPLOY_DIR%\.env" >nul

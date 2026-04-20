@@ -27,6 +27,7 @@ class Usuario {
     private $fotoPerfilUrl;
     private $fotoPerfilPublicId;
     private $nombreInstitucion;
+    private $logoInstitucion;
     private $nombreCarrera;
 
     public function __construct(
@@ -81,6 +82,7 @@ class Usuario {
     public function getFotoPerfilUrl() { return $this->fotoPerfilUrl; }
     public function getFotoPerfilPublicId() { return $this->fotoPerfilPublicId; }
     public function getNombreInstitucion() { return $this->nombreInstitucion; }
+    public function getLogoInstitucion() { return $this->logoInstitucion; }
     public function getNombreCarrera() { return $this->nombreCarrera; }
 
     public function setEmail($email) { $this->email = $email; }
@@ -141,6 +143,7 @@ class Usuario {
             'fecha_nacimiento' => $this->fechaNacimiento,
             'foto_perfil_url' => $this->fotoPerfilUrl,
             'foto_perfil_public_id' => $this->fotoPerfilPublicId,
+            'logo_ifts' => $this->logoInstitucion,
             'habilitado' => $this->habilitado,
             'cancelado' => $this->cancelado
         ];
@@ -159,6 +162,7 @@ class Usuario {
                     p.foto_perfil_url,
                     p.foto_perfil_public_id,
                     i.nombre_ifts,
+                    i.logo_ifts,
                     c.nombre_carrera
                 FROM usuario u
                 INNER JOIN rol r ON u.id_rol = r.id_rol
@@ -206,6 +210,7 @@ class Usuario {
         $usuario->fotoPerfilUrl = $row['foto_perfil_url'] ?? null;
         $usuario->fotoPerfilPublicId = $row['foto_perfil_public_id'] ?? null;
         $usuario->nombreInstitucion = $row['nombre_ifts'] ?? null;
+        $usuario->logoInstitucion = $row['logo_ifts'] ?? null;
         $usuario->nombreCarrera = $row['nombre_carrera'] ?? null;
 
         return $usuario;
@@ -301,6 +306,7 @@ class Usuario {
                     p.foto_perfil_url,
                     p.foto_perfil_public_id,
                     i.nombre_ifts,
+                    i.logo_ifts,
                     c.nombre_carrera
                 FROM usuario u
                 INNER JOIN rol r ON u.id_rol = r.id_rol
@@ -348,6 +354,7 @@ class Usuario {
         $usuario->fotoPerfilUrl = $row['foto_perfil_url'] ?? null;
         $usuario->fotoPerfilPublicId = $row['foto_perfil_public_id'] ?? null;
         $usuario->nombreInstitucion = $row['nombre_ifts'] ?? null;
+        $usuario->logoInstitucion = $row['logo_ifts'] ?? null;
         $usuario->nombreCarrera = $row['nombre_carrera'] ?? null;
 
         return $usuario;
