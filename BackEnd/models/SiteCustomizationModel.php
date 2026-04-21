@@ -4,12 +4,14 @@ class SiteCustomizationModel
 {
     private static bool $tablaTiendaCarruselCreada = false;
     private static bool $tablaTiendaGaleriaCreada = false;
+    private static bool $tablaFooterBrandingCreada = false;
 
     public static function obtenerConfiguracionPublica(PDO $pdo): array
     {
         return [
             'navbar' => self::obtenerNavbar($pdo),
             'sidebar' => self::obtenerSidebar($pdo),
+            'footer_branding' => self::obtenerFooterBranding($pdo),
             'carousel' => self::obtenerCarrusel($pdo, false),
             'shop_carousel' => self::obtenerTiendaCarrusel($pdo, false),
             'shop_gallery' => self::obtenerTiendaGaleria($pdo, false),
@@ -21,6 +23,7 @@ class SiteCustomizationModel
         return [
             'navbar' => self::obtenerNavbar($pdo),
             'sidebar' => self::obtenerSidebar($pdo),
+            'footer_branding' => self::obtenerFooterBranding($pdo),
             'carousel' => self::obtenerCarrusel($pdo, true),
             'shop_carousel' => self::obtenerTiendaCarrusel($pdo, true),
             'shop_gallery' => self::obtenerTiendaGaleria($pdo, true),
@@ -119,6 +122,59 @@ class SiteCustomizationModel
         }
 
         return self::obtenerSidebar($pdo);
+    }
+
+    public static function obtenerFooterBranding(PDO $pdo): array
+    {
+        self::asegurarTablaFooterBranding($pdo);
+
+        $stmt = $pdo->query(
+            'SELECT id_footer_branding, developer_text, enlace, foto_perfil_url, foto_perfil_public_id, habilitado
+             FROM footer_branding
+             WHERE cancelado = 0
+             ORDER BY id_footer_branding ASC
+             LIMIT 1'
+        );
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return [
+            'id_footer_branding' => isset($row['id_footer_branding']) ? (int)$row['id_footer_branding'] : null,
+            'developer_text' => trim((string)($row['developer_text'] ?? 'Desarrollado por DeMentesConsultora')),
+            'link_url' => self::nullableText($row['enlace'] ?? null),
+            'logo_url' => self::nullableText($row['foto_perfil_url'] ?? null),
+            'logo_public_id' => self::nullableText($row['foto_perfil_public_id'] ?? null),
+            'habilitado' => isset($row['habilitado']) ? (int)$row['habilitado'] : 1,
+        ];
+    }
+
+    public static function guardarFooterBranding(PDO $pdo, array $footerBranding): array
+    {
+        self::asegurarTablaFooterBranding($pdo);
+
+        $actual = self::obtenerFooterBranding($pdo);
+        $developerText = trim((string)($footerBranding['developer_text'] ?? ''));
+        $linkUrl = self::nullableText($footerBranding['link_url'] ?? null);
+        $logoUrl = self::nullableText($footerBranding['logo_url'] ?? null);
+        $logoPublicId = self::nullableText($footerBranding['logo_public_id'] ?? null);
+        $habilitado = isset($footerBranding['habilitado']) ? (int)((bool)$footerBranding['habilitado']) : 1;
+
+        if (!empty($actual['id_footer_branding'])) {
+            $stmt = $pdo->prepare(
+                'UPDATE footer_branding
+                 SET developer_text = ?, enlace = ?, foto_perfil_url = ?, foto_perfil_public_id = ?, habilitado = ?, cancelado = 0
+                 WHERE id_footer_branding = ?'
+            );
+            $stmt->execute([$developerText, $linkUrl, $logoUrl, $logoPublicId, $habilitado, $actual['id_footer_branding']]);
+        } else {
+            $stmt = $pdo->prepare(
+                'INSERT INTO footer_branding (developer_text, enlace, foto_perfil_url, foto_perfil_public_id, habilitado, cancelado)
+                 VALUES (?, ?, ?, ?, ?, 0)'
+            );
+            $stmt->execute([$developerText, $linkUrl, $logoUrl, $logoPublicId, $habilitado]);
+        }
+
+        return self::obtenerFooterBranding($pdo);
     }
 
     public static function obtenerCarrusel(PDO $pdo, bool $includeDisabled = false): array
@@ -327,5 +383,34 @@ class SiteCustomizationModel
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
         );
         self::$tablaTiendaGaleriaCreada = true;
+    }
+
+    private static function asegurarTablaFooterBranding(PDO $pdo): void
+    {
+        if (self::$tablaFooterBrandingCreada) {
+            return;
+        }
+
+        $pdo->exec(
+            'CREATE TABLE IF NOT EXISTS footer_branding (
+                id_footer_branding INT(11) NOT NULL AUTO_INCREMENT,
+                developer_text VARCHAR(255) NOT NULL DEFAULT "Desarrollado por DeMentesConsultora",
+                enlace VARCHAR(255) NULL,
+                foto_perfil_url TEXT NULL,
+                foto_perfil_public_id VARCHAR(255) NULL,
+                habilitado TINYINT(1) NOT NULL DEFAULT 1,
+                cancelado TINYINT(1) NOT NULL DEFAULT 0,
+                idCreate TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                idUpdate TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id_footer_branding)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+        );
+
+        $columnas = $pdo->query('SHOW COLUMNS FROM footer_branding LIKE "enlace"')->fetchAll(PDO::FETCH_ASSOC);
+        if (count($columnas) === 0) {
+            $pdo->exec('ALTER TABLE footer_branding ADD COLUMN enlace VARCHAR(255) NULL AFTER developer_text');
+        }
+
+        self::$tablaFooterBrandingCreada = true;
     }
 }

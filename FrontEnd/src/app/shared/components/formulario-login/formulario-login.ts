@@ -95,7 +95,7 @@ export class FormularioLoginComponent {
 
     this.authService.getGoogleIdentity().subscribe({
       next: (identity) => {
-        this.authService.loginWithGoogleToken(identity.idToken).subscribe({
+        this.authService.loginWithGoogleToken(identity.idToken, identity.fotoPerfilUrl).subscribe({
           next: (user) => {
             setTimeout(() => {
               this.cargando = false;

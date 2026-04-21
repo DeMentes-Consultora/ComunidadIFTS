@@ -16,6 +16,10 @@
             <mat-icon>menu_open</mat-icon>
             Marca del sidebar
           </button>
+          <button type="button" class="sidebar-link" [class.active]="selectedSection() === 'footer_branding'" (click)="seleccionarSeccion('footer_branding')">
+            <mat-icon>copyright</mat-icon>
+            Marca del footer
+          </button>
           <button type="button" class="sidebar-link" [class.active]="selectedSection() === 'carousel'" (click)="seleccionarSeccion('carousel')">
             <mat-icon>view_carousel</mat-icon>
             Carrusel principal
@@ -129,6 +133,50 @@
                       <span>{{ sidebarLogoPreview() ? 'Cambiar logo' : 'Agregar logo' }}</span>
                     </label>
                     <button mat-stroked-button type="button" (click)="quitarLogoSidebar()" [disabled]="!sidebarLogoPreview()">
+                      Quitar logo
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          }
+
+          @if (selectedSection() === 'footer_branding') {
+            <form class="editor-section" [formGroup]="footerBrandingForm">
+              <div class="editor-grid footer-branding-grid">
+                <div class="branding-fields-stack">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Texto de desarrollador</mat-label>
+                    <input matInput formControlName="developer_text" maxlength="255" title="Texto de desarrollador" />
+                    <mat-hint>Se muestra junto al logo en el copyright del footer.</mat-hint>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Link del desarrollador</mat-label>
+                    <input matInput formControlName="link_url" maxlength="255" title="Link del desarrollador" placeholder="https://dementes.infinityfreeapp.com/" />
+                    <mat-hint>Destino del texto y logo, como en el carrusel principal.</mat-hint>
+                    @if (footerBrandingForm.controls.link_url.hasError('pattern')) {
+                      <mat-error>Ingresa una URL valida que empiece con http:// o https://</mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+
+                <div class="logo-panel">
+                  <div class="logo-preview" *ngIf="footerBrandingLogoPreview(); else footerBrandingLogoPlaceholder">
+                    <img [src]="footerBrandingLogoPreview()!" alt="Logo de la consultora" />
+                  </div>
+                  <ng-template #footerBrandingLogoPlaceholder>
+                    <div class="logo-preview empty">
+                      <mat-icon>image</mat-icon>
+                    </div>
+                  </ng-template>
+
+                  <div class="logo-actions">
+                    <label class="file-button">
+                      <input type="file" accept="image/*" (change)="cambiarArchivoFooterBranding($event)" />
+                      <span>{{ footerBrandingLogoPreview() ? 'Cambiar logo' : 'Agregar logo' }}</span>
+                    </label>
+                    <button mat-stroked-button type="button" (click)="quitarLogoFooterBranding()" [disabled]="!footerBrandingLogoPreview()">
                       Quitar logo
                     </button>
                   </div>

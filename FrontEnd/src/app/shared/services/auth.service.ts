@@ -138,10 +138,11 @@ export class AuthService {
     );
   }
 
-  loginWithGoogleToken(idToken: string): Observable<AuthUser> {
+  loginWithGoogleToken(idToken: string, fotoPerfilUrl?: string): Observable<AuthUser> {
     const payload: GoogleLoginRequest = {
       mode: 'login',
-      id_token: idToken
+      id_token: idToken,
+      foto_perfil_url: fotoPerfilUrl
     };
 
     return this.http.post(this.apiGoogleAuthUrl, payload, { withCredentials: true, responseType: 'text' }).pipe(

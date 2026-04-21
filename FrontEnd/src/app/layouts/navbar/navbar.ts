@@ -58,10 +58,14 @@ export class Navbar {
     return cleanName ? cleanName.charAt(0).toUpperCase() : '?';
   }
 
-  getAvatarUrl(user: { foto_perfil_url?: string | null; logo_ifts?: string | null } | null | undefined): string | null {
+  getAvatarUrl(user: { id_rol?: number | null; foto_perfil_url?: string | null; logo_ifts?: string | null } | null | undefined): string | null {
     const fotoPerfil = (user?.foto_perfil_url ?? '').trim();
     if (fotoPerfil) {
       return fotoPerfil;
+    }
+
+    if ((user?.id_rol ?? 0) !== 3) {
+      return null;
     }
 
     const logoInstitucion = (user?.logo_ifts ?? '').trim();

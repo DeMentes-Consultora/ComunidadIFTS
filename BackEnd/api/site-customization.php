@@ -207,6 +207,7 @@ try {
     $payload = parsePayload();
     $navbarPayload = is_array($payload['navbar'] ?? null) ? $payload['navbar'] : [];
     $sidebarPayload = is_array($payload['sidebar'] ?? null) ? $payload['sidebar'] : [];
+    $footerBrandingPayload = is_array($payload['footer_branding'] ?? null) ? $payload['footer_branding'] : [];
     $carouselPayload = is_array($payload['carousel'] ?? null) ? $payload['carousel'] : [];
     $shopCarouselPayload = is_array($payload['shop_carousel'] ?? null) ? $payload['shop_carousel'] : [];
     $shopGalleryPayload = is_array($payload['shop_gallery'] ?? null) ? $payload['shop_gallery'] : [];
@@ -238,6 +239,12 @@ try {
     $removeSidebarLogo = !empty($sidebarPayload['remove_logo']);
     $navbarLogoSelected = !empty($navbarPayload['logo_selected']);
     $sidebarLogoSelected = !empty($sidebarPayload['logo_selected']);
+
+    $footerBrandingActual = is_array($configActual['footer_branding'] ?? null) ? $configActual['footer_branding'] : [];
+    $footerBrandingLogoPublicId = trim((string)($footerBrandingActual['logo_public_id'] ?? ''));
+    $footerBrandingLogoUrl = trim((string)($footerBrandingActual['logo_url'] ?? ''));
+    $removeFooterBrandingLogo = !empty($footerBrandingPayload['remove_logo']);
+    $footerBrandingLogoSelected = !empty($footerBrandingPayload['logo_selected']);
 
     if ($removeNavbarLogo && $navbarLogoPublicId !== '') {
         $cloudinary->delete($navbarLogoPublicId, 'image');
@@ -319,6 +326,46 @@ try {
         $sidebarLogoUrl = trim((string)($uploadSidebarLogo['url'] ?? ''));
     }
 
+    if ($removeFooterBrandingLogo && $footerBrandingLogoPublicId !== '') {
+        $cloudinary->delete($footerBrandingLogoPublicId, 'image');
+        $footerBrandingLogoPublicId = '';
+        $footerBrandingLogoUrl = '';
+    }
+
+    $footerBrandingFileError = (int)($_FILES['footer_branding_logo']['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($footerBrandingLogoSelected && $footerBrandingFileError !== UPLOAD_ERR_OK) {
+        respond(400, [
+            'success' => false,
+            'message' => 'Se selecciono un logo de marca para footer pero el servidor no recibio el archivo.',
+            'details' => [
+                'field' => 'footer_branding_logo',
+                'upload_error_code' => $footerBrandingFileError,
+                'upload_error_text' => uploadErrorText($footerBrandingFileError),
+                'upload_max_filesize' => ini_get('upload_max_filesize'),
+                'post_max_size' => ini_get('post_max_size'),
+            ],
+        ]);
+    }
+
+    if (!empty($_FILES['footer_branding_logo']) && $footerBrandingFileError === UPLOAD_ERR_OK) {
+        $folderFooterBranding = $mediaFolders['footer_branding']['logo'] ?? 'ComunidadIFTS/footer-branding';
+        $uploadFooterBrandingLogo = $cloudinary->uploadFromFileArray($_FILES['footer_branding_logo'], $folderFooterBranding, 'image');
+        if (empty($uploadFooterBrandingLogo['success'])) {
+            respond(500, [
+                'success' => false,
+                'message' => $uploadFooterBrandingLogo['message'] ?? 'No fue posible subir el logo del footer',
+                'error' => ($_ENV['APP_DEBUG'] ?? false) ? ($uploadFooterBrandingLogo['error'] ?? null) : null,
+            ]);
+        }
+
+        if ($footerBrandingLogoPublicId !== '' && $footerBrandingLogoPublicId !== (string)($uploadFooterBrandingLogo['public_id'] ?? '')) {
+            $cloudinary->delete($footerBrandingLogoPublicId, 'image');
+        }
+
+        $footerBrandingLogoPublicId = trim((string)($uploadFooterBrandingLogo['public_id'] ?? ''));
+        $footerBrandingLogoUrl = trim((string)($uploadFooterBrandingLogo['url'] ?? ''));
+    }
+
     $slidesActuales = [];
     foreach ($configActual['carousel'] as $slideActual) {
         $slidesActuales[(int)$slideActual['id_carrousel']] = $slideActual;
@@ -378,6 +425,14 @@ try {
         'brand_text' => $sidebarPayload['brand_text'] ?? $sidebarActual['brand_text'] ?? '',
         'logo_url' => $sidebarLogoUrl !== '' ? $sidebarLogoUrl : null,
         'logo_public_id' => $sidebarLogoPublicId !== '' ? $sidebarLogoPublicId : null,
+        'habilitado' => 1,
+    ]);
+
+    SiteCustomizationModel::guardarFooterBranding($pdo, [
+        'developer_text' => $footerBrandingPayload['developer_text'] ?? $footerBrandingActual['developer_text'] ?? 'Desarrollado por DeMentesConsultora',
+        'link_url' => $footerBrandingPayload['link_url'] ?? $footerBrandingActual['link_url'] ?? null,
+        'logo_url' => $footerBrandingLogoUrl !== '' ? $footerBrandingLogoUrl : null,
+        'logo_public_id' => $footerBrandingLogoPublicId !== '' ? $footerBrandingLogoPublicId : null,
         'habilitado' => 1,
     ]);
 

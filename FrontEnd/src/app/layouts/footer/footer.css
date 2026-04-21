@@ -7,6 +7,11 @@
   border-top: 2px solid #FFD700;
 }
 
+.footer-shop-strip-wrapper {
+  margin-top: 25px;
+  margin-bottom: 6px;
+}
+
 .footer-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -232,6 +237,76 @@
   margin-bottom: 8px;
 }
 
+.footer-shop-strip {
+  width: 100%;
+  padding: 7px 16px 8px;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(15, 19, 24, 0.96) 0%, rgba(11, 14, 18, 0.98) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 215, 0, 0.15);
+}
+
+.footer-shop-strip::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin-top: 7px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 215, 0, 0.45) 20%, rgba(255, 215, 0, 0.45) 80%, transparent 100%);
+}
+
+.shop-strip-track {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.shop-strip-item {
+  position: relative;
+  height: 120px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1c3b2a 0%, #0f2419 100%);
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.shop-strip-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.shop-strip-empty-image {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 215, 0, 0.8);
+}
+
+.shop-strip-empty-image .material-icons {
+  font-size: 34px;
+}
+
+.shop-strip-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 8px 10px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.75) 100%);
+  color: #fff;
+  font-size: 12px;
+}
+
+.shop-strip-track.empty {
+  grid-template-columns: 1fr;
+}
+
 .shop-carousel {
   position: relative;
   width: 100%;
@@ -273,7 +348,7 @@
 .shop-carousel-controls {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 8px;
   margin-top: 8px;
 }
@@ -287,27 +362,6 @@
   height: 26px;
   cursor: pointer;
   line-height: 1;
-}
-
-.shop-dots {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  flex: 1;
-}
-
-.shop-dots button {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.35);
-  cursor: pointer;
-}
-
-.shop-dots button.active {
-  background: #ffd700;
 }
 
 /* Separador Dorado Degradado */
@@ -343,11 +397,39 @@
   font-size: 12px;
 }
 
+.developer-branding {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.developer-branding-link {
+  color: #b0b0b0;
+  text-decoration: none;
+}
+
+.developer-branding-link:hover {
+  color: #ffd700;
+}
+
+.developer-branding img {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 215, 0, 0.35);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .footer-content {
     grid-template-columns: 1fr;
     gap: 20px;
+  }
+
+  .footer-shop-strip-wrapper {
+    margin-top: 14px;
+    margin-bottom: 4px;
   }
 
   .footer-copyright {
@@ -374,6 +456,20 @@
 
   .map-embed iframe {
     height: 100px !important;
+  }
+
+  .shop-strip-track {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-shop-strip {
+    padding: 6px 12px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1100px) {
+  .shop-strip-track {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

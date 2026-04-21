@@ -20,7 +20,7 @@ import {
 import { AuthService } from '../../../shared/services/auth.service';
 import { SiteCustomizationService } from '../../../shared/services/site-customization.service';
 
-type DashboardSection = 'navbar' | 'sidebar' | 'carousel' | 'shop_carousel' | 'shop_gallery';
+type DashboardSection = 'navbar' | 'sidebar' | 'footer_branding' | 'carousel' | 'shop_carousel' | 'shop_gallery';
 type SlideCollection = 'carousel' | 'shop_carousel' | 'shop_gallery';
 
 interface EditableCarouselSlide {
@@ -63,6 +63,7 @@ export class AdminDashboard implements OnInit {
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
   private readonly fb = inject(FormBuilder);
+  private readonly optionalHttpUrlPattern = /^(https?:\/\/).+/i;
 
   readonly loading = signal(true);
   readonly saving = signal(false);
@@ -77,6 +78,9 @@ export class AdminDashboard implements OnInit {
   readonly sidebarLogoPreview = signal<string | null>(null);
   readonly sidebarLogoFile = signal<File | null>(null);
   readonly removeSidebarLogo = signal(false);
+  readonly footerBrandingLogoPreview = signal<string | null>(null);
+  readonly footerBrandingLogoFile = signal<File | null>(null);
+  readonly removeFooterBrandingLogo = signal(false);
 
   readonly statsCards = computed(() => {
     const stats = this.stats();
@@ -100,6 +104,11 @@ export class AdminDashboard implements OnInit {
 
   readonly sidebarForm = this.fb.group({
     brand_text: this.fb.nonNullable.control('', [Validators.maxLength(255)]),
+  });
+
+  readonly footerBrandingForm = this.fb.group({
+    developer_text: this.fb.nonNullable.control('Desarrollado por DeMentesConsultora', [Validators.maxLength(255)]),
+    link_url: this.fb.nonNullable.control('', [Validators.maxLength(255), Validators.pattern(this.optionalHttpUrlPattern)]),
   });
 
   ngOnInit(): void {
@@ -167,6 +176,21 @@ export class AdminDashboard implements OnInit {
     this.removeSidebarLogo.set(true);
   }
 
+  cambiarArchivoFooterBranding(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+
+    this.footerBrandingLogoFile.set(file);
+    this.removeFooterBrandingLogo.set(false);
+    this.footerBrandingLogoPreview.set(file ? URL.createObjectURL(file) : this.footerBrandingLogoPreview());
+  }
+
+  quitarLogoFooterBranding(): void {
+    this.footerBrandingLogoFile.set(null);
+    this.footerBrandingLogoPreview.set(null);
+    this.removeFooterBrandingLogo.set(true);
+  }
+
   cambiarImagenSlide(collection: SlideCollection, clientKey: string, event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
@@ -211,10 +235,11 @@ export class AdminDashboard implements OnInit {
   }
 
   guardarCambios(): void {
-    if (this.navbarForm.invalid || this.sidebarForm.invalid) {
+    if (this.navbarForm.invalid || this.sidebarForm.invalid || this.footerBrandingForm.invalid) {
       this.navbarForm.markAllAsTouched();
       this.sidebarForm.markAllAsTouched();
-      this.mostrarMensaje('El texto del navbar o sidebar supera el maximo permitido', 'error');
+      this.footerBrandingForm.markAllAsTouched();
+      this.mostrarMensaje('Alguno de los textos de marca supera el maximo permitido', 'error');
       return;
     }
 
@@ -228,6 +253,12 @@ export class AdminDashboard implements OnInit {
         brand_text: this.sidebarForm.getRawValue().brand_text.trim(),
         remove_logo: this.removeSidebarLogo(),
         logo_selected: !!this.sidebarLogoFile(),
+      },
+      footer_branding: {
+        developer_text: this.footerBrandingForm.getRawValue().developer_text.trim(),
+        link_url: this.footerBrandingForm.getRawValue().link_url.trim(),
+        remove_logo: this.removeFooterBrandingLogo(),
+        logo_selected: !!this.footerBrandingLogoFile(),
       },
       carousel: this.reordenarSlides(this.carouselSlides()).map((slide, index) => ({
         id_carrousel: slide.id_carrousel,
@@ -281,6 +312,7 @@ export class AdminDashboard implements OnInit {
     this.siteCustomizationService.saveSiteConfig(payload, {
       navbarLogo: this.navbarLogoFile(),
       sidebarLogo: this.sidebarLogoFile(),
+      footerBrandingLogo: this.footerBrandingLogoFile(),
       carouselFiles,
       shopCarouselFiles,
       shopGalleryFiles,
@@ -362,12 +394,20 @@ export class AdminDashboard implements OnInit {
       brand_text: config.sidebar.brand_text ?? '',
     });
 
+    this.footerBrandingForm.patchValue({
+      developer_text: config.footer_branding.developer_text ?? 'Desarrollado por DeMentesConsultora',
+      link_url: config.footer_branding.link_url ?? '',
+    });
+
     this.navbarLogoPreview.set(config.navbar.logo_url || null);
     this.navbarLogoFile.set(null);
     this.removeNavbarLogo.set(false);
     this.sidebarLogoPreview.set(config.sidebar.logo_url || null);
     this.sidebarLogoFile.set(null);
     this.removeSidebarLogo.set(false);
+    this.footerBrandingLogoPreview.set(config.footer_branding.logo_url || null);
+    this.footerBrandingLogoFile.set(null);
+    this.removeFooterBrandingLogo.set(false);
     this.carouselSlides.set(this.reordenarSlides((config.carousel ?? []).map((slide, index) => this.mapEditableSlide(slide, index))));
     this.shopCarouselSlides.set(this.reordenarSlides((config.shop_carousel ?? []).map((slide, index) => this.mapEditableSlide(slide, index, 'shop_carousel'))));
     this.shopGallerySlides.set(this.reordenarSlides((config.shop_gallery ?? []).map((slide, index) => this.mapEditableSlide(slide, index, 'shop_gallery'))));

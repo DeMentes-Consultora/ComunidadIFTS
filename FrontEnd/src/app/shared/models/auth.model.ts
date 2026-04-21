@@ -72,6 +72,7 @@ export interface GoogleIdentity {
 export interface GoogleLoginRequest {
   mode: 'login';
   id_token: string;
+  foto_perfil_url?: string;
 }
 
 export interface GoogleRegisterRequest {

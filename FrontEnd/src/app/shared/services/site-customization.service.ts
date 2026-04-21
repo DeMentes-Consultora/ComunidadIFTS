@@ -31,6 +31,14 @@ export class SiteCustomizationService {
       logo_public_id: null,
       habilitado: 1,
     },
+    footer_branding: {
+      id_footer_branding: null,
+      developer_text: 'Desarrollado por DeMentesConsultora',
+      link_url: null,
+      logo_url: null,
+      logo_public_id: null,
+      habilitado: 1,
+    },
     carousel: [],
     shop_carousel: [],
     shop_gallery: [],
@@ -45,6 +53,7 @@ export class SiteCustomizationService {
   private normalizeConfig(config: Partial<SiteCustomizationConfig> | null | undefined): SiteCustomizationConfig {
     const navbar = config?.navbar ?? {};
     const sidebar = config?.sidebar ?? {};
+    const footerBranding = config?.footer_branding ?? {};
     const carousel = Array.isArray(config?.carousel) ? config!.carousel : [];
     const shopCarousel = Array.isArray(config?.shop_carousel) ? config!.shop_carousel : [];
     const shopGallery = Array.isArray(config?.shop_gallery) ? config!.shop_gallery : [];
@@ -57,6 +66,10 @@ export class SiteCustomizationService {
       sidebar: {
         ...this.defaultConfig.sidebar,
         ...sidebar,
+      },
+      footer_branding: {
+        ...this.defaultConfig.footer_branding,
+        ...footerBranding,
       },
       carousel,
       shop_carousel: shopCarousel,
@@ -99,6 +112,7 @@ export class SiteCustomizationService {
     files: {
       navbarLogo?: File | null;
       sidebarLogo?: File | null;
+      footerBrandingLogo?: File | null;
       carouselFiles?: Record<string, File | null>;
       shopCarouselFiles?: Record<string, File | null>;
       shopGalleryFiles?: Record<string, File | null>;
@@ -113,6 +127,10 @@ export class SiteCustomizationService {
 
     if (files.sidebarLogo) {
       formData.append('sidebar_logo', files.sidebarLogo);
+    }
+
+    if (files.footerBrandingLogo) {
+      formData.append('footer_branding_logo', files.footerBrandingLogo);
     }
 
     Object.entries(files.carouselFiles ?? {}).forEach(([clientKey, file]) => {
@@ -151,6 +169,7 @@ export class SiteCustomizationService {
         this.siteConfigSubject.next({
           navbar: adminConfig.navbar,
           sidebar: adminConfig.sidebar,
+          footer_branding: adminConfig.footer_branding,
           carousel: adminConfig.carousel.filter((slide) => slide.habilitado === 1),
           shop_carousel: adminConfig.shop_carousel.filter((slide) => slide.habilitado === 1),
           shop_gallery: adminConfig.shop_gallery.filter((slide) => slide.habilitado === 1),

@@ -14,6 +14,15 @@ export interface SiteSidebarConfig {
   habilitado: number;
 }
 
+export interface SiteFooterBrandingConfig {
+  id_footer_branding: number | null;
+  developer_text: string;
+  link_url: string | null;
+  logo_url: string | null;
+  logo_public_id: string | null;
+  habilitado: number;
+}
+
 export interface SiteCarouselItem {
   id_carrousel: number;
   titulo: string;
@@ -28,6 +37,7 @@ export interface SiteCarouselItem {
 export interface SiteCustomizationConfig {
   navbar: SiteNavbarConfig;
   sidebar: SiteSidebarConfig;
+  footer_branding: SiteFooterBrandingConfig;
   carousel: SiteCarouselItem[];
   shop_carousel: SiteCarouselItem[];
   shop_gallery: SiteCarouselItem[];
@@ -56,6 +66,12 @@ export interface SiteCustomizationSavePayload {
   };
   sidebar: {
     brand_text: string;
+    remove_logo?: boolean;
+    logo_selected?: boolean;
+  };
+  footer_branding: {
+    developer_text: string;
+    link_url: string;
     remove_logo?: boolean;
     logo_selected?: boolean;
   };

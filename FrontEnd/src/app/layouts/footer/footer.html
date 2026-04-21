@@ -1,4 +1,47 @@
 <!-- Footer -->
+<section class="footer-shop-strip-wrapper">
+	<div class="footer-container">
+		<div class="footer-shop-strip">
+			<a class="shop-title-link" routerLink="/tienda">
+				<h6 class="footer-title shop-title">
+					<span class="footer-title-row">
+						<i class="material-icons footer-icon-title">storefront</i>
+						Tienda
+					</span>
+				</h6>
+			</a>
+
+			<div class="shop-strip-track" [class.empty]="!visibleShopSlides.length">
+				@if (visibleShopSlides.length) {
+					@for (slide of visibleShopSlides; track slide.id_carrousel) {
+						<a class="shop-strip-item" routerLink="/tienda" [attr.aria-label]="slide.titulo || 'Ir a la tienda'">
+							@if (slide.foto_perfil_url) {
+								<img [src]="slide.foto_perfil_url" [alt]="slide.titulo || 'Producto de tienda'" title="Producto de tienda" loading="lazy" />
+							} @else {
+								<div class="shop-strip-empty-image">
+									<i class="material-icons">shopping_bag</i>
+								</div>
+							}
+							<div class="shop-strip-overlay">
+								<strong>{{ slide.titulo || 'Tienda Comunidad IFTS' }}</strong>
+							</div>
+						</a>
+					}
+				} @else {
+					<div class="shop-carousel-empty">Proximamente productos en tienda</div>
+				}
+			</div>
+
+			@if (showShopControls) {
+				<div class="shop-carousel-controls">
+					<button type="button" (click)="prevShopSlide()" aria-label="Imagen anterior">&#10094;</button>
+					<button type="button" (click)="nextShopSlide()" aria-label="Imagen siguiente">&#10095;</button>
+				</div>
+			}
+		</div>
+	</div>
+</section>
+
 <footer class="footer">
 	<div class="footer-container">
 		<div class="footer-content">
@@ -16,42 +59,6 @@
 						<span>Buenos Aires, Argentina</span>
 					</li>
 				</ul>
-
-				<div class="shop-mini-card">
-					<a class="shop-title-link" routerLink="/tienda">
-						<h6 class="footer-title shop-title">
-							<span class="footer-title-row">
-								<i class="material-icons footer-icon-title">storefront</i>
-								Tienda
-							</span>
-						</h6>
-					</a>
-
-					<a class="shop-carousel-link" routerLink="/tienda" [attr.aria-label]="currentShopSlide?.titulo || 'Ir a la tienda'">
-						<div class="shop-carousel" [class.empty]="!currentShopSlide">
-							@if (currentShopSlide?.foto_perfil_url) {
-								<img [src]="currentShopSlide!.foto_perfil_url" [alt]="currentShopSlide?.titulo || 'Producto de tienda'" title="Producto de tienda" loading="lazy" />
-								<div class="shop-carousel-overlay">
-									<strong>{{ currentShopSlide?.titulo || 'Tienda Comunidad IFTS' }}</strong>
-								</div>
-							} @else {
-								<div class="shop-carousel-empty">Proximamente productos en tienda</div>
-							}
-						</div>
-					</a>
-
-					@if (shopSlides.length > 1) {
-						<div class="shop-carousel-controls">
-							<button type="button" (click)="prevShopSlide()" aria-label="Imagen anterior">&#10094;</button>
-							<div class="shop-dots">
-								@for (slide of shopSlides; track slide.id_carrousel; let idx = $index) {
-									<button type="button" [class.active]="idx === currentShopSlideIndex" (click)="goToShopSlide(idx)" [attr.aria-label]="'Ir a imagen ' + (idx + 1)" title="Ir a imagen">●</button>
-								}
-							</div>
-							<button type="button" (click)="nextShopSlide()" aria-label="Imagen siguiente">&#10095;</button>
-						</div>
-					}
-				</div>
 			</div>
 
 			<!-- Columna 2: Enlaces Útiles -->
@@ -145,7 +152,21 @@
 				<small>&copy; {{ currentYear }} Comunidad IFTS. Todos los derechos reservados.</small>
 			</div>
 			<div class="copyright-right">
-				<small>Desarrollado por DeMentesConsultora</small>
+				@if (footerBrandingLinkUrl) {
+					<a class="developer-branding developer-branding-link" [href]="footerBrandingLinkUrl" target="_blank" rel="noopener noreferrer">
+						@if (footerBrandingLogoUrl) {
+							<img [src]="footerBrandingLogoUrl" [alt]="footerBrandingText" title="Logo de desarrollador" loading="lazy" />
+						}
+						<span>{{ footerBrandingText }}</span>
+					</a>
+				} @else {
+					<small class="developer-branding">
+						@if (footerBrandingLogoUrl) {
+							<img [src]="footerBrandingLogoUrl" [alt]="footerBrandingText" title="Logo de desarrollador" loading="lazy" />
+						}
+						<span>{{ footerBrandingText }}</span>
+					</small>
+				}
 			</div>
 		</div>
 	</div>
