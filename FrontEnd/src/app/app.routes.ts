@@ -16,6 +16,10 @@ export const routes: Routes = [
     loadComponent: () => import('./shared/components/mapa/mapa').then(m => m.MapaComponent)
   },
   {
+    path: 'tienda',
+    loadComponent: () => import('./features/tienda/tienda').then(m => m.Tienda)
+  },
+  {
     path: 'admin',
     canActivate: [authGuard, roleGuard],
     data: { roles: [1] },

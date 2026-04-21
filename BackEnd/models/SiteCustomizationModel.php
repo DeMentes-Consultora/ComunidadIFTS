@@ -2,12 +2,17 @@
 
 class SiteCustomizationModel
 {
+    private static bool $tablaTiendaCarruselCreada = false;
+    private static bool $tablaTiendaGaleriaCreada = false;
+
     public static function obtenerConfiguracionPublica(PDO $pdo): array
     {
         return [
             'navbar' => self::obtenerNavbar($pdo),
             'sidebar' => self::obtenerSidebar($pdo),
             'carousel' => self::obtenerCarrusel($pdo, false),
+            'shop_carousel' => self::obtenerTiendaCarrusel($pdo, false),
+            'shop_gallery' => self::obtenerTiendaGaleria($pdo, false),
         ];
     }
 
@@ -17,6 +22,8 @@ class SiteCustomizationModel
             'navbar' => self::obtenerNavbar($pdo),
             'sidebar' => self::obtenerSidebar($pdo),
             'carousel' => self::obtenerCarrusel($pdo, true),
+            'shop_carousel' => self::obtenerTiendaCarrusel($pdo, true),
+            'shop_gallery' => self::obtenerTiendaGaleria($pdo, true),
         ];
     }
 
@@ -116,82 +123,36 @@ class SiteCustomizationModel
 
     public static function obtenerCarrusel(PDO $pdo, bool $includeDisabled = false): array
     {
-        $sql = 'SELECT id_carrousel, titulo, descripcion, enlace, orden_visual, foto_perfil_url, foto_perfil_public_id, habilitado
-                FROM carrousel
-                WHERE cancelado = 0';
-
-        if (!$includeDisabled) {
-            $sql .= ' AND habilitado = 1';
-        }
-
-        $sql .= ' ORDER BY orden_visual ASC, id_carrousel ASC';
-
-        $stmt = $pdo->query($sql);
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return array_map(static function (array $row): array {
-            return [
-                'id_carrousel' => (int)$row['id_carrousel'],
-                'titulo' => trim((string)($row['titulo'] ?? '')),
-                'descripcion' => trim((string)($row['descripcion'] ?? '')),
-                'enlace' => self::nullableText($row['enlace'] ?? null),
-                'orden_visual' => isset($row['orden_visual']) ? (int)$row['orden_visual'] : 0,
-                'foto_perfil_url' => self::nullableText($row['foto_perfil_url'] ?? null),
-                'foto_perfil_public_id' => self::nullableText($row['foto_perfil_public_id'] ?? null),
-                'habilitado' => isset($row['habilitado']) ? (int)$row['habilitado'] : 1,
-            ];
-        }, $rows);
+        return self::obtenerColeccionSlides($pdo, 'carrousel', 'id_carrousel', $includeDisabled);
     }
 
     public static function guardarCarrusel(PDO $pdo, array $slides): array
     {
-        $existentes = self::obtenerCarrusel($pdo, true);
-        $existentesPorId = [];
-        foreach ($existentes as $slideExistente) {
-            $existentesPorId[(int)$slideExistente['id_carrousel']] = $slideExistente;
-        }
+        return self::guardarColeccionSlides($pdo, 'carrousel', 'id_carrousel', $slides);
+    }
 
-        $idsPersistidos = [];
+    public static function obtenerTiendaCarrusel(PDO $pdo, bool $includeDisabled = false): array
+    {
+        self::asegurarTablaTiendaCarrusel($pdo);
+        return self::obtenerColeccionSlides($pdo, 'tienda_carrousel', 'id_tienda_carrousel', $includeDisabled);
+    }
 
-        foreach ($slides as $index => $slide) {
-            $id = isset($slide['id_carrousel']) ? (int)$slide['id_carrousel'] : 0;
-            $titulo = trim((string)($slide['titulo'] ?? ''));
-            $descripcion = trim((string)($slide['descripcion'] ?? ''));
-            $enlace = self::nullableText($slide['enlace'] ?? null);
-            $ordenVisual = isset($slide['orden_visual']) ? (int)$slide['orden_visual'] : ($index + 1);
-            $fotoUrl = self::nullableText($slide['foto_perfil_url'] ?? null);
-            $fotoPublicId = self::nullableText($slide['foto_perfil_public_id'] ?? null);
-            $habilitado = isset($slide['habilitado']) ? (int)((bool)$slide['habilitado']) : 1;
+    public static function guardarTiendaCarrusel(PDO $pdo, array $slides): array
+    {
+        self::asegurarTablaTiendaCarrusel($pdo);
+        return self::guardarColeccionSlides($pdo, 'tienda_carrousel', 'id_tienda_carrousel', $slides);
+    }
 
-            if ($id > 0 && isset($existentesPorId[$id])) {
-                $stmt = $pdo->prepare(
-                    'UPDATE carrousel
-                     SET titulo = ?, descripcion = ?, enlace = ?, orden_visual = ?, foto_perfil_url = ?, foto_perfil_public_id = ?, habilitado = ?, cancelado = 0
-                     WHERE id_carrousel = ?'
-                );
-                $stmt->execute([$titulo, $descripcion, $enlace, $ordenVisual, $fotoUrl, $fotoPublicId, $habilitado, $id]);
-                $idsPersistidos[] = $id;
-                continue;
-            }
+    public static function obtenerTiendaGaleria(PDO $pdo, bool $includeDisabled = false): array
+    {
+        self::asegurarTablaTiendaGaleria($pdo);
+        return self::obtenerColeccionSlides($pdo, 'tienda_producto', 'id_tienda_producto', $includeDisabled);
+    }
 
-            $stmt = $pdo->prepare(
-                'INSERT INTO carrousel (titulo, descripcion, enlace, orden_visual, foto_perfil_url, foto_perfil_public_id, habilitado, cancelado)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, 0)'
-            );
-            $stmt->execute([$titulo, $descripcion, $enlace, $ordenVisual, $fotoUrl, $fotoPublicId, $habilitado]);
-            $idsPersistidos[] = (int)$pdo->lastInsertId();
-        }
-
-        foreach ($existentesPorId as $existingId => $existingSlide) {
-            if (in_array($existingId, $idsPersistidos, true)) {
-                continue;
-            }
-
-            $stmt = $pdo->prepare('UPDATE carrousel SET cancelado = 1 WHERE id_carrousel = ?');
-            $stmt->execute([$existingId]);
-        }
-
-        return self::obtenerCarrusel($pdo, true);
+    public static function guardarTiendaGaleria(PDO $pdo, array $slides): array
+    {
+        self::asegurarTablaTiendaGaleria($pdo);
+        return self::guardarColeccionSlides($pdo, 'tienda_producto', 'id_tienda_producto', $slides);
     }
 
     public static function obtenerEstadisticasDashboard(PDO $pdo): array
@@ -225,5 +186,146 @@ class SiteCustomizationModel
 
         $text = trim((string)$value);
         return $text === '' ? null : $text;
+    }
+
+    private static function obtenerColeccionSlides(PDO $pdo, string $table, string $idColumn, bool $includeDisabled): array
+    {
+        $sql = sprintf(
+            'SELECT %s AS id_slide, titulo, descripcion, enlace, orden_visual, foto_perfil_url, foto_perfil_public_id, habilitado
+             FROM %s
+             WHERE cancelado = 0',
+            $idColumn,
+            $table
+        );
+
+        if (!$includeDisabled) {
+            $sql .= ' AND habilitado = 1';
+        }
+
+        $sql .= ' ORDER BY orden_visual ASC, id_slide ASC';
+
+        $stmt = $pdo->query($sql);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_map(static function (array $row): array {
+            return [
+                'id_carrousel' => (int)$row['id_slide'],
+                'titulo' => trim((string)($row['titulo'] ?? '')),
+                'descripcion' => trim((string)($row['descripcion'] ?? '')),
+                'enlace' => self::nullableText($row['enlace'] ?? null),
+                'orden_visual' => isset($row['orden_visual']) ? (int)$row['orden_visual'] : 0,
+                'foto_perfil_url' => self::nullableText($row['foto_perfil_url'] ?? null),
+                'foto_perfil_public_id' => self::nullableText($row['foto_perfil_public_id'] ?? null),
+                'habilitado' => isset($row['habilitado']) ? (int)$row['habilitado'] : 1,
+            ];
+        }, $rows);
+    }
+
+    private static function guardarColeccionSlides(PDO $pdo, string $table, string $idColumn, array $slides): array
+    {
+        $existentes = self::obtenerColeccionSlides($pdo, $table, $idColumn, true);
+        $existentesPorId = [];
+        foreach ($existentes as $slideExistente) {
+            $existentesPorId[(int)$slideExistente['id_carrousel']] = $slideExistente;
+        }
+
+        $idsPersistidos = [];
+
+        foreach ($slides as $index => $slide) {
+            $id = isset($slide['id_carrousel']) ? (int)$slide['id_carrousel'] : 0;
+            $titulo = trim((string)($slide['titulo'] ?? ''));
+            $descripcion = trim((string)($slide['descripcion'] ?? ''));
+            $enlace = self::nullableText($slide['enlace'] ?? null);
+            $ordenVisual = isset($slide['orden_visual']) ? (int)$slide['orden_visual'] : ($index + 1);
+            $fotoUrl = self::nullableText($slide['foto_perfil_url'] ?? null);
+            $fotoPublicId = self::nullableText($slide['foto_perfil_public_id'] ?? null);
+            $habilitado = isset($slide['habilitado']) ? (int)((bool)$slide['habilitado']) : 1;
+
+            if ($id > 0 && isset($existentesPorId[$id])) {
+                $stmt = $pdo->prepare(
+                    sprintf(
+                        'UPDATE %s
+                         SET titulo = ?, descripcion = ?, enlace = ?, orden_visual = ?, foto_perfil_url = ?, foto_perfil_public_id = ?, habilitado = ?, cancelado = 0
+                         WHERE %s = ?',
+                        $table,
+                        $idColumn
+                    )
+                );
+                $stmt->execute([$titulo, $descripcion, $enlace, $ordenVisual, $fotoUrl, $fotoPublicId, $habilitado, $id]);
+                $idsPersistidos[] = $id;
+                continue;
+            }
+
+            $stmt = $pdo->prepare(
+                sprintf(
+                    'INSERT INTO %s (titulo, descripcion, enlace, orden_visual, foto_perfil_url, foto_perfil_public_id, habilitado, cancelado)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, 0)',
+                    $table
+                )
+            );
+            $stmt->execute([$titulo, $descripcion, $enlace, $ordenVisual, $fotoUrl, $fotoPublicId, $habilitado]);
+            $idsPersistidos[] = (int)$pdo->lastInsertId();
+        }
+
+        foreach ($existentesPorId as $existingId => $existingSlide) {
+            if (in_array($existingId, $idsPersistidos, true)) {
+                continue;
+            }
+
+            $stmt = $pdo->prepare(sprintf('UPDATE %s SET cancelado = 1 WHERE %s = ?', $table, $idColumn));
+            $stmt->execute([$existingId]);
+        }
+
+        return self::obtenerColeccionSlides($pdo, $table, $idColumn, true);
+    }
+
+    private static function asegurarTablaTiendaCarrusel(PDO $pdo): void
+    {
+        if (self::$tablaTiendaCarruselCreada) {
+            return;
+        }
+
+        $pdo->exec(
+            'CREATE TABLE IF NOT EXISTS tienda_carrousel (
+                id_tienda_carrousel INT(11) NOT NULL AUTO_INCREMENT,
+                titulo VARCHAR(255) NOT NULL DEFAULT "",
+                descripcion TEXT NULL,
+                enlace VARCHAR(255) NULL,
+                orden_visual INT(11) NOT NULL DEFAULT 1,
+                foto_perfil_url TEXT NULL,
+                foto_perfil_public_id VARCHAR(255) NULL,
+                habilitado TINYINT(1) NOT NULL DEFAULT 1,
+                cancelado TINYINT(1) NOT NULL DEFAULT 0,
+                idCreate TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                idUpdate TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id_tienda_carrousel)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+        );
+        self::$tablaTiendaCarruselCreada = true;
+    }
+
+    private static function asegurarTablaTiendaGaleria(PDO $pdo): void
+    {
+        if (self::$tablaTiendaGaleriaCreada) {
+            return;
+        }
+
+        $pdo->exec(
+            'CREATE TABLE IF NOT EXISTS tienda_producto (
+                id_tienda_producto INT(11) NOT NULL AUTO_INCREMENT,
+                titulo VARCHAR(255) NOT NULL DEFAULT "",
+                descripcion TEXT NULL,
+                enlace VARCHAR(255) NULL,
+                orden_visual INT(11) NOT NULL DEFAULT 1,
+                foto_perfil_url TEXT NULL,
+                foto_perfil_public_id VARCHAR(255) NULL,
+                habilitado TINYINT(1) NOT NULL DEFAULT 1,
+                cancelado TINYINT(1) NOT NULL DEFAULT 0,
+                idCreate TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                idUpdate TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id_tienda_producto)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+        );
+        self::$tablaTiendaGaleriaCreada = true;
     }
 }

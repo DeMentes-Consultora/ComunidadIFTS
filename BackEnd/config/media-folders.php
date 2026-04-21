@@ -23,5 +23,9 @@ return [
         'foto' => 'ComunidadIFTS/perfiles',
     ],
     'carrusel' => 'ComunidadIFTS/carrusel',
+    'tienda' => [
+        'carrusel' => 'ComunidadIFTS/tienda/carrusel',
+        'galeria' => 'ComunidadIFTS/tienda/galeria',
+    ],
     'novedades' => 'ComunidadIFTS/novedades',
 ];

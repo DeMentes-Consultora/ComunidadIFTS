@@ -32,6 +32,8 @@ export class SiteCustomizationService {
       habilitado: 1,
     },
     carousel: [],
+    shop_carousel: [],
+    shop_gallery: [],
   };
   private readonly siteConfigSubject = new BehaviorSubject<SiteCustomizationConfig>(this.defaultConfig);
   private loaded = false;
@@ -44,6 +46,8 @@ export class SiteCustomizationService {
     const navbar = config?.navbar ?? {};
     const sidebar = config?.sidebar ?? {};
     const carousel = Array.isArray(config?.carousel) ? config!.carousel : [];
+    const shopCarousel = Array.isArray(config?.shop_carousel) ? config!.shop_carousel : [];
+    const shopGallery = Array.isArray(config?.shop_gallery) ? config!.shop_gallery : [];
 
     return {
       navbar: {
@@ -55,6 +59,8 @@ export class SiteCustomizationService {
         ...sidebar,
       },
       carousel,
+      shop_carousel: shopCarousel,
+      shop_gallery: shopGallery,
     };
   }
 
@@ -94,6 +100,8 @@ export class SiteCustomizationService {
       navbarLogo?: File | null;
       sidebarLogo?: File | null;
       carouselFiles?: Record<string, File | null>;
+      shopCarouselFiles?: Record<string, File | null>;
+      shopGalleryFiles?: Record<string, File | null>;
     }
   ): Observable<SiteCustomizationConfig> {
     const formData = new FormData();
@@ -115,6 +123,22 @@ export class SiteCustomizationService {
       formData.append(`carousel_image_${clientKey}`, file);
     });
 
+    Object.entries(files.shopCarouselFiles ?? {}).forEach(([clientKey, file]) => {
+      if (!file) {
+        return;
+      }
+
+      formData.append(`shop_carousel_image_${clientKey}`, file);
+    });
+
+    Object.entries(files.shopGalleryFiles ?? {}).forEach(([clientKey, file]) => {
+      if (!file) {
+        return;
+      }
+
+      formData.append(`shop_gallery_image_${clientKey}`, file);
+    });
+
     return this.http.post<SiteCustomizationResponse<SiteCustomizationConfig>>(this.apiUrl, formData, { withCredentials: true }).pipe(
       map((response) => {
         if (!response.success) {
@@ -128,6 +152,8 @@ export class SiteCustomizationService {
           navbar: adminConfig.navbar,
           sidebar: adminConfig.sidebar,
           carousel: adminConfig.carousel.filter((slide) => slide.habilitado === 1),
+          shop_carousel: adminConfig.shop_carousel.filter((slide) => slide.habilitado === 1),
+          shop_gallery: adminConfig.shop_gallery.filter((slide) => slide.habilitado === 1),
         });
       })
     );

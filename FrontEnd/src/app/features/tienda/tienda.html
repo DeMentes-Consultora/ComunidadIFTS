@@ -1,0 +1,41 @@
+<main class="tienda-page">
+  <header class="tienda-header">
+    <p class="eyebrow">Comunidad IFTS</p>
+    <h1>Tienda</h1>
+    <p>Explora productos y recursos cargados desde el dashboard.</p>
+  </header>
+
+  @if (cargando) {
+    <section class="empty-state">
+      <p>Cargando tienda...</p>
+    </section>
+  } @else if (!productos.length) {
+    <section class="empty-state">
+      <h2>Aun no hay productos publicados</h2>
+      <p>Cuando agregues imagenes desde el dashboard, apareceran aqui en formato de cards.</p>
+    </section>
+  } @else {
+    <section class="productos-grid">
+      @for (producto of productos; track producto.id_carrousel) {
+        <article class="producto-card">
+          <div class="producto-image-wrap">
+            @if (producto.foto_perfil_url) {
+              <img [src]="producto.foto_perfil_url" [alt]="producto.titulo || 'Producto tienda'" title="Producto tienda" loading="lazy" />
+            } @else {
+              <div class="producto-empty">Sin imagen</div>
+            }
+          </div>
+
+          <div class="producto-content">
+            <h2>{{ producto.titulo || 'Producto sin titulo' }}</h2>
+            <p>{{ producto.descripcion || 'Descripcion pendiente.' }}</p>
+
+            @if (producto.enlace) {
+              <a class="producto-link" [href]="producto.enlace" target="_blank" rel="noopener">Ver mas</a>
+            }
+          </div>
+        </article>
+      }
+    </section>
+  }
+</main>

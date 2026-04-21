@@ -29,6 +29,8 @@ export interface SiteCustomizationConfig {
   navbar: SiteNavbarConfig;
   sidebar: SiteSidebarConfig;
   carousel: SiteCarouselItem[];
+  shop_carousel: SiteCarouselItem[];
+  shop_gallery: SiteCarouselItem[];
 }
 
 export interface DashboardStats {
@@ -58,6 +60,26 @@ export interface SiteCustomizationSavePayload {
     logo_selected?: boolean;
   };
   carousel: Array<{
+    id_carrousel?: number | null;
+    client_key: string;
+    titulo: string;
+    descripcion: string;
+    enlace: string;
+    orden_visual: number;
+    habilitado: boolean;
+    remove_image?: boolean;
+  }>;
+  shop_carousel: Array<{
+    id_carrousel?: number | null;
+    client_key: string;
+    titulo: string;
+    descripcion: string;
+    enlace: string;
+    orden_visual: number;
+    habilitado: boolean;
+    remove_image?: boolean;
+  }>;
+  shop_gallery: Array<{
     id_carrousel?: number | null;
     client_key: string;
     titulo: string;

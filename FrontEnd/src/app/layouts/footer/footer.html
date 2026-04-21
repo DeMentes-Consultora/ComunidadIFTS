@@ -6,29 +6,52 @@
 			<div class="footer-column">
 				<h6 class="footer-title">
 					<span class="footer-title-row">
-						<i class="material-icons" style="font-size: 20px; vertical-align: middle; margin-right: 8px;">school</i>
+						<i class="material-icons footer-icon-title">school</i>
 						Comunidad IFTS
 					</span>
 				</h6>
 				<ul class="footer-list">
 					<li class="footer-item">
-						<i class="material-icons" style="font-size: 16px; color: #FFD700; margin-right: 8px;">location_on</i>
+						<i class="material-icons footer-icon-small">location_on</i>
 						<span>Buenos Aires, Argentina</span>
 					</li>
-					<li class="footer-item">
-						<span class="map-embed" id="mapEmbedMobile">
-							<iframe
-								src="https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d26276.51559359395!2d-58.4458!3d-34.5884!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses-419!2sar!4v1764794541823"
-								width="100%"
-								height="120"
-								style="border: 0; border-radius: 4px;"
-								allowfullscreen=""
-								loading="lazy"
-								referrerpolicy="no-referrer-when-downgrade">
-							</iframe>
-						</span>
-					</li>
 				</ul>
+
+				<div class="shop-mini-card">
+					<a class="shop-title-link" routerLink="/tienda">
+						<h6 class="footer-title shop-title">
+							<span class="footer-title-row">
+								<i class="material-icons footer-icon-title">storefront</i>
+								Tienda
+							</span>
+						</h6>
+					</a>
+
+					<a class="shop-carousel-link" routerLink="/tienda" [attr.aria-label]="currentShopSlide?.titulo || 'Ir a la tienda'">
+						<div class="shop-carousel" [class.empty]="!currentShopSlide">
+							@if (currentShopSlide?.foto_perfil_url) {
+								<img [src]="currentShopSlide!.foto_perfil_url" [alt]="currentShopSlide?.titulo || 'Producto de tienda'" title="Producto de tienda" loading="lazy" />
+								<div class="shop-carousel-overlay">
+									<strong>{{ currentShopSlide?.titulo || 'Tienda Comunidad IFTS' }}</strong>
+								</div>
+							} @else {
+								<div class="shop-carousel-empty">Proximamente productos en tienda</div>
+							}
+						</div>
+					</a>
+
+					@if (shopSlides.length > 1) {
+						<div class="shop-carousel-controls">
+							<button type="button" (click)="prevShopSlide()" aria-label="Imagen anterior">&#10094;</button>
+							<div class="shop-dots">
+								@for (slide of shopSlides; track slide.id_carrousel; let idx = $index) {
+									<button type="button" [class.active]="idx === currentShopSlideIndex" (click)="goToShopSlide(idx)" [attr.aria-label]="'Ir a imagen ' + (idx + 1)" title="Ir a imagen">●</button>
+								}
+							</div>
+							<button type="button" (click)="nextShopSlide()" aria-label="Imagen siguiente">&#10095;</button>
+						</div>
+					}
+				</div>
 			</div>
 
 			<!-- Columna 2: Enlaces Útiles -->
@@ -71,15 +94,15 @@
 				</h6>
 				<ul class="footer-list">
 					<li class="footer-item">
-						<i class="material-icons" style="font-size: 16px; color: #FFD700;">schedule</i>
+						<i class="material-icons footer-icon-small">schedule</i>
 						<span>Atención: Lunes a Viernes 9:00 - 18:00 hs</span>
 					</li>
 					<li class="footer-item">
-						<i class="material-icons" style="font-size: 16px; color: #FFD700;">phone</i>
+						<i class="material-icons footer-icon-small">phone</i>
 						<a href="tel:+5491145551234" class="footer-link-text">(011) 4555-1234</a>
 					</li>
 					<li class="footer-item">
-						<i class="material-icons" style="font-size: 16px; color: #FFD700;">email</i>
+						<i class="material-icons footer-icon-small">email</i>
 						<a href="mailto:contacto@comunidadifts.com" class="footer-link-text">contacto@comunidadifts.com</a>
 					</li>
 				</ul>

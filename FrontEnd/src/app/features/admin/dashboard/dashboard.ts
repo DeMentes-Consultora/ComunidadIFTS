@@ -20,7 +20,8 @@ import {
 import { AuthService } from '../../../shared/services/auth.service';
 import { SiteCustomizationService } from '../../../shared/services/site-customization.service';
 
-type DashboardSection = 'navbar' | 'sidebar' | 'carousel';
+type DashboardSection = 'navbar' | 'sidebar' | 'carousel' | 'shop_carousel' | 'shop_gallery';
+type SlideCollection = 'carousel' | 'shop_carousel' | 'shop_gallery';
 
 interface EditableCarouselSlide {
   id_carrousel: number | null;
@@ -68,6 +69,8 @@ export class AdminDashboard implements OnInit {
   readonly selectedSection = signal<DashboardSection>('navbar');
   readonly stats = signal<DashboardStats | null>(null);
   readonly carouselSlides = signal<EditableCarouselSlide[]>([]);
+  readonly shopCarouselSlides = signal<EditableCarouselSlide[]>([]);
+  readonly shopGallerySlides = signal<EditableCarouselSlide[]>([]);
   readonly navbarLogoPreview = signal<string | null>(null);
   readonly navbarLogoFile = signal<File | null>(null);
   readonly removeNavbarLogo = signal(false);
@@ -107,19 +110,20 @@ export class AdminDashboard implements OnInit {
     this.selectedSection.set(section);
   }
 
-  agregarSlide(): void {
-    const slides = [...this.carouselSlides()];
+  agregarSlide(collection: SlideCollection): void {
+    const current = this.getSlidesByCollection(collection);
+    const slides = [...current];
     slides.push(this.createEmptySlide(slides.length + 1));
-    this.carouselSlides.set(slides);
+    this.setSlidesByCollection(collection, slides);
   }
 
-  eliminarSlide(clientKey: string): void {
-    const slides = this.carouselSlides().filter((slide) => slide.client_key !== clientKey);
-    this.carouselSlides.set(this.reordenarSlides(slides));
+  eliminarSlide(collection: SlideCollection, clientKey: string): void {
+    const slides = this.getSlidesByCollection(collection).filter((slide) => slide.client_key !== clientKey);
+    this.setSlidesByCollection(collection, this.reordenarSlides(slides));
   }
 
-  actualizarSlide(clientKey: string, field: keyof EditableCarouselSlide, value: string | boolean | null): void {
-    const slides = this.carouselSlides().map((slide) => {
+  actualizarSlide(collection: SlideCollection, clientKey: string, field: keyof EditableCarouselSlide, value: string | boolean | null): void {
+    const slides = this.getSlidesByCollection(collection).map((slide) => {
       if (slide.client_key !== clientKey) {
         return slide;
       }
@@ -130,7 +134,7 @@ export class AdminDashboard implements OnInit {
       };
     });
 
-    this.carouselSlides.set(slides);
+    this.setSlidesByCollection(collection, slides);
   }
 
   cambiarArchivoNavbar(event: Event): void {
@@ -163,7 +167,7 @@ export class AdminDashboard implements OnInit {
     this.removeSidebarLogo.set(true);
   }
 
-  cambiarImagenSlide(clientKey: string, event: Event): void {
+  cambiarImagenSlide(collection: SlideCollection, clientKey: string, event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
 
@@ -171,7 +175,7 @@ export class AdminDashboard implements OnInit {
       return;
     }
 
-    const slides = this.carouselSlides().map((slide) => {
+    const slides = this.getSlidesByCollection(collection).map((slide) => {
       if (slide.client_key !== clientKey) {
         return slide;
       }
@@ -184,11 +188,11 @@ export class AdminDashboard implements OnInit {
       };
     });
 
-    this.carouselSlides.set(slides);
+    this.setSlidesByCollection(collection, slides);
   }
 
-  quitarImagenSlide(clientKey: string): void {
-    const slides = this.carouselSlides().map((slide) => {
+  quitarImagenSlide(collection: SlideCollection, clientKey: string): void {
+    const slides = this.getSlidesByCollection(collection).map((slide) => {
       if (slide.client_key !== clientKey) {
         return slide;
       }
@@ -203,7 +207,7 @@ export class AdminDashboard implements OnInit {
       };
     });
 
-    this.carouselSlides.set(slides);
+    this.setSlidesByCollection(collection, slides);
   }
 
   guardarCambios(): void {
@@ -235,9 +239,39 @@ export class AdminDashboard implements OnInit {
         habilitado: slide.habilitado,
         remove_image: slide.remove_image,
       })),
+      shop_carousel: this.reordenarSlides(this.shopCarouselSlides()).map((slide, index) => ({
+        id_carrousel: slide.id_carrousel,
+        client_key: slide.client_key,
+        titulo: slide.titulo.trim(),
+        descripcion: slide.descripcion.trim(),
+        enlace: slide.enlace.trim(),
+        orden_visual: index + 1,
+        habilitado: slide.habilitado,
+        remove_image: slide.remove_image,
+      })),
+      shop_gallery: this.reordenarSlides(this.shopGallerySlides()).map((slide, index) => ({
+        id_carrousel: slide.id_carrousel,
+        client_key: slide.client_key,
+        titulo: slide.titulo.trim(),
+        descripcion: slide.descripcion.trim(),
+        enlace: slide.enlace.trim(),
+        orden_visual: index + 1,
+        habilitado: slide.habilitado,
+        remove_image: slide.remove_image,
+      })),
     };
 
     const carouselFiles = this.carouselSlides().reduce<Record<string, File | null>>((acc, slide) => {
+      acc[slide.client_key] = slide.file;
+      return acc;
+    }, {});
+
+    const shopCarouselFiles = this.shopCarouselSlides().reduce<Record<string, File | null>>((acc, slide) => {
+      acc[slide.client_key] = slide.file;
+      return acc;
+    }, {});
+
+    const shopGalleryFiles = this.shopGallerySlides().reduce<Record<string, File | null>>((acc, slide) => {
       acc[slide.client_key] = slide.file;
       return acc;
     }, {});
@@ -248,6 +282,8 @@ export class AdminDashboard implements OnInit {
       navbarLogo: this.navbarLogoFile(),
       sidebarLogo: this.sidebarLogoFile(),
       carouselFiles,
+      shopCarouselFiles,
+      shopGalleryFiles,
     }).subscribe({
       next: (config) => {
         this.applyConfig(config);
@@ -333,12 +369,14 @@ export class AdminDashboard implements OnInit {
     this.sidebarLogoFile.set(null);
     this.removeSidebarLogo.set(false);
     this.carouselSlides.set(this.reordenarSlides((config.carousel ?? []).map((slide, index) => this.mapEditableSlide(slide, index))));
+    this.shopCarouselSlides.set(this.reordenarSlides((config.shop_carousel ?? []).map((slide, index) => this.mapEditableSlide(slide, index, 'shop_carousel'))));
+    this.shopGallerySlides.set(this.reordenarSlides((config.shop_gallery ?? []).map((slide, index) => this.mapEditableSlide(slide, index, 'shop_gallery'))));
   }
 
-  private mapEditableSlide(slide: SiteCarouselItem, index: number): EditableCarouselSlide {
+  private mapEditableSlide(slide: SiteCarouselItem, index: number, prefix = 'slide'): EditableCarouselSlide {
     return {
       id_carrousel: slide.id_carrousel,
-      client_key: `slide_${slide.id_carrousel}_${index}`,
+      client_key: `${prefix}_${slide.id_carrousel}_${index}`,
       titulo: slide.titulo,
       descripcion: slide.descripcion,
       enlace: slide.enlace ?? '',
@@ -374,6 +412,32 @@ export class AdminDashboard implements OnInit {
       ...slide,
       orden_visual: index + 1,
     }));
+  }
+
+  private getSlidesByCollection(collection: SlideCollection): EditableCarouselSlide[] {
+    if (collection === 'shop_carousel') {
+      return this.shopCarouselSlides();
+    }
+
+    if (collection === 'shop_gallery') {
+      return this.shopGallerySlides();
+    }
+
+    return this.carouselSlides();
+  }
+
+  private setSlidesByCollection(collection: SlideCollection, slides: EditableCarouselSlide[]): void {
+    if (collection === 'shop_carousel') {
+      this.shopCarouselSlides.set(slides);
+      return;
+    }
+
+    if (collection === 'shop_gallery') {
+      this.shopGallerySlides.set(slides);
+      return;
+    }
+
+    this.carouselSlides.set(slides);
   }
 
   private mostrarMensaje(mensaje: string, tipo: 'success' | 'error'): void {

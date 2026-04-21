@@ -80,6 +80,84 @@ function uploadErrorText(int $code): string
     }
 }
 
+function procesarColeccionSlides(
+    array $slidesPayload,
+    array $slidesActuales,
+    array $_files,
+    string $filePrefix,
+    string $folderDestino,
+    $cloudinary
+): array {
+    $slidesSanitizados = [];
+    $idsConservados = [];
+
+    foreach ($slidesPayload as $index => $slide) {
+        if (!is_array($slide)) {
+            continue;
+        }
+
+        $idCarousel = isset($slide['id_carrousel']) ? (int)$slide['id_carrousel'] : 0;
+        $slideActual = $idCarousel > 0 && isset($slidesActuales[$idCarousel]) ? $slidesActuales[$idCarousel] : null;
+        $clientKey = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($slide['client_key'] ?? ('slide_' . $index)));
+        $fileKey = $filePrefix . $clientKey;
+
+        $slideImageUrl = trim((string)($slideActual['foto_perfil_url'] ?? ''));
+        $slideImagePublicId = trim((string)($slideActual['foto_perfil_public_id'] ?? ''));
+
+        if (!empty($slide['remove_image']) && $slideImagePublicId !== '') {
+            $cloudinary->delete($slideImagePublicId, 'image');
+            $slideImageUrl = '';
+            $slideImagePublicId = '';
+        }
+
+        if (!empty($_files[$fileKey]) && (int)($_files[$fileKey]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+            $uploadSlide = $cloudinary->uploadFromFileArray($_files[$fileKey], $folderDestino, 'image');
+            if (empty($uploadSlide['success'])) {
+                respond(500, [
+                    'success' => false,
+                    'message' => $uploadSlide['message'] ?? 'No fue posible subir una imagen',
+                    'error' => ($_ENV['APP_DEBUG'] ?? false) ? ($uploadSlide['error'] ?? null) : null,
+                ]);
+            }
+
+            if ($slideImagePublicId !== '' && $slideImagePublicId !== (string)($uploadSlide['public_id'] ?? '')) {
+                $cloudinary->delete($slideImagePublicId, 'image');
+            }
+
+            $slideImageUrl = trim((string)($uploadSlide['url'] ?? ''));
+            $slideImagePublicId = trim((string)($uploadSlide['public_id'] ?? ''));
+        }
+
+        $slidesSanitizados[] = [
+            'id_carrousel' => $idCarousel > 0 ? $idCarousel : null,
+            'titulo' => trim((string)($slide['titulo'] ?? '')),
+            'descripcion' => trim((string)($slide['descripcion'] ?? '')),
+            'enlace' => trim((string)($slide['enlace'] ?? '')),
+            'orden_visual' => isset($slide['orden_visual']) ? (int)$slide['orden_visual'] : ($index + 1),
+            'foto_perfil_url' => $slideImageUrl !== '' ? $slideImageUrl : null,
+            'foto_perfil_public_id' => $slideImagePublicId !== '' ? $slideImagePublicId : null,
+            'habilitado' => !empty($slide['habilitado']) ? 1 : 0,
+        ];
+
+        if ($idCarousel > 0) {
+            $idsConservados[] = $idCarousel;
+        }
+    }
+
+    foreach ($slidesActuales as $existingId => $existingSlide) {
+        if (in_array($existingId, $idsConservados, true)) {
+            continue;
+        }
+
+        $publicId = trim((string)($existingSlide['foto_perfil_public_id'] ?? ''));
+        if ($publicId !== '') {
+            $cloudinary->delete($publicId, 'image');
+        }
+    }
+
+    return $slidesSanitizados;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
         $scope = trim((string)($_GET['scope'] ?? 'public'));
@@ -130,6 +208,8 @@ try {
     $navbarPayload = is_array($payload['navbar'] ?? null) ? $payload['navbar'] : [];
     $sidebarPayload = is_array($payload['sidebar'] ?? null) ? $payload['sidebar'] : [];
     $carouselPayload = is_array($payload['carousel'] ?? null) ? $payload['carousel'] : [];
+    $shopCarouselPayload = is_array($payload['shop_carousel'] ?? null) ? $payload['shop_carousel'] : [];
+    $shopGalleryPayload = is_array($payload['shop_gallery'] ?? null) ? $payload['shop_gallery'] : [];
 
     $db = Database::getInstance();
     $pdo = $db->getConnection();
@@ -244,73 +324,46 @@ try {
         $slidesActuales[(int)$slideActual['id_carrousel']] = $slideActual;
     }
 
-    $slidesSanitizados = [];
-    $idsConservados = [];
-
-    foreach ($carouselPayload as $index => $slide) {
-        if (!is_array($slide)) {
-            continue;
-        }
-
-        $idCarousel = isset($slide['id_carrousel']) ? (int)$slide['id_carrousel'] : 0;
-        $slideActual = $idCarousel > 0 && isset($slidesActuales[$idCarousel]) ? $slidesActuales[$idCarousel] : null;
-        $clientKey = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($slide['client_key'] ?? ('slide_' . $index)));
-        $fileKey = 'carousel_image_' . $clientKey;
-
-        $slideImageUrl = trim((string)($slideActual['foto_perfil_url'] ?? ''));
-        $slideImagePublicId = trim((string)($slideActual['foto_perfil_public_id'] ?? ''));
-
-        if (!empty($slide['remove_image']) && $slideImagePublicId !== '') {
-            $cloudinary->delete($slideImagePublicId, 'image');
-            $slideImageUrl = '';
-            $slideImagePublicId = '';
-        }
-
-        if (!empty($_FILES[$fileKey]) && (int)($_FILES[$fileKey]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
-            $folderCarrusel = $mediaFolders['carrusel'] ?? 'ComunidadIFTS/carrusel';
-            $uploadSlide = $cloudinary->uploadFromFileArray($_FILES[$fileKey], $folderCarrusel, 'image');
-            if (empty($uploadSlide['success'])) {
-                respond(500, [
-                    'success' => false,
-                    'message' => $uploadSlide['message'] ?? 'No fue posible subir una imagen del carrusel',
-                    'error' => ($_ENV['APP_DEBUG'] ?? false) ? ($uploadSlide['error'] ?? null) : null,
-                ]);
-            }
-
-            if ($slideImagePublicId !== '' && $slideImagePublicId !== (string)($uploadSlide['public_id'] ?? '')) {
-                $cloudinary->delete($slideImagePublicId, 'image');
-            }
-
-            $slideImageUrl = trim((string)($uploadSlide['url'] ?? ''));
-            $slideImagePublicId = trim((string)($uploadSlide['public_id'] ?? ''));
-        }
-
-        $slidesSanitizados[] = [
-            'id_carrousel' => $idCarousel > 0 ? $idCarousel : null,
-            'titulo' => trim((string)($slide['titulo'] ?? '')),
-            'descripcion' => trim((string)($slide['descripcion'] ?? '')),
-            'enlace' => trim((string)($slide['enlace'] ?? '')),
-            'orden_visual' => isset($slide['orden_visual']) ? (int)$slide['orden_visual'] : ($index + 1),
-            'foto_perfil_url' => $slideImageUrl !== '' ? $slideImageUrl : null,
-            'foto_perfil_public_id' => $slideImagePublicId !== '' ? $slideImagePublicId : null,
-            'habilitado' => !empty($slide['habilitado']) ? 1 : 0,
-        ];
-
-        if ($idCarousel > 0) {
-            $idsConservados[] = $idCarousel;
-        }
+    $slidesTiendaCarruselActuales = [];
+    foreach (($configActual['shop_carousel'] ?? []) as $slideActual) {
+        $slidesTiendaCarruselActuales[(int)$slideActual['id_carrousel']] = $slideActual;
     }
 
-    foreach ($slidesActuales as $existingId => $existingSlide) {
-        if (in_array($existingId, $idsConservados, true)) {
-            continue;
-        }
-
-        $publicId = trim((string)($existingSlide['foto_perfil_public_id'] ?? ''));
-        if ($publicId !== '') {
-            $cloudinary->delete($publicId, 'image');
-        }
+    $slidesTiendaGaleriaActuales = [];
+    foreach (($configActual['shop_gallery'] ?? []) as $slideActual) {
+        $slidesTiendaGaleriaActuales[(int)$slideActual['id_carrousel']] = $slideActual;
     }
+
+    $folderCarrusel = $mediaFolders['carrusel'] ?? 'ComunidadIFTS/carrusel';
+    $folderTiendaCarrusel = $mediaFolders['tienda']['carrusel'] ?? 'ComunidadIFTS/tienda/carrusel';
+    $folderTiendaGaleria = $mediaFolders['tienda']['galeria'] ?? 'ComunidadIFTS/tienda/galeria';
+
+    $slidesSanitizados = procesarColeccionSlides(
+        $carouselPayload,
+        $slidesActuales,
+        $_FILES,
+        'carousel_image_',
+        $folderCarrusel,
+        $cloudinary
+    );
+
+    $slidesTiendaCarruselSanitizados = procesarColeccionSlides(
+        $shopCarouselPayload,
+        $slidesTiendaCarruselActuales,
+        $_FILES,
+        'shop_carousel_image_',
+        $folderTiendaCarrusel,
+        $cloudinary
+    );
+
+    $slidesTiendaGaleriaSanitizados = procesarColeccionSlides(
+        $shopGalleryPayload,
+        $slidesTiendaGaleriaActuales,
+        $_FILES,
+        'shop_gallery_image_',
+        $folderTiendaGaleria,
+        $cloudinary
+    );
 
     $pdo->beginTransaction();
 
@@ -329,6 +382,8 @@ try {
     ]);
 
     SiteCustomizationModel::guardarCarrusel($pdo, $slidesSanitizados);
+    SiteCustomizationModel::guardarTiendaCarrusel($pdo, $slidesTiendaCarruselSanitizados);
+    SiteCustomizationModel::guardarTiendaGaleria($pdo, $slidesTiendaGaleriaSanitizados);
 
     $pdo->commit();
 

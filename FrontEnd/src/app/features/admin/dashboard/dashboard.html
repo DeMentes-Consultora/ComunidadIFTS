@@ -20,6 +20,14 @@
             <mat-icon>view_carousel</mat-icon>
             Carrusel principal
           </button>
+          <button type="button" class="sidebar-link" [class.active]="selectedSection() === 'shop_carousel'" (click)="seleccionarSeccion('shop_carousel')">
+            <mat-icon>storefront</mat-icon>
+            Carrusel tienda
+          </button>
+          <button type="button" class="sidebar-link" [class.active]="selectedSection() === 'shop_gallery'" (click)="seleccionarSeccion('shop_gallery')">
+            <mat-icon>shopping_bag</mat-icon>
+            Tienda
+          </button>
         </div>
 
         <div class="sidebar-block">
@@ -68,7 +76,7 @@
               <div class="editor-grid">
                 <mat-form-field appearance="outline">
                   <mat-label>Texto del navbar</mat-label>
-                  <input matInput formControlName="brand_text" maxlength="255" />
+                  <input matInput formControlName="brand_text" maxlength="255" title="Texto del navbar" />
                   <mat-hint>Opcional. Si queda vacio, se mostrara solo el logo.</mat-hint>
                 </mat-form-field>
 
@@ -101,7 +109,7 @@
               <div class="editor-grid">
                 <mat-form-field appearance="outline">
                   <mat-label>Texto del sidebar</mat-label>
-                  <input matInput formControlName="brand_text" maxlength="255" />
+                  <input matInput formControlName="brand_text" maxlength="255" title="Texto del sidebar" />
                   <mat-hint>Opcional. Si queda vacio, se mostrara solo el logo o icono.</mat-hint>
                 </mat-form-field>
 
@@ -132,7 +140,7 @@
           @if (selectedSection() === 'carousel') {
             <div class="editor-section">
               <div class="section-actions">
-                <button mat-stroked-button type="button" (click)="agregarSlide()">
+                <button mat-stroked-button type="button" (click)="agregarSlide('carousel')">
                   <mat-icon>add_photo_alternate</mat-icon>
                   Agregar slide
                 </button>
@@ -143,7 +151,7 @@
                   <article class="slide-editor">
                     <div class="slide-topbar">
                       <strong>Slide {{ slide.orden_visual }}</strong>
-                      <button mat-icon-button type="button" (click)="eliminarSlide(slide.client_key)">
+                      <button mat-icon-button type="button" (click)="eliminarSlide('carousel', slide.client_key)">
                         <mat-icon>delete</mat-icon>
                       </button>
                     </div>
@@ -151,7 +159,7 @@
                     <div class="slide-grid">
                       <div class="slide-preview" [class.empty]="!slide.preview_url">
                         @if (slide.preview_url) {
-                          <img [src]="slide.preview_url" [alt]="slide.titulo || 'Slide del carrusel'" />
+                          <img [src]="slide.preview_url" [alt]="slide.titulo || 'Slide del carrusel'" title="Slide del carrusel" />
                         } @else {
                           <mat-icon>photo</mat-icon>
                         }
@@ -160,29 +168,159 @@
                       <div class="slide-fields">
                         <mat-form-field appearance="outline">
                           <mat-label>Titulo</mat-label>
-                          <input matInput [value]="slide.titulo" (input)="actualizarSlide(slide.client_key, 'titulo', $any($event.target).value)" />
+                          <input matInput [value]="slide.titulo" title="Titulo del slide" (input)="actualizarSlide('carousel', slide.client_key, 'titulo', $any($event.target).value)" />
                         </mat-form-field>
 
                         <mat-form-field appearance="outline">
                           <mat-label>Descripcion</mat-label>
-                          <textarea matInput rows="3" [value]="slide.descripcion" (input)="actualizarSlide(slide.client_key, 'descripcion', $any($event.target).value)"></textarea>
+                          <textarea matInput rows="3" [value]="slide.descripcion" title="Descripcion del slide" (input)="actualizarSlide('carousel', slide.client_key, 'descripcion', $any($event.target).value)"></textarea>
                         </mat-form-field>
 
                         <mat-form-field appearance="outline">
                           <mat-label>Enlace</mat-label>
-                          <input matInput [value]="slide.enlace" (input)="actualizarSlide(slide.client_key, 'enlace', $any($event.target).value)" />
+                          <input matInput [value]="slide.enlace" title="Enlace del slide" (input)="actualizarSlide('carousel', slide.client_key, 'enlace', $any($event.target).value)" />
                         </mat-form-field>
 
-                        <mat-slide-toggle [checked]="slide.habilitado" (change)="actualizarSlide(slide.client_key, 'habilitado', $event.checked)">
+                        <mat-slide-toggle [checked]="slide.habilitado" (change)="actualizarSlide('carousel', slide.client_key, 'habilitado', $event.checked)">
                           Mostrar en el home
                         </mat-slide-toggle>
 
                         <div class="slide-actions">
                           <label class="file-button">
-                            <input type="file" accept="image/*" (change)="cambiarImagenSlide(slide.client_key, $event)" />
+                            <input type="file" accept="image/*" (change)="cambiarImagenSlide('carousel', slide.client_key, $event)" />
                             <span>{{ slide.preview_url ? 'Cambiar imagen' : 'Agregar imagen' }}</span>
                           </label>
-                          <button mat-stroked-button type="button" (click)="quitarImagenSlide(slide.client_key)" [disabled]="!slide.preview_url">
+                          <button mat-stroked-button type="button" (click)="quitarImagenSlide('carousel', slide.client_key)" [disabled]="!slide.preview_url">
+                            Quitar imagen
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                }
+              </div>
+            </div>
+          }
+
+          @if (selectedSection() === 'shop_carousel') {
+            <div class="editor-section">
+              <div class="section-actions">
+                <button mat-stroked-button type="button" (click)="agregarSlide('shop_carousel')">
+                  <mat-icon>add_photo_alternate</mat-icon>
+                  Agregar slide tienda
+                </button>
+              </div>
+
+              <div class="slides-list">
+                @for (slide of shopCarouselSlides(); track slide.client_key) {
+                  <article class="slide-editor">
+                    <div class="slide-topbar">
+                      <strong>Slide tienda {{ slide.orden_visual }}</strong>
+                      <button mat-icon-button type="button" (click)="eliminarSlide('shop_carousel', slide.client_key)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+
+                    <div class="slide-grid">
+                      <div class="slide-preview" [class.empty]="!slide.preview_url">
+                        @if (slide.preview_url) {
+                          <img [src]="slide.preview_url" [alt]="slide.titulo || 'Slide de tienda'" title="Slide de tienda" />
+                        } @else {
+                          <mat-icon>photo</mat-icon>
+                        }
+                      </div>
+
+                      <div class="slide-fields">
+                        <mat-form-field appearance="outline">
+                          <mat-label>Titulo</mat-label>
+                          <input matInput [value]="slide.titulo" title="Titulo del slide de tienda" (input)="actualizarSlide('shop_carousel', slide.client_key, 'titulo', $any($event.target).value)" />
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                          <mat-label>Descripcion</mat-label>
+                          <textarea matInput rows="3" [value]="slide.descripcion" title="Descripcion del slide de tienda" (input)="actualizarSlide('shop_carousel', slide.client_key, 'descripcion', $any($event.target).value)"></textarea>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                          <mat-label>Enlace</mat-label>
+                          <input matInput [value]="slide.enlace" title="Enlace del slide de tienda" (input)="actualizarSlide('shop_carousel', slide.client_key, 'enlace', $any($event.target).value)" />
+                        </mat-form-field>
+
+                        <mat-slide-toggle [checked]="slide.habilitado" (change)="actualizarSlide('shop_carousel', slide.client_key, 'habilitado', $event.checked)">
+                          Mostrar en el footer
+                        </mat-slide-toggle>
+
+                        <div class="slide-actions">
+                          <label class="file-button">
+                            <input type="file" accept="image/*" (change)="cambiarImagenSlide('shop_carousel', slide.client_key, $event)" />
+                            <span>{{ slide.preview_url ? 'Cambiar imagen' : 'Agregar imagen' }}</span>
+                          </label>
+                          <button mat-stroked-button type="button" (click)="quitarImagenSlide('shop_carousel', slide.client_key)" [disabled]="!slide.preview_url">
+                            Quitar imagen
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                }
+              </div>
+            </div>
+          }
+
+          @if (selectedSection() === 'shop_gallery') {
+            <div class="editor-section">
+              <div class="section-actions">
+                <button mat-stroked-button type="button" (click)="agregarSlide('shop_gallery')">
+                  <mat-icon>add_photo_alternate</mat-icon>
+                  Agregar producto
+                </button>
+              </div>
+
+              <div class="slides-list">
+                @for (slide of shopGallerySlides(); track slide.client_key) {
+                  <article class="slide-editor">
+                    <div class="slide-topbar">
+                      <strong>Producto {{ slide.orden_visual }}</strong>
+                      <button mat-icon-button type="button" (click)="eliminarSlide('shop_gallery', slide.client_key)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+
+                    <div class="slide-grid">
+                      <div class="slide-preview" [class.empty]="!slide.preview_url">
+                        @if (slide.preview_url) {
+                          <img [src]="slide.preview_url" [alt]="slide.titulo || 'Producto de tienda'" title="Producto de tienda" />
+                        } @else {
+                          <mat-icon>photo</mat-icon>
+                        }
+                      </div>
+
+                      <div class="slide-fields">
+                        <mat-form-field appearance="outline">
+                          <mat-label>Nombre del producto</mat-label>
+                          <input matInput [value]="slide.titulo" title="Nombre del producto" (input)="actualizarSlide('shop_gallery', slide.client_key, 'titulo', $any($event.target).value)" />
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                          <mat-label>Descripcion</mat-label>
+                          <textarea matInput rows="3" [value]="slide.descripcion" title="Descripcion del producto" (input)="actualizarSlide('shop_gallery', slide.client_key, 'descripcion', $any($event.target).value)"></textarea>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                          <mat-label>Enlace (opcional)</mat-label>
+                          <input matInput [value]="slide.enlace" title="Enlace del producto" (input)="actualizarSlide('shop_gallery', slide.client_key, 'enlace', $any($event.target).value)" />
+                        </mat-form-field>
+
+                        <mat-slide-toggle [checked]="slide.habilitado" (change)="actualizarSlide('shop_gallery', slide.client_key, 'habilitado', $event.checked)">
+                          Mostrar en pagina tienda
+                        </mat-slide-toggle>
+
+                        <div class="slide-actions">
+                          <label class="file-button">
+                            <input type="file" accept="image/*" (change)="cambiarImagenSlide('shop_gallery', slide.client_key, $event)" />
+                            <span>{{ slide.preview_url ? 'Cambiar imagen' : 'Agregar imagen' }}</span>
+                          </label>
+                          <button mat-stroked-button type="button" (click)="quitarImagenSlide('shop_gallery', slide.client_key)" [disabled]="!slide.preview_url">
                             Quitar imagen
                           </button>
                         </div>
