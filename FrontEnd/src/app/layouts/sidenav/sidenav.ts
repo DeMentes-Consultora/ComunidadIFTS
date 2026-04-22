@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
 import { SidenavService } from '../../shared/services/sidenav.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { SiteCustomizationService } from '../../shared/services/site-customization.service';
+import { Contacto } from '../../features/contacto/contacto';
 
 @Component({
   selector: 'app-sidenav',
@@ -18,6 +20,7 @@ import { SiteCustomizationService } from '../../shared/services/site-customizati
 export class Sidenav {
   currentUser$;
   siteConfig$;
+  private readonly dialog = inject(MatDialog);
 
   constructor(
     private sidenavService: SidenavService,
@@ -31,5 +34,22 @@ export class Sidenav {
 
   closeSidenavPanel() {
     this.sidenavService.close();
+  }
+
+  openContacto(event: Event): void {
+    if (typeof window === 'undefined' || window.matchMedia('(max-width: 768px)').matches) {
+      this.closeSidenavPanel();
+      return;
+    }
+
+    event.preventDefault();
+    this.closeSidenavPanel();
+    this.dialog.open(Contacto, {
+      panelClass: 'contacto-dialog-panel',
+      data: { modal: true },
+      maxWidth: '860px',
+      width: '92vw',
+      autoFocus: false,
+    });
   }
 }

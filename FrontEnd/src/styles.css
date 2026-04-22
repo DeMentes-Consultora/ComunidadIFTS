@@ -18,6 +18,15 @@
 	pointer-events: auto !important;
 }
 
+.contacto-dialog-panel .mat-mdc-dialog-surface {
+	border-radius: 16px !important;
+	max-height: min(88vh, 840px) !important;
+}
+
+.contacto-dialog-panel .mat-mdc-dialog-container {
+	padding: 0 !important;
+}
+
 /* Snackbars globales */
 .mat-mdc-snack-bar-container.snackbar-success,
 .mat-mdc-snack-bar-container.snackbar-error,

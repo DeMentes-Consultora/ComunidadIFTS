@@ -1,9 +1,11 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { Subscription, interval } from 'rxjs';
 import { SiteCarouselItem } from '../../shared/models/site-customization.model';
 import { SiteCustomizationService } from '../../shared/services/site-customization.service';
+import { Contacto } from '../../features/contacto/contacto';
 
 @Component({
   selector: 'app-footer',
@@ -13,11 +15,14 @@ import { SiteCustomizationService } from '../../shared/services/site-customizati
 })
 export class Footer implements OnInit, OnDestroy {
   private readonly siteCustomizationService = inject(SiteCustomizationService);
+  private readonly dialog = inject(MatDialog);
   private shopTimerSub: Subscription | null = null;
   readonly maxShopSlidesVisible = 6;
 
   currentYear: number = 0;
   shopSlides: SiteCarouselItem[] = [];
+  visibleShopSlides: SiteCarouselItem[] = [];
+  showShopControls = false;
   currentShopSlideIndex = 0;
   footerBrandingText = 'Desarrollado por DeMentesConsultora';
   footerBrandingLogoUrl: string | null = null;
@@ -32,10 +37,13 @@ export class Footer implements OnInit, OnDestroy {
         this.footerBrandingLogoUrl = config.footer_branding?.logo_url || null;
         this.footerBrandingLinkUrl = config.footer_branding?.link_url || null;
         this.currentShopSlideIndex = 0;
+        this.refreshVisibleShopSlides();
         this.startShopAutoplay();
       },
       error: () => {
         this.shopSlides = [];
+        this.visibleShopSlides = [];
+        this.showShopControls = false;
         this.footerBrandingText = 'Desarrollado por DeMentesConsultora';
         this.footerBrandingLogoUrl = null;
         this.footerBrandingLinkUrl = null;
@@ -47,40 +55,13 @@ export class Footer implements OnInit, OnDestroy {
     this.stopShopAutoplay();
   }
 
-  openContactModal(): void {
-    // TODO: Implementar modal de contacto
-    console.log('Abrir modal de contacto');
-  }
-
-  get visibleShopSlides(): SiteCarouselItem[] {
-    if (!this.shopSlides.length) {
-      return [];
-    }
-
-    const visibleCount = Math.min(this.maxShopSlidesVisible, this.shopSlides.length);
-    const slides: SiteCarouselItem[] = [];
-
-    for (let i = 0; i < visibleCount; i++) {
-      const index = (this.currentShopSlideIndex + i) % this.shopSlides.length;
-      const slide = this.shopSlides[index];
-      if (slide) {
-        slides.push(slide);
-      }
-    }
-
-    return slides;
-  }
-
-  get showShopControls(): boolean {
-    return this.shopSlides.length > this.maxShopSlidesVisible;
-  }
-
   goToShopSlide(index: number): void {
     if (!this.shopSlides.length) {
       return;
     }
 
     this.currentShopSlideIndex = (index + this.shopSlides.length) % this.shopSlides.length;
+    this.refreshVisibleShopSlides();
   }
 
   prevShopSlide(): void {
@@ -89,6 +70,21 @@ export class Footer implements OnInit, OnDestroy {
 
   nextShopSlide(): void {
     this.goToShopSlide(this.currentShopSlideIndex + 1);
+  }
+
+  openContacto(event: Event): void {
+    if (typeof window === 'undefined' || window.matchMedia('(max-width: 768px)').matches) {
+      return;
+    }
+
+    event.preventDefault();
+    this.dialog.open(Contacto, {
+      panelClass: 'contacto-dialog-panel',
+      data: { modal: true },
+      maxWidth: '860px',
+      width: '92vw',
+      autoFocus: false,
+    });
   }
 
   private startShopAutoplay(): void {
@@ -109,5 +105,27 @@ export class Footer implements OnInit, OnDestroy {
 
     this.shopTimerSub.unsubscribe();
     this.shopTimerSub = null;
+  }
+
+  private refreshVisibleShopSlides(): void {
+    this.showShopControls = this.shopSlides.length > this.maxShopSlidesVisible;
+
+    if (!this.shopSlides.length) {
+      this.visibleShopSlides = [];
+      return;
+    }
+
+    const visibleCount = Math.min(this.maxShopSlidesVisible, this.shopSlides.length);
+    const slides: SiteCarouselItem[] = [];
+
+    for (let i = 0; i < visibleCount; i++) {
+      const index = (this.currentShopSlideIndex + i) % this.shopSlides.length;
+      const slide = this.shopSlides[index];
+      if (slide) {
+        slides.push(slide);
+      }
+    }
+
+    this.visibleShopSlides = slides;
   }
 }

@@ -3,7 +3,7 @@
   <div class="sidebar-header">
     <ng-container *ngIf="siteConfig$ | async as siteConfig">
       <div class="header-logo" *ngIf="siteConfig.sidebar.logo_url; else defaultSidebarIcon">
-        <img [src]="siteConfig.sidebar.logo_url" [alt]="siteConfig.sidebar.brand_text || 'Logo del sidebar'" loading="lazy" />
+        <img [src]="siteConfig.sidebar.logo_url" [alt]="siteConfig.sidebar.brand_text || 'Logo del sidebar'" title="Logo del sidebar" loading="lazy" />
       </div>
       <ng-template #defaultSidebarIcon>
         <mat-icon class="header-icon">school</mat-icon>
@@ -106,7 +106,7 @@
       Acerca de
     </a>
     
-    <a mat-button routerLink="/contacto" (click)="closeSidenavPanel()" class="nav-link">
+    <a mat-button href="/contacto" (click)="openContacto($event)" class="nav-link">
       <mat-icon>contact_mail</mat-icon>
       Contacto
     </a>

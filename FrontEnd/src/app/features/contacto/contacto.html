@@ -1,0 +1,47 @@
+<section class="contacto-page" [class.contacto-page--modal]="isModal">
+  <div class="contacto-card">
+    <div class="contacto-headline">
+      <h1>Formulario de consultas</h1>
+      @if (isModal) {
+        <button class="modal-close" type="button" (click)="cerrarModal()" aria-label="Cerrar formulario de contacto">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      }
+    </div>
+    <p>Dejanos tu mensaje y te respondemos a la brevedad.</p>
+
+    <form [formGroup]="form" (ngSubmit)="enviarConsulta()" novalidate>
+      <label>
+        Nombre
+        <input type="text" formControlName="nombre" placeholder="Tu nombre" />
+      </label>
+
+      <label>
+        Email
+        <input type="email" formControlName="email" placeholder="tu-email@dominio.com" />
+      </label>
+
+      <label>
+        Asunto
+        <input type="text" formControlName="asunto" placeholder="Motivo de la consulta" />
+      </label>
+
+      <label>
+        Mensaje
+        <textarea formControlName="mensaje" rows="6" placeholder="Escribe tu consulta..."></textarea>
+      </label>
+
+      @if (mensajeExito()) {
+        <div class="estado exito">{{ mensajeExito() }}</div>
+      }
+
+      @if (mensajeError()) {
+        <div class="estado error">{{ mensajeError() }}</div>
+      }
+
+      <button type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Enviando...' : 'Enviar consulta' }}
+      </button>
+    </form>
+  </div>
+</section>

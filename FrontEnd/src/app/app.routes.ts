@@ -20,6 +20,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/tienda/tienda').then(m => m.Tienda)
   },
   {
+    path: 'contacto',
+    loadComponent: () => import('./features/contacto/contacto').then(m => m.Contacto)
+  },
+  {
     path: 'admin',
     canActivate: [authGuard, roleGuard],
     data: { roles: [1] },
