@@ -82,8 +82,9 @@ export class SiteCustomizationService {
       return of(this.siteConfigSubject.value);
     }
 
-    return this.http.get<SiteCustomizationResponse<SiteCustomizationConfig>>(this.apiUrl).pipe(
-      map((response) => {
+    return this.http.get(this.apiUrl, { responseType: 'text' }).pipe(
+      map((rawResponse) => {
+        const response = this.parseApiResponse<SiteCustomizationConfig>(rawResponse);
         if (!response.success) {
           throw new Error(response.message || 'No fue posible obtener la configuracion publica');
         }
@@ -179,13 +180,81 @@ export class SiteCustomizationService {
   }
 
   getDashboardStats(): Observable<DashboardStats> {
-    return this.http.get<SiteCustomizationResponse<DashboardStats>>(this.statsUrl, { withCredentials: true }).pipe(
-      map((response) => {
+    return this.http.get(this.statsUrl, { withCredentials: true, responseType: 'text' }).pipe(
+      map((rawResponse) => {
+        const response = this.parseApiResponse<DashboardStats>(rawResponse);
         if (!response.success || !response.data) {
           throw new Error(response.message || 'No fue posible obtener las estadisticas del dashboard');
         }
         return response.data;
       })
     );
+  }
+
+  private parseApiResponse<T>(rawResponse: unknown): SiteCustomizationResponse<T> {
+    if (typeof rawResponse !== 'string') {
+      return rawResponse as SiteCustomizationResponse<T>;
+    }
+
+    const text = rawResponse.replace(/^\uFEFF/, '').trim();
+    if (!text) {
+      throw new Error('El servidor devolvio una respuesta vacia');
+    }
+
+    if (this.looksLikeInfinityFreeChallenge(text)) {
+      throw new Error('El hosting devolvio una pagina de verificacion (InfinityFree) en lugar de JSON');
+    }
+
+    const parsedDirect = this.tryParseJson<SiteCustomizationResponse<T>>(text);
+    if (parsedDirect !== null) {
+      return parsedDirect;
+    }
+
+    const preJson = this.extractJsonFromPreTag(text);
+    if (preJson) {
+      const parsedFromPre = this.tryParseJson<SiteCustomizationResponse<T>>(preJson);
+      if (parsedFromPre !== null) {
+        return parsedFromPre;
+      }
+    }
+
+    const start = text.indexOf('{');
+    const end = text.lastIndexOf('}');
+    if (start !== -1 && end > start) {
+      const candidate = text.slice(start, end + 1);
+      const parsedCandidate = this.tryParseJson<SiteCustomizationResponse<T>>(candidate);
+      if (parsedCandidate !== null) {
+        return parsedCandidate;
+      }
+    }
+
+    throw new Error('El servidor devolvio una respuesta invalida');
+  }
+
+  private extractJsonFromPreTag(text: string): string | null {
+    const match = text.match(/<pre[^>]*>([\s\S]*?)<\/pre>/i);
+    if (!match || !match[1]) {
+      return null;
+    }
+
+    return match[1]
+      .replace(/&quot;/g, '"')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .trim();
+  }
+
+  private looksLikeInfinityFreeChallenge(text: string): boolean {
+    const lower = text.toLowerCase();
+    return lower.includes('/aes.js') || lower.includes('tonumbers(') || lower.includes('openresty');
+  }
+
+  private tryParseJson<T>(text: string): T | null {
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      return null;
+    }
   }
 }

@@ -22,9 +22,10 @@ export class InstitucionesService {
    * Obtener todas las instituciones
    */
   obtenerTodas(): Observable<Institucion[]> {
-    return this.http.get<ApiResponse<Institucion[]>>(this.apiUrl)
+    return this.http.get(this.apiUrl, { responseType: 'text' })
       .pipe(
-        map(response => {
+        map(rawResponse => {
+          const response = this.parseApiResponse<Institucion[]>(rawResponse);
           if (response.success && response.data) {
             return response.data;
           }
@@ -46,9 +47,10 @@ export class InstitucionesService {
    * Obtener todas las carreras disponibles con id y nombre
    */
   obtenerCarrerasConId(): Observable<Array<{ id: number; nombre: string }>> {
-    return this.http.get<ApiResponse<any[]>>(this.apiCarrerasUrl)
+    return this.http.get(this.apiCarrerasUrl, { responseType: 'text' })
       .pipe(
-        map(response => {
+        map(rawResponse => {
+          const response = this.parseApiResponse<any[]>(rawResponse);
           if (response.success && response.data) {
             // Mapear array de objetos con id y nombre
             return response.data.map((carrera: any) => ({
@@ -59,6 +61,73 @@ export class InstitucionesService {
           throw new Error(response.message || 'Error al obtener carreras');
         })
       );
+  }
+
+  private parseApiResponse<T>(rawResponse: unknown): ApiResponse<T> {
+    if (typeof rawResponse !== 'string') {
+      return rawResponse as ApiResponse<T>;
+    }
+
+    const text = rawResponse.replace(/^\uFEFF/, '').trim();
+    if (!text) {
+      throw new Error('El servidor devolvio una respuesta vacia');
+    }
+
+    if (this.looksLikeInfinityFreeChallenge(text)) {
+      throw new Error('El hosting devolvio una pagina de verificacion (InfinityFree) en lugar de JSON');
+    }
+
+    const parsedDirect = this.tryParseJson<ApiResponse<T>>(text);
+    if (parsedDirect !== null) {
+      return parsedDirect;
+    }
+
+    const preJson = this.extractJsonFromPreTag(text);
+    if (preJson) {
+      const parsedFromPre = this.tryParseJson<ApiResponse<T>>(preJson);
+      if (parsedFromPre !== null) {
+        return parsedFromPre;
+      }
+    }
+
+    const start = text.indexOf('{');
+    const end = text.lastIndexOf('}');
+    if (start !== -1 && end > start) {
+      const candidate = text.slice(start, end + 1);
+      const parsedCandidate = this.tryParseJson<ApiResponse<T>>(candidate);
+      if (parsedCandidate !== null) {
+        return parsedCandidate;
+      }
+    }
+
+    throw new Error('El servidor devolvio una respuesta invalida');
+  }
+
+  private extractJsonFromPreTag(text: string): string | null {
+    const match = text.match(/<pre[^>]*>([\s\S]*?)<\/pre>/i);
+    if (!match || !match[1]) {
+      return null;
+    }
+
+    return match[1]
+      .replace(/&quot;/g, '"')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .trim();
+  }
+
+  private looksLikeInfinityFreeChallenge(text: string): boolean {
+    const lower = text.toLowerCase();
+    return lower.includes('/aes.js') || lower.includes('toNumbers(') || lower.includes('openresty');
+  }
+
+  private tryParseJson<T>(text: string): T | null {
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      return null;
+    }
   }
 
   /**
