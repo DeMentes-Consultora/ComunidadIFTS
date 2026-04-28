@@ -38,3 +38,5 @@ Cuando termino de adjuntarlo en dicha card se habilitara el Boton postulate y al
 Features (Vista “Gestion de Ofertas Laborales”):
 
 Se debe crear una gestion de “ofertas laborales” similar a la del registro de usuarios. La misma tendra una tabla que mostrara los siguientes campos : Institucion, ofertaLaboral, postulante(usuario) y un slide toggle para habilitar la oferta laboral en la pagina. Esto en la seccion pendientes de habilitacion o publicacion, luego al igual que en registro de usuarios quiero un boton que diga publicadas y muestre los siguientes campos:  Institución, oferta Laboral y postulaciones (que va a tener la cantidad de postulaciones que tiene esa oferta laboral en tiempo real).
+
+ya esta listo . OK
