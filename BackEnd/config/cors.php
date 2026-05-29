@@ -12,6 +12,7 @@ if (!isset($_ENV['APP_ENV']) || !isset($_ENV['CORS_ALLOWED_ORIGINS'])) {
 
 // Resolver origin de la petición actual
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$requestMethod = $_SERVER['REQUEST_METHOD'] ?? null;
 $appEnv = $_ENV['APP_ENV'] ?? getenv('APP_ENV') ?: 'development';
 $defaultOrigins = 'http://localhost:4200,http://localhost:3000,https://comunidadifts.infinityfreeapp.com,http://comunidadifts.infinityfreeapp.com';
 
@@ -41,7 +42,7 @@ header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Max-Age: 86400");
 
 // Manejar peticiones OPTIONS (preflight)
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+if ($requestMethod === 'OPTIONS') {
     http_response_code(200);
     exit;
 }

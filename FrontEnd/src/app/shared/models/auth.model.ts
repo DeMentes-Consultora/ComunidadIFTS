@@ -3,6 +3,16 @@ export interface LoginRequest {
   clave: string;
 }
 
+export interface PasswordResetRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  password: string;
+  confirm_password: string;
+}
+
 export interface RegisterRequest {
   nombre: string;
   apellido: string;
@@ -59,6 +69,8 @@ export interface RegisterResponse {
 export interface BasicAuthResponse {
   success: boolean;
   message?: string;
+  warning?: string;
+  reset_link?: string;
 }
 
 export interface GoogleIdentity {

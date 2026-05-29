@@ -23,26 +23,32 @@ interface Slide {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CarruselComponent implements OnInit, OnDestroy {
+  private readonly fallbackBackgrounds = [
+    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+  ];
+
   slides: Slide[] = [
     {
       id: 'fallback-1',
       titulo: 'Bienvenido a Comunidad IFTS',
       descripcion: 'Conecta con todos los Institutos Superiores de Tecnología de Buenos Aires',
-      imagen: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      imagen: this.fallbackBackgrounds[0],
       enlace: '#'
     },
     {
       id: 'fallback-2',
       titulo: 'IFTS y comunidad',
       descripcion: 'Descubre instituciones, carreras y oportunidades en un solo lugar',
-      imagen: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      imagen: this.fallbackBackgrounds[1],
       enlace: '#'
     },
     {
       id: 'fallback-3',
       titulo: 'Únete a la comunidad',
       descripcion: 'Personaliza el sitio y mantén la información siempre actualizada desde el dashboard',
-      imagen: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      imagen: this.fallbackBackgrounds[2],
       enlace: '#'
     }
   ];
@@ -60,7 +66,8 @@ export class CarruselComponent implements OnInit, OnDestroy {
       next: (config) => {
         const slidesConfigurados = (config.carousel ?? []).filter(slide => slide.habilitado === 1);
         if (slidesConfigurados.length > 0) {
-          this.slides = slidesConfigurados.map((slide) => this.mapSlide(slide));
+          this.slides = slidesConfigurados.map((slide, index) => this.mapSlide(slide, index));
+          this.ensureSlideImages();
           this.currentIndex = 0;
           this.cdr.markForCheck();
         }
@@ -131,13 +138,37 @@ export class CarruselComponent implements OnInit, OnDestroy {
     return slide.imagen;
   }
 
-  private mapSlide(slide: SiteCarouselItem): Slide {
+  private mapSlide(slide: SiteCarouselItem, index: number): Slide {
     return {
       id: slide.id_carrousel,
       titulo: slide.titulo || 'Comunidad IFTS',
       descripcion: slide.descripcion || '',
-      imagen: slide.foto_perfil_url || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      imagen: slide.foto_perfil_url || this.getFallbackBackground(index),
       enlace: slide.enlace || '#'
     };
+  }
+
+  private ensureSlideImages(): void {
+    this.slides.forEach((slide, index) => {
+      if (!slide.imagen || !this.isRemoteImage(slide.imagen)) {
+        return;
+      }
+
+      const image = new Image();
+      image.onload = () => undefined;
+      image.onerror = () => {
+        slide.imagen = this.getFallbackBackground(index);
+        this.cdr.markForCheck();
+      };
+      image.src = slide.imagen;
+    });
+  }
+
+  private isRemoteImage(value: string): boolean {
+    return value.startsWith('http://') || value.startsWith('https://');
+  }
+
+  private getFallbackBackground(index: number): string {
+    return this.fallbackBackgrounds[index % this.fallbackBackgrounds.length];
   }
 }

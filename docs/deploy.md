@@ -105,6 +105,7 @@ Migraciones historicamente relevantes detectadas en la documentacion:
 - `BackEnd/database/migrations/20260414_dashboard_personalizacion_sitio.sql`
 - `BackEnd/database/migrations/20260414_rename_carrousel_id_column.sql`
 - `BackEnd/database/migrations/20260419_fix_carrera_materia_habilitado.sql`
+- `BackEnd/database/migrations/20260529_password_resets.sql`
 
 ## Pasos de despliegue
 
@@ -137,6 +138,7 @@ Migraciones historicamente relevantes detectadas en la documentacion:
 - [ ] `api/ofertas-publicadas.php` responde para alumno autenticado.
 - [ ] El formulario de contacto responde correctamente.
 - [ ] Los mails criticos funcionan o queda documentado que SMTP sigue pendiente.
+- [ ] El recupero de contraseña genera enlace y permite actualizar la clave.
 
 ## Problemas frecuentes
 
@@ -163,6 +165,7 @@ Migraciones historicamente relevantes detectadas en la documentacion:
 - Verificar variables SMTP.
 - Si se usa Gmail, usar app password y no la contraseña normal.
 - Confirmar que el hosting no bloquee el puerto o el proveedor SMTP.
+- Si la prueba se hace desde una PC corporativa o con restricciones locales, validar tambien desde el hosting o desde otra red antes de atribuir el fallo al codigo.
 
 ## Estado de esta documentacion
 

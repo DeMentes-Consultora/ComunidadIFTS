@@ -245,6 +245,24 @@ class Usuario {
         return $usuario->verificarClave($clavePlano) ? $usuario : null;
     }
 
+    public static function buscarPorEmailParaRecupero($pdo, $email) {
+        return self::buscarPorEmail($pdo, $email);
+    }
+
+    public static function actualizarClavePorId($pdo, $idUsuario, $clavePlano) {
+        $hash = password_hash($clavePlano, PASSWORD_DEFAULT);
+
+        $stmt = $pdo->prepare(
+            "UPDATE usuario
+             SET clave = ?, idUpdate = CURRENT_TIMESTAMP
+             WHERE id_usuario = ?
+               AND habilitado = 1
+               AND cancelado = 0"
+        );
+
+        return $stmt->execute([$hash, (int)$idUsuario]);
+    }
+
     public static function obtenerPendientesAprobacion($pdo) {
         $sql = "SELECT
                     u.id_usuario,

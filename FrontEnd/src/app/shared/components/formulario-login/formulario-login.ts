@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -31,6 +32,7 @@ export class FormularioLoginComponent {
   @Output() cancel = new EventEmitter<void>();
   private readonly formBuilder = inject(FormBuilder);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly router = inject(Router);
 
   cargando = false;
   error: string | null = null;
@@ -141,6 +143,11 @@ export class FormularioLoginComponent {
 
   irARegistro(): void {
     this.switchToRegister.emit();
+  }
+
+  irARecupero(): void {
+    this.cancel.emit();
+    void this.router.navigate(['/recuperar']);
   }
 
   cancelar(): void {

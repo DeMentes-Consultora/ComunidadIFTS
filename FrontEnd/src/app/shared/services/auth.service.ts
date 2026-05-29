@@ -13,8 +13,10 @@ import {
   GoogleLoginRequest,
   GoogleRegisterRequest,
   LoginRequest,
+  PasswordResetRequest,
   RegisterRequest,
-  RegisterResponse
+  RegisterResponse,
+  ResetPasswordRequest
 } from '../models/auth.model';
 
 type GoogleAuthApiResponse = AuthResponse & {
@@ -31,6 +33,8 @@ export class AuthService {
   private apiLogoutUrl = `${environment.apiUrl}/logout.php`;
   private apiGoogleAuthUrl = `${environment.apiUrl}/google-auth.php`;
   private apiActualizarFotoPerfilUrl = `${environment.apiUrl}/actualizar-foto-perfil.php`;
+  private apiRequestPasswordResetUrl = `${environment.apiUrl}/request-password-reset.php`;
+  private apiResetPasswordUrl = `${environment.apiUrl}/reset-password.php`;
   private storageKey = 'comunidadifts.auth.user';
   private currentUserSubject = new BehaviorSubject<AuthUser | null>(this.getStoredUser());
   private pendingGoogleIdentity: GoogleIdentity | null = null;
@@ -81,6 +85,51 @@ export class AuthService {
           return throwError(() => new Error(message));
         })
       );
+  }
+
+  requestPasswordReset(payload: PasswordResetRequest): Observable<BasicAuthResponse> {
+    return this.http.post<BasicAuthResponse>(this.apiRequestPasswordResetUrl, payload).pipe(
+      map((response) => {
+        if (!response.success) {
+          throw new Error(response.message || 'No fue posible iniciar el recupero de contraseña');
+        }
+        return response;
+      }),
+      catchError((err) => {
+        const message = err?.error?.message || err?.message || 'No fue posible iniciar el recupero de contraseña';
+        return throwError(() => new Error(message));
+      })
+    );
+  }
+
+  validatePasswordResetToken(token: string): Observable<BasicAuthResponse> {
+    return this.http.get<BasicAuthResponse>(`${this.apiResetPasswordUrl}?token=${encodeURIComponent(token)}`).pipe(
+      map((response) => {
+        if (!response.success) {
+          throw new Error(response.message || 'El enlace de recuperación no es válido');
+        }
+        return response;
+      }),
+      catchError((err) => {
+        const message = err?.error?.message || err?.message || 'El enlace de recuperación no es válido';
+        return throwError(() => new Error(message));
+      })
+    );
+  }
+
+  resetPassword(payload: ResetPasswordRequest): Observable<BasicAuthResponse> {
+    return this.http.post<BasicAuthResponse>(this.apiResetPasswordUrl, payload).pipe(
+      map((response) => {
+        if (!response.success) {
+          throw new Error(response.message || 'No fue posible restablecer la contraseña');
+        }
+        return response;
+      }),
+      catchError((err) => {
+        const message = err?.error?.message || err?.message || 'No fue posible restablecer la contraseña';
+        return throwError(() => new Error(message));
+      })
+    );
   }
 
   logout(): Observable<boolean> {

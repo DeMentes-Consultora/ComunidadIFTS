@@ -24,6 +24,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/contacto/contacto').then(m => m.Contacto)
   },
   {
+    path: 'recuperar',
+    loadComponent: () => import('./features/auth/recuperar-password/recuperar-password').then(m => m.RecuperarPassword)
+  },
+  {
+    path: 'resetear',
+    loadComponent: () => import('./features/auth/resetear-password/resetear-password').then(m => m.ResetearPassword)
+  },
+  {
     path: 'admin',
     canActivate: [authGuard, roleGuard],
     data: { roles: [1] },

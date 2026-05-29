@@ -173,7 +173,7 @@ CREATE TABLE `carrousel` (
 INSERT INTO `carrousel` (`id_carrousel`, `titulo`, `descripcion`, `enlace`, `orden_visual`, `foto_perfil_public_id`, `foto_perfil_url`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
 (1, 'Bienvenido a Comunidad IFTS', 'Conecta con todos los Institutos Superiores de Tecnologia de Buenos Aires', '#', 1, 'ComunidadIFTS/carrusel/php86D5_sydagd', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776363189/ComunidadIFTS/carrusel/php86D5_sydagd.png', 1, 0, '2026-04-14 15:50:23', '2026-04-16 18:13:12'),
 (2, 'IFTS y comunidad', 'Descubre carreras, instituciones y oportunidades para crecer profesionalmente', '#', 2, 'ComunidadIFTS/carrusel/php8792_bpidkr', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776363190/ComunidadIFTS/carrusel/php8792_bpidkr.png', 1, 0, '2026-04-14 15:50:23', '2026-04-16 18:13:12'),
-(3, 'Estudia sistemas en el IFTS12', 'Modelo vitual y presencial', 'https://ifts12online.com.ar/', 3, 'ComunidadIFTS/carrusel/php6226_c9t5zf', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776612847/ComunidadIFTS/carrusel/php6226_c9t5zf.jpg', 1, 0, '2026-04-19 15:34:08', '2026-04-19 15:34:08');
+(3, 'Estudia sistemas en el IFTS12', 'Modelo vitual y presencial', 'https://ifts12online.com.ar/', 3, NULL, NULL, 1, 0, '2026-04-19 15:34:08', '2026-04-19 15:34:08');
 
 -- --------------------------------------------------------
 

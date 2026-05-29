@@ -119,6 +119,43 @@ Este archivo concentra los hitos tecnicos relevantes del proyecto y reemplaza la
 
 ### Superficies involucradas
 
+## 29 de mayo de 2026 - Recupero de contraseña
+
+### Cambio funcional
+
+- Se implemento el flujo de recupero de contraseña para ComunidadIFTS, alineado con el enfoque usado previamente en IFTS15 pero adaptado a Angular + API PHP.
+- Se agrego una pantalla publica para solicitar el enlace de recupero y otra para definir la nueva contraseña usando token.
+- El login del frontend ahora enlaza al recupero desde el modal de autenticacion.
+
+### Superficies involucradas
+
+- `BackEnd/api/request-password-reset.php`
+- `BackEnd/api/reset-password.php`
+- `BackEnd/models/PasswordReset.php`
+- `BackEnd/models/Usuario.php`
+- `BackEnd/database/migrations/20260529_password_resets.sql`
+- `FrontEnd/src/app/shared/services/auth.service.ts`
+- `FrontEnd/src/app/shared/components/formulario-login/`
+- `FrontEnd/src/app/features/auth/recuperar-password/`
+- `FrontEnd/src/app/features/auth/resetear-password/`
+- `FrontEnd/src/app/app.routes.ts`
+
+### Dependencias operativas
+
+- Requiere aplicar la migracion `BackEnd/database/migrations/20260529_password_resets.sql` en la base de datos activa.
+- Requiere `APP_URL` correcta para construir el link enviado por correo.
+- Requiere SMTP funcional en `BackEnd/.env`; sin eso el endpoint responde error y no envia el email.
+
+### Verificaciones registradas
+
+- PHP lint OK en `Usuario.php`, `PasswordReset.php`, `request-password-reset.php` y `reset-password.php`.
+- Diagnosticos del editor sin errores en los archivos Angular nuevos y modificados del flujo de recupero.
+- Validacion HTTP local registrada: `request-password-reset.php` responde generico para email inexistente, devuelve `reset_link` de prueba en desarrollo para usuario valido y `reset-password.php?token=...` valida correctamente el token emitido.
+
+### Ajuste operativo posterior
+
+- En entornos no productivos, el recupero omite el envio SMTP real y devuelve un enlace de prueba para poder validar el flujo completo aun cuando la red local bloquee correo saliente.
+
 - `FrontEnd/src/app/features/admin/gestion-ofertas/gestion-ofertas.ts`
 - `BackEnd/models/Materia.php`
 - `BackEnd/database/migrations/20260419_fix_carrera_materia_habilitado.sql`

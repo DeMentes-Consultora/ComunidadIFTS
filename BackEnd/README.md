@@ -190,20 +190,37 @@ Opcionalmente podes indicar archivo de entorno y datos del correo:
 php scripts/test_postulacion_mail.php --to=alumno@correo.com --env-file=.env.production --titulo="Oferta QA" --ifts="IFTS 15"
 ```
 
-### Limpiar logos huerfanos en Cloudinary
+### Reconciliar Cloudinary de forma general
 
-Compara los logos de la carpeta Cloudinary de instituciones contra los logos en uso en tabla `institucion` y elimina solo los no referenciados.
+Compara recursos de Cloudinary contra las referencias reales en base de datos para varias superficies del proyecto: instituciones, carrusel, navbar, sidebar, footer branding, perfiles, tienda y CVs.
+
+El script arranca en modo solo lectura por defecto. Solo borra si se pasa `--delete`.
 
 ```bash
-# Simulacion sin borrar
-php scripts/limpiar_logos_huerfanos_cloudinary.php --dry-run
+# Solo lectura para todas las secciones
+php scripts/reconciliar_cloudinary_general.php
 
-# Produccion con .env especifico (simulacion)
-php scripts/limpiar_logos_huerfanos_cloudinary.php --env-file=.env.production --dry-run
+# Solo lectura para una seccion puntual
+php scripts/reconciliar_cloudinary_general.php --section=carrusel_home
 
-# Limpieza real (borra en Cloudinary)
-php scripts/limpiar_logos_huerfanos_cloudinary.php --env-file=.env.production
+# Produccion con .env especifico, sin borrar
+php scripts/reconciliar_cloudinary_general.php --env-file=.env.production --dry-run
+
+# Limpieza real con limite de borrado
+php scripts/reconciliar_cloudinary_general.php --env-file=.env.production --delete --limit-delete=20
 ```
+
+Secciones disponibles:
+
+- `instituciones_logo`
+- `carrusel_home`
+- `navbar_logo`
+- `sidebar_logo`
+- `footer_branding_logo`
+- `perfiles_foto`
+- `tienda_carrusel`
+- `tienda_galeria`
+- `cv_postulaciones`
 
 ## Seguridad
 
