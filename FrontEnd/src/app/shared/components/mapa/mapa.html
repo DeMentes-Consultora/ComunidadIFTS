@@ -17,6 +17,7 @@
         *ngIf="map"
         [map]="map"
         [instituciones]="institucionesParaBusqueda"
+        (direccionEncontrada)="onDireccionEncontrada($event)"
         (institucionSeleccionada)="onInstitucionSeleccionada($event)"
         (carrerasFiltradas)="onCarrerasFiltradas($event)">
       </app-buscador-direccion>
@@ -70,8 +71,25 @@
         </div>
       </div>
 
+      <div *ngIf="!institucionSeleccionada && direccionBuscada" class="institucion-info">
+        <div class="institucion-title-row">
+          <h3>Ubicación buscada</h3>
+        </div>
+
+        <div class="info-details">
+          <div class="info-item">
+            <label>Dirección:</label>
+            <p>{{ direccionBuscada }}</p>
+          </div>
+          <div class="info-item">
+            <label>Estado:</label>
+            <p>La ubicación se marcó temporalmente en el mapa.</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Mensaje cuando no hay institución seleccionada -->
-      <div *ngIf="!institucionSeleccionada" class="no-selection">
+      <div *ngIf="!institucionSeleccionada && !direccionBuscada" class="no-selection">
         <mat-icon>info</mat-icon>
         <p>Haz clic en una institución en el mapa para ver detalles</p>
       </div>

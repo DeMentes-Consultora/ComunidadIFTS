@@ -1,14 +1,47 @@
 <div class="buscador-container">
-  <!-- Input de Búsqueda (solo visible en modo dirección) -->
+  <!-- Selector de instituciones para ubicar un IFTS sin conocer la dirección -->
   @if (modoBusqueda === 'direccion') {
-    <div class="search-input-wrapper">
-      <input
-        #searchInput
-        type="text"
-        class="search-input"
-        placeholder="Buscar dirección..."
-        (input)="onSearchInput($event)"
-      />
+    <div class="instituciones-selector-compact">
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>Seleccionar por institución y dirección</mat-label>
+        <mat-select
+          [(ngModel)]="institucionSeleccionadaId"
+          (selectionChange)="onInstitucionChange()"
+          panelClass="instituciones-select-panel">
+
+          <mat-option disabled class="search-option">
+            <input
+              matInput
+              type="text"
+              class="search-carreras-input"
+              placeholder="🔍 Buscar institución o dirección..."
+              [(ngModel)]="searchInstitucionText"
+              (ngModelChange)="filtrarInstitucionesEnSelector()"
+              (click)="$event.stopPropagation()"
+            />
+          </mat-option>
+
+          @for (institucion of institucionesFiltradasList; track institucion.id) {
+            <mat-option [value]="institucion.id">
+              {{ institucion.nombre }}
+              @if (institucion.direccion) {
+                <span class="option-secondary"> - {{ institucion.direccion }}</span>
+              }
+            </mat-option>
+          }
+
+          @if (institucionesFiltradasList.length === 0) {
+            <mat-option disabled>
+              No se encontraron instituciones
+            </mat-option>
+          }
+        </mat-select>
+        <mat-hint>Si conocés la dirección exacta, usá el buscador del mapa.</mat-hint>
+      </mat-form-field>
+
+      <div class="search-empty-state helper-state">
+        Elegí un IFTS desde la lista o buscá una dirección directamente sobre el mapa.
+      </div>
     </div>
   }
 
@@ -22,7 +55,7 @@
         [(ngModel)]="modoBusqueda"
         (change)="onModoChange()"
       />
-      <span>📍 Buscar por Dirección</span>
+      <span>🏫 Seleccionar por institución y dirección</span>
     </label>
 
     <label class="radio-option">

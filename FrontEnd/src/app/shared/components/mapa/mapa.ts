@@ -26,12 +26,15 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
   private instituciones: Institucion[] = [];
   institucionesParaBusqueda: Institucion[] = [];
   institucionSeleccionada: Institucion | null = null;
+  direccionBuscada: string | null = null;
   private isLoading = true;
   private useClustering = false;
   private popupCloseTimers = new Map<number, ReturnType<typeof setTimeout>>();
   private markersByInstitucionId = new Map<number, L.CircleMarker>();
   private renderedMarkers: L.CircleMarker[] = [];
   private carrerasFiltradasIds: number[] = [];
+  private direccionMarker: L.Marker | null = null;
+  private highlightedMarker: L.CircleMarker | null = null;
 
   constructor(
     private institucionesService: InstitucionesService,
@@ -50,6 +53,8 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.popupCloseTimers.forEach((timer) => clearTimeout(timer));
     this.popupCloseTimers.clear();
+    this.direccionMarker?.remove();
+    this.highlightedMarker?.closePopup();
     this.markerClusterService.destroy();
     this.map?.remove();
   }
@@ -58,6 +63,7 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
     // Seleccionar la institución en el panel lateral
     const institucion = this.instituciones.find(i => i.id === idInstitucion);
     if (institucion) {
+      this.limpiarDireccionBuscada();
       this.institucionSeleccionada = institucion;
       this.cdr.markForCheck();
     }
@@ -83,24 +89,44 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
     this.highlightMarker(marker);
   }
 
+  onDireccionEncontrada(payload: { coordenadas: L.LatLng; direccion: string }): void {
+    if (!this.map) {
+      return;
+    }
+
+    this.institucionSeleccionada = null;
+    this.direccionBuscada = payload.direccion;
+    this.resetHighlightedMarker();
+
+    this.direccionMarker?.remove();
+    this.direccionMarker = L.marker(payload.coordenadas)
+      .addTo(this.map)
+      .bindPopup(`<strong>Ubicacion buscada</strong><br>${this.escapeHtml(payload.direccion)}`)
+      .openPopup();
+
+    this.map.setView(payload.coordenadas, Math.max(this.map.getZoom(), 16));
+    this.cdr.markForCheck();
+  }
+
   /**
    * Resaltar un marcador visualmente
    */
   private highlightMarker(marker: L.CircleMarker): void {
-    marker.setStyle({
-      radius: 14,
-      fillColor: '#22c55e',
-      weight: 3
-    });
+    if (this.highlightedMarker && this.highlightedMarker !== marker) {
+      this.resetMarkerStyle(this.highlightedMarker);
+      this.highlightedMarker.closePopup();
+    }
 
-    // Restaurar estilo después de 1 segundo
-    setTimeout(() => {
-      marker.setStyle({
-        radius: 10,
-        fillColor: '#66bb6a',
-        weight: 2
-      });
-    }, 1000);
+    this.highlightedMarker = marker;
+    marker.setStyle({
+      radius: 15,
+      color: '#14532d',
+      fillColor: '#22c55e',
+      fillOpacity: 1,
+      weight: 4
+    });
+    marker.bringToFront();
+    marker.openPopup();
   }
 
   private cargarInstituciones(): void {
@@ -179,6 +205,8 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
         this.onInstitucionSeleccionada(inst.id);
       });
 
+      marker.bindPopup(this.buildInstitucionPopup(inst));
+
       if (this.useClustering) {
         this.markerClusterService.addMarker(marker);
       } else {
@@ -197,12 +225,19 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  private limpiarDireccionBuscada(): void {
+    this.direccionBuscada = null;
+    this.direccionMarker?.remove();
+    this.direccionMarker = null;
+  }
+
   /**
    * Limpiar marcadores de manera segura
    */
   private limpiarMarcadores(): void {
     // Limpiar el mapa del elemento _leaflet_id
     this.markersByInstitucionId.clear();
+    this.highlightedMarker = null;
 
     if (this.useClustering) {
       // Para clustering: limpiar todos los layers del cluster
@@ -269,5 +304,39 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  private buildInstitucionPopup(inst: Institucion): string {
+    const direccion = this.escapeHtml(inst.direccion || 'Sin dirección registrada');
+    const logo = inst.logo
+      ? `<img src="${this.escapeHtml(inst.logo)}" alt="Logo de ${this.escapeHtml(inst.nombre)}" style="width:42px;height:42px;object-fit:contain;border-radius:8px;border:1px solid #d1d5db;background:#fff;padding:3px;flex-shrink:0;" />`
+      : `<div style="width:42px;height:42px;border-radius:8px;border:1px solid #d1d5db;background:#f3f4f6;color:#4b5563;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;">IFTS</div>`;
+
+    return `
+      <div style="display:flex;align-items:center;gap:10px;max-width:260px;">
+        ${logo}
+        <div style="font-size:13px;line-height:1.35;color:#1f2937;">${direccion}</div>
+      </div>
+    `;
+  }
+
+  private resetHighlightedMarker(): void {
+    if (!this.highlightedMarker) {
+      return;
+    }
+
+    this.resetMarkerStyle(this.highlightedMarker);
+    this.highlightedMarker.closePopup();
+    this.highlightedMarker = null;
+  }
+
+  private resetMarkerStyle(marker: L.CircleMarker): void {
+    marker.setStyle({
+      radius: 10,
+      color: '#006633',
+      fillColor: '#66bb6a',
+      fillOpacity: 0.9,
+      weight: 2
+    });
   }
 }

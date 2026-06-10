@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
@@ -31,31 +31,41 @@ interface Carrera {
   templateUrl: './buscador-direccion.html',
   styleUrls: ['./buscador-direccion.css']
 })
-export class BuscadorDireccionComponent implements OnInit, OnDestroy {
+export class BuscadorDireccionComponent implements OnInit, OnDestroy, OnChanges {
   @Input() map: L.Map | null = null;
   @Input() instituciones: Institucion[] = [];
   @Output() direccionEncontrada = new EventEmitter<{ coordenadas: L.LatLng; direccion: string }>();
   @Output() institucionSeleccionada = new EventEmitter<number>();
   @Output() carrerasFiltradas = new EventEmitter<number[]>();
-  
-  @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
 
   modoBusqueda: 'direccion' | 'carrera' = 'direccion';
   carrerasDisponibles: Carrera[] = [];
   carrerasFiltradasList: Carrera[] = []; // Lista filtrada para búsqueda
   carrerasSeleccionadas: number[] = [];
+  institucionesFiltradasList: Institucion[] = [];
   institucionesFiltradas = 0;
   searchCarreraText = ''; // Texto de búsqueda de carreras
+  searchInstitucionText = '';
+  institucionSeleccionadaId: number | null = null;
 
+  private arcgisGeocoder: any;
   private geocoderControl: any;
 
   constructor(private institucionesService: InstitucionesService) {}
 
   ngOnInit(): void {
+    this.institucionesFiltradasList = this.instituciones;
     if (this.map && this.modoBusqueda === 'direccion') {
       this.inicializarGeocoder();
     }
     this.cargarCarreras();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['instituciones']) {
+      this.filtrarInstitucionesEnSelector();
+      this.institucionesFiltradas = this.instituciones.length;
+    }
   }
 
   ngOnDestroy(): void {
@@ -67,7 +77,7 @@ export class BuscadorDireccionComponent implements OnInit, OnDestroy {
   private inicializarGeocoder(): void {
     if (!this.map) return;
 
-    const arcgisGeocoder = (L.Control as any).Geocoder.arcgis({
+    this.arcgisGeocoder = (L.Control as any).Geocoder.arcgis({
       geocodingQueryParams: {
         sourceCountry: 'ARG'
       }
@@ -79,7 +89,7 @@ export class BuscadorDireccionComponent implements OnInit, OnDestroy {
         let remotos: any = [];
 
         try {
-          remotos = await arcgisGeocoder.geocode(query, context);
+          remotos = await this.arcgisGeocoder.geocode(query, context);
         } catch {
           remotos = [];
         }
@@ -89,9 +99,9 @@ export class BuscadorDireccionComponent implements OnInit, OnDestroy {
       suggest: async (query: string, context: any) => {
         const locales = this.buscarInstitucionesLocales(query);
 
-        if (typeof arcgisGeocoder.suggest === 'function') {
+        if (typeof this.arcgisGeocoder.suggest === 'function') {
           try {
-            const remotos = await arcgisGeocoder.suggest(query, context);
+            const remotos = await this.arcgisGeocoder.suggest(query, context);
             return this.combinarResultados(locales, remotos);
           } catch {
             return this.combinarResultados(locales, []);
@@ -101,9 +111,9 @@ export class BuscadorDireccionComponent implements OnInit, OnDestroy {
         return this.combinarResultados(locales, []);
       },
       reverse: async (location: any, scale: number, context: any) => {
-        if (typeof arcgisGeocoder.reverse === 'function') {
+        if (typeof this.arcgisGeocoder.reverse === 'function') {
           try {
-            const remotos = await arcgisGeocoder.reverse(location, scale, context);
+            const remotos = await this.arcgisGeocoder.reverse(location, scale, context);
             return this.normalizarResultados(remotos);
           } catch {
             return [];
@@ -173,17 +183,7 @@ export class BuscadorDireccionComponent implements OnInit, OnDestroy {
   }
 
   private buscarInstitucionesLocales(query: string): any[] {
-    const termino = (query || '').trim().toLowerCase();
-    if (termino.length < 2) {
-      return [];
-    }
-
-    return this.instituciones
-      .filter((inst) => {
-        const nombre = (inst.nombre || '').toLowerCase();
-        const direccion = (inst.direccion || '').toLowerCase();
-        return nombre.includes(termino) || direccion.includes(termino);
-      })
+    return this.filtrarInstituciones(query)
       .slice(0, 10)
       .map((inst) => {
         const lat = Number(inst.latitud);
@@ -210,6 +210,19 @@ export class BuscadorDireccionComponent implements OnInit, OnDestroy {
         };
       })
       .filter((resultado): resultado is { name: string; center: L.LatLng; bbox: L.LatLngBounds; properties: { source: string; id: number } } => resultado !== null);
+  }
+
+  private filtrarInstituciones(query: string): Institucion[] {
+    const termino = (query || '').trim().toLowerCase();
+    if (termino.length < 2) {
+      return [];
+    }
+
+    return this.instituciones.filter((inst) => {
+      const nombre = (inst.nombre || '').toLowerCase();
+      const direccion = (inst.direccion || '').toLowerCase();
+      return nombre.includes(termino) || direccion.includes(termino);
+    });
   }
 
   /**
@@ -270,12 +283,37 @@ export class BuscadorDireccionComponent implements OnInit, OnDestroy {
       }
       // Limpiar filtro de carreras
       this.limpiarFiltros();
+      this.filtrarInstitucionesEnSelector();
     } else {
       // Desactivar geocoder
       if (this.map && this.geocoderControl) {
         this.map.removeControl(this.geocoderControl);
         this.geocoderControl = null;
       }
+      this.searchInstitucionText = '';
+      this.institucionSeleccionadaId = null;
+    }
+  }
+
+  filtrarInstitucionesEnSelector(): void {
+    const termino = this.searchInstitucionText.trim().toLowerCase();
+
+    if (!termino) {
+      this.institucionesFiltradasList = [...this.instituciones];
+      return;
+    }
+
+    this.institucionesFiltradasList = this.instituciones.filter((institucion) => {
+      const nombre = (institucion.nombre || '').toLowerCase();
+      const direccion = (institucion.direccion || '').toLowerCase();
+      return nombre.includes(termino) || direccion.includes(termino);
+    });
+  }
+
+  onInstitucionChange(): void {
+    const idInstitucion = Number(this.institucionSeleccionadaId);
+    if (!Number.isNaN(idInstitucion) && idInstitucion > 0) {
+      this.institucionSeleccionada.emit(idInstitucion);
     }
   }
 
@@ -316,13 +354,6 @@ export class BuscadorDireccionComponent implements OnInit, OnDestroy {
     this.carrerasSeleccionadas = [];
     this.institucionesFiltradas = this.instituciones.length;
     this.carrerasFiltradas.emit([]);
-  }
-
-  /**
-   * Manejar input de búsqueda (para direcciones)
-   */
-  onSearchInput(event: Event): void {
-    // El geocoder de Leaflet maneja esto automáticamente
   }
 }
 
