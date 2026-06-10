@@ -175,6 +175,41 @@ Este archivo concentra los hitos tecnicos relevantes del proyecto y reemplaza la
 - Los roles vigentes contrastados con el codigo son `1` AdministradorComunidad, `2` Alumno y `3` AdministradorIFTS.
 - La documentacion de deploy y estado actual fue centralizada en `docs/` para reducir drift con archivos legacy de raiz.
 
+## 10 de junio de 2026 - Mapa, buscador mixto y snapshot de deploy
+
+### Cambio funcional
+
+- Se corrigio el proxy local del frontend para desarrollo con backend PHP en `localhost:3000`.
+- El mapa publico paso a usar dos entradas complementarias:
+  - desplegable de seleccion por institucion y direccion en el panel lateral
+  - buscador visible de Leaflet para direcciones exactas sobre el mapa
+- La seleccion de una institucion ahora deja el marcador resaltado de forma persistente y abre popup asociado.
+- El popup del marcador fue ajustado para mostrar el logo de la institucion junto a la direccion.
+- La busqueda de direccion externa crea un marcador temporal y expone la direccion buscada en el panel.
+- Las carreras del panel de una institucion pasaron a reutilizar el filtro de carreras existente del mapa.
+- Al limpiar ese filtro de carreras, el mapa vuelve a encuadrar todas las instituciones visibles.
+
+### Superficies involucradas
+
+- `FrontEnd/proxy.conf.json`
+- `FrontEnd/src/app/shared/components/buscador-direccion/`
+- `FrontEnd/src/app/shared/components/mapa/`
+
+### Validacion registrada
+
+- Build Angular OK.
+- Validacion interactiva en navegador sobre `/mapa`:
+  - seleccion de institucion desde desplegable
+  - popup con logo + direccion
+  - geocoder visible en Leaflet para direcciones exactas
+  - filtro por carrera disparado desde el panel lateral de la institucion
+  - reencuadre del mapa al limpiar el filtro
+
+### Ajuste operativo
+
+- Se sincronizo `deploy-infinityfree/` con el build frontend vigente para subir directamente esa carpeta a InfinityFree.
+- El snapshot de deploy fue resincronizado una vez mas tras el ajuste final del filtro por carreras en el mapa.
+
 ## Relacion con otros markdown historicos
 
 - `docs/historial-conversacion.md` conserva el detalle largo y contexto de negocio.

@@ -41,6 +41,23 @@ ComunidadIFTS/
 
 ## Frontend vigente
 
+### Estado funcional reciente del mapa
+
+- El mapa publico en `/mapa` usa Leaflet con clustering de marcadores.
+- El panel izquierdo ahora separa dos flujos de uso:
+	- seleccion por institucion y direccion mediante un desplegable buscable
+	- busqueda de direccion exacta desde el geocoder visible de Leaflet sobre el mapa
+- Al seleccionar una institucion desde el desplegable o desde el propio marcador:
+	- se abre el panel lateral con datos completos de la institucion
+	- el marcador queda resaltado de forma persistente
+	- el popup del mapa muestra el logo de la institucion junto a la direccion
+- Las carreras listadas dentro del panel de una institucion ahora pueden reutilizar el filtro del mapa:
+	- al seleccionar una carrera se filtran los IFTS que la dictan
+	- al limpiar ese filtro el mapa vuelve a encuadrar todas las instituciones visibles
+- Al buscar una direccion externa en el mapa:
+	- se crea un marcador temporal
+	- el panel lateral muestra la ubicacion buscada
+
 ### Features detectadas
 
 - `home`
@@ -108,6 +125,8 @@ ComunidadIFTS/
 - QA funcional ejecutado y documentado con 7 casos pass al 16-04-2026.
 - Deploy marcado como listo en esa misma etapa.
 - Pendiente operativo recurrente: configuracion y validacion real de SMTP en entorno de deploy.
+- Snapshot de `deploy-infinityfree/` sincronizado nuevamente con el build frontend vigente de junio 2026.
+- Snapshot de `deploy-infinityfree/` resincronizado otra vez tras el ajuste final del filtro por carreras del mapa.
 
 ## Punto de arranque recomendado
 

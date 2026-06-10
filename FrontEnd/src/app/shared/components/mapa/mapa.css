@@ -153,6 +153,31 @@
   gap: 4px;
 }
 
+.carreras-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.btn-limpiar-filtro-carreras {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-limpiar-filtro-carreras:hover {
+  background: #f8fafc;
+}
+
+.carrera-filter-chip {
+  cursor: pointer;
+}
+
 /* Formulario en el panel */
 .formulario-wrapper {
   flex: 1;

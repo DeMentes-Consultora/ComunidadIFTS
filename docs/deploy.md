@@ -10,6 +10,8 @@ Centralizar el proceso de despliegue del proyecto tomando como referencia los sn
 - Backend documentado como listo para deploy.
 - QA funcional documentado con 7 casos pass al 16-04-2026.
 - Pendiente operativo recurrente: configuracion real de SMTP en el entorno de produccion.
+- Snapshot `deploy-infinityfree/` resincronizado con el frontend vigente el 10-06-2026.
+- Snapshot `deploy-infinityfree/` resincronizado nuevamente tras el ajuste final del mapa y del filtro por carreras.
 
 ## Stack de despliegue
 
@@ -22,7 +24,11 @@ Centralizar el proceso de despliegue del proyecto tomando como referencia los sn
 
 ### Frontend
 
-Subir el contenido generado para produccion a la raiz publica del hosting.
+Subir a la raiz publica del hosting el contenido de `deploy-infinityfree/` ya sincronizado.
+
+Fuente actual para regenerar ese snapshot si hiciera falta:
+
+- `FrontEnd/dist/ComunidadIFTS/browser/`
 
 Referencia historica documentada:
 
@@ -43,6 +49,7 @@ public_html/
 ```
 
 Nota: los archivos van en la raiz publica, no dentro de una carpeta anidada tipo `browser/`.
+La carpeta `deploy-infinityfree/` ya esta preparada con esa estructura final.
 
 ### Backend
 
@@ -111,9 +118,9 @@ Migraciones historicamente relevantes detectadas en la documentacion:
 
 1. Instalar dependencias locales si hace falta preparar un build nuevo.
 2. Compilar frontend para produccion.
-3. Preparar variables de entorno reales para frontend y backend.
-4. Subir el frontend compilado a la raiz publica.
-5. Subir el backend a la carpeta publica de API.
+3. Sincronizar `deploy-infinityfree/` con `FrontEnd/dist/ComunidadIFTS/browser/` y con el backend actual si hubo cambios backend.
+4. Preparar variables de entorno reales para frontend y backend.
+5. Subir `deploy-infinityfree/` completo a la raiz publica.
 6. Ejecutar `composer install --no-dev` en el servidor si no se sube `vendor/`.
 7. Importar esquema base y aplicar migraciones pendientes.
 8. Verificar permisos de archivos y carpetas.
@@ -122,6 +129,7 @@ Migraciones historicamente relevantes detectadas en la documentacion:
 ## Checklist pre deploy
 
 - [ ] Build frontend completado.
+- [ ] `deploy-infinityfree/` sincronizado con el build vigente.
 - [ ] Variables de entorno frontend actualizadas.
 - [ ] Variables de entorno backend actualizadas.
 - [ ] Base de datos existente y actualizada.

@@ -36,6 +36,10 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
   private direccionMarker: L.Marker | null = null;
   private highlightedMarker: L.CircleMarker | null = null;
 
+  get carrerasFiltradasActivas(): boolean {
+    return this.carrerasFiltradasIds.length > 0;
+  }
+
   constructor(
     private institucionesService: InstitucionesService,
     private markerClusterService: MarkerClusterService,
@@ -282,6 +286,10 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
     
     // Re-renderizar el mapa con el filtro aplicado
     this.renderInstituciones();
+
+    if (carrerasIds.length === 0) {
+      this.reencuadrarInstitucionesVisibles();
+    }
     
     // Si hay carreras filtradas y había una institución seleccionada que ya no está visible, limpiar selección
     if (carrerasIds.length > 0 && this.institucionSeleccionada) {
@@ -295,6 +303,41 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     
     this.cdr.markForCheck();
+  }
+
+  isCarreraFiltrada(idCarrera: number): boolean {
+    return this.carrerasFiltradasIds.includes(idCarrera);
+  }
+
+  toggleCarreraFiltro(idCarrera: number): void {
+    const siguientes = this.isCarreraFiltrada(idCarrera)
+      ? this.carrerasFiltradasIds.filter((id) => id !== idCarrera)
+      : [...this.carrerasFiltradasIds, idCarrera];
+
+    this.onCarrerasFiltradas(siguientes);
+  }
+
+  limpiarFiltroCarrerasPanel(): void {
+    this.onCarrerasFiltradas([]);
+  }
+
+  private reencuadrarInstitucionesVisibles(): void {
+    if (!this.map) {
+      return;
+    }
+
+    if (this.useClustering) {
+      this.markerClusterService.zoomToAllMarkers();
+      return;
+    }
+
+    const bounds = L.latLngBounds(
+      this.renderedMarkers.map((marker) => marker.getLatLng())
+    );
+
+    if (bounds.isValid()) {
+      this.map.fitBounds(bounds, { padding: [50, 50] });
+    }
   }
 
   private escapeHtml(value: string): string {

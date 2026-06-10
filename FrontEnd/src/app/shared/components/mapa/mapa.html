@@ -60,10 +60,22 @@
           }
           @if (institucionSeleccionada.carreras && institucionSeleccionada.carreras.length > 0) {
             <div class="info-item">
-              <label>Carreras:</label>
+              <div class="carreras-header-row">
+                <label>Carreras:</label>
+                @if (carrerasFiltradasActivas) {
+                  <button type="button" class="btn-limpiar-filtro-carreras" (click)="limpiarFiltroCarrerasPanel()">
+                    Limpiar filtro
+                  </button>
+                }
+              </div>
               <div class="carreras-list">
                 @for (carrera of institucionSeleccionada.carreras; track carrera.nombre) {
-                  <mat-chip-option>{{ carrera.nombre }}</mat-chip-option>
+                  <mat-chip-option
+                    class="carrera-filter-chip"
+                    [selected]="isCarreraFiltrada(carrera.id)"
+                    (click)="toggleCarreraFiltro(carrera.id)">
+                    {{ carrera.nombre }}
+                  </mat-chip-option>
                 }
               </div>
             </div>
