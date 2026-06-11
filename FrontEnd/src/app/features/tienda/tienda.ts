@@ -16,6 +16,20 @@ import { SiteCustomizationService } from '../../shared/services/site-customizati
         <p>Explora productos y recursos cargados desde el dashboard.</p>
       </header>
 
+      <section class="legal-note">
+        <h2>Informacion de compra</h2>
+        <p>
+          Los pagos se procesan mediante Mercado Pago. Los envios se realizan a domicilio por
+          mensajeria privada, con un plazo estimado de hasta 72 horas habiles desde la confirmacion
+          del pago.
+        </p>
+        <p>
+          Solo se aceptan reclamos por fallas de fabricacion o defectos comprobables dentro de los 7
+          dias corridos posteriores a la recepcion del producto.
+        </p>
+        <a class="legal-link" routerLink="/terminos-condiciones">Consultar terminos de compra</a>
+      </section>
+
       @if (cargando) {
         <section class="empty-state">
           <p>Cargando tienda...</p>
@@ -92,6 +106,38 @@ import { SiteCustomizationService } from '../../shared/services/site-customizati
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 18px;
+    }
+
+    .legal-note {
+      max-width: 920px;
+      margin: 0 auto 24px;
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d7e7d9;
+      box-shadow: 0 10px 22px rgba(24, 56, 37, 0.08);
+    }
+
+    .legal-note h2 {
+      margin: 0 0 10px;
+      color: #173827;
+      font-size: 1.15rem;
+    }
+
+    .legal-note p {
+      margin: 0 0 10px;
+      color: #4f6556;
+      line-height: 1.55;
+    }
+
+    .legal-link {
+      color: #0f5132;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .legal-link:hover {
+      text-decoration: underline;
     }
 
     .producto-card {

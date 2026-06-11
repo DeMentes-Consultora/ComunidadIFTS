@@ -105,6 +105,22 @@
     </mat-form-field>
   </div>
 
+  <div class="legal-consent">
+    <mat-checkbox formControlName="aceptar_legal" color="primary">
+      Acepto los
+      <a routerLink="/terminos-condiciones" target="_blank" rel="noopener">Terminos y Condiciones</a>
+      y la
+      <a routerLink="/politica-privacidad" target="_blank" rel="noopener">Politica de Privacidad</a>.
+    </mat-checkbox>
+    <div class="legal-consent-text">
+      Tus datos se utilizaran para gestionar la cuenta, validar pertenencia a la comunidad y operar
+      funcionalidades como la bolsa de trabajo.
+    </div>
+    <div *ngIf="form.get('aceptar_legal')?.touched && form.get('aceptar_legal')?.hasError('required')" class="error-message">
+      Debes aceptar los terminos y la politica de privacidad para continuar.
+    </div>
+  </div>
+
   <div *ngIf="error" class="error-message">{{ error }}</div>
 
   <button mat-stroked-button type="button" class="google-btn" [disabled]="cargando" (click)="onGoogleRegister()">

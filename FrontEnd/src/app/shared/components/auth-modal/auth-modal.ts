@@ -1,5 +1,6 @@
-import { Component, Inject } from '@angular/core';
+import { AfterViewInit, Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +17,7 @@ interface AuthModalData {
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
@@ -33,14 +35,21 @@ export class AuthModalComponent {
     @Inject(MAT_DIALOG_DATA) data: AuthModalData
   ) {
     this.currentView = data?.view === 'register' ? 'register' : 'login';
+    this.updateDialogSize();
+  }
+
+  ngAfterViewInit(): void {
+    this.updateDialogSize();
   }
 
   mostrarLogin(): void {
     this.currentView = 'login';
+    this.updateDialogSize();
   }
 
   mostrarRegistro(): void {
     this.currentView = 'register';
+    this.updateDialogSize();
   }
 
   onAuthSuccess(user: AuthUser): void {
@@ -49,5 +58,10 @@ export class AuthModalComponent {
 
   cerrar(): void {
     this.dialogRef.close();
+  }
+
+  private updateDialogSize(): void {
+    const isRegister = this.currentView === 'register';
+    this.dialogRef.updateSize(isRegister ? 'min(760px, 94vw)' : 'min(420px, 92vw)');
   }
 }

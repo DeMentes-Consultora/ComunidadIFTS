@@ -134,6 +134,13 @@
   color: #FFD700;
 }
 
+.footer-disclaimer {
+  display: block;
+  margin-top: 6px;
+  color: #cfd3d6;
+  line-height: 1.45;
+}
+
 /* Redes Sociales */
 .social-links {
   display: flex;

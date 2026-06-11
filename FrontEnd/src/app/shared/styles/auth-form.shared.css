@@ -1,0 +1,98 @@
+.login-form,
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: var(--auth-border-soft);
+  border-radius: var(--auth-radius-panel);
+  background: var(--auth-color-surface-elevated);
+  box-shadow: var(--auth-shadow-panel);
+}
+
+.login-form .mdc-text-field,
+.login-form .mat-mdc-raised-button,
+.login-form .mat-mdc-button,
+.register-form .mdc-text-field,
+.register-form .mat-mdc-raised-button,
+.register-form .mat-mdc-button {
+  border-radius: 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.google-btn {
+  width: 100%;
+  border-radius: var(--auth-radius-control);
+  border-color: rgba(0, 102, 51, 0.24);
+  color: var(--auth-color-primary);
+  background: var(--auth-color-primary-soft);
+}
+
+.divider {
+  opacity: 0.88;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--auth-color-text-muted);
+}
+
+.error-message {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 10px;
+}
+
+.form-question {
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:host ::ng-deep .login-form .mat-mdc-form-field-focus-overlay,
+:host ::ng-deep .register-form .mat-mdc-form-field-focus-overlay {
+  background-color: var(--auth-color-focus);
+}
+
+:host ::ng-deep .login-form .mdc-notched-outline__leading,
+:host ::ng-deep .login-form .mdc-notched-outline__notch,
+:host ::ng-deep .login-form .mdc-notched-outline__trailing,
+:host ::ng-deep .register-form .mdc-notched-outline__leading,
+:host ::ng-deep .register-form .mdc-notched-outline__notch,
+:host ::ng-deep .register-form .mdc-notched-outline__trailing {
+  border-color: var(--auth-border-outline) !important;
+}
+
+:host ::ng-deep .login-form .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+:host ::ng-deep .login-form .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+:host ::ng-deep .login-form .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing,
+:host ::ng-deep .register-form .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+:host ::ng-deep .register-form .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+:host ::ng-deep .register-form .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--auth-color-primary) !important;
+}
+
+:host ::ng-deep .login-form .mat-mdc-raised-button.mat-primary,
+:host ::ng-deep .register-form .mat-mdc-raised-button.mat-primary {
+  background: linear-gradient(135deg, var(--auth-color-primary) 0%, var(--auth-color-primary-dark) 100%);
+  color: #ffffff;
+  border-radius: var(--auth-radius-control);
+}
+
+:host ::ng-deep .login-form .mat-mdc-button,
+:host ::ng-deep .login-form .mat-mdc-unelevated-button,
+:host ::ng-deep .login-form .mat-mdc-stroked-button,
+:host ::ng-deep .register-form .mat-mdc-button,
+:host ::ng-deep .register-form .mat-mdc-unelevated-button,
+:host ::ng-deep .register-form .mat-mdc-stroked-button {
+  border-radius: var(--auth-radius-control);
+}

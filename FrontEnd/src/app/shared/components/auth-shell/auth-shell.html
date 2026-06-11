@@ -1,0 +1,21 @@
+<section class="auth-page">
+  <mat-card class="auth-card" [style.--auth-card-width]="cardWidth">
+    <mat-card-header>
+      <div class="auth-card-title-wrap">
+        <mat-card-title>{{ title }}</mat-card-title>
+        @if (subtitle) {
+          <mat-card-subtitle>{{ subtitle }}</mat-card-subtitle>
+        }
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <ng-content></ng-content>
+
+      <div class="legal-links auth-shell-legal-links">
+        <a routerLink="/terminos-condiciones">Términos y Condiciones</a>
+        <a routerLink="/politica-privacidad">Política de Privacidad</a>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</section>

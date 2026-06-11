@@ -1,79 +1,98 @@
-.register-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.register-form .mdc-text-field,
-.register-form .mat-mdc-raised-button,
-.register-form .mat-mdc-button {
-  border-radius: 0px;
-}
+@import '../../styles/auth-form.shared.css';
 
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.full-width {
-  width: 100%;
-}
-
-.google-btn {
-  width: 100%;
-  border-radius: 0;
+  gap: 10px;
 }
 
 .divider {
   font-size: 0.8rem;
-  opacity: 0.75;
-  text-align: center;
-  text-transform: uppercase;
 }
 
 .google-helper {
   font-size: 0.9rem;
-  padding: 8px 10px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  background: rgba(0, 0, 0, 0.03);
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 102, 51, 0.14);
+  background: rgba(0, 102, 51, 0.05);
+  border-radius: 12px;
+  color: #456357;
 }
 
 .google-helper-ready {
-  border-color: rgba(46, 125, 50, 0.45);
-  background: rgba(46, 125, 50, 0.08);
+  border-color: rgba(0, 102, 51, 0.28);
+  background: rgba(0, 102, 51, 0.1);
 }
 
 .google-note {
   font-size: 0.85rem;
-  opacity: 0.85;
+  opacity: 0.95;
+  color: #4e655c;
+}
+
+.legal-consent {
+  display: grid;
+  gap: 6px;
+  margin-top: 0;
+}
+
+.legal-consent a {
+  color: #006633;
+  font-weight: 600;
+}
+
+.legal-consent-text {
+  font-size: 0.84rem;
+  color: #4f645b;
+  line-height: 1.45;
 }
 
 .error-message {
   font-size: 0.9rem;
-  font-weight: 500;
-  margin-bottom: 4px;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 4px;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
-  padding-top: 12px;
 }
 
 .form-question {
-  display: flex;
-  justify-content: center;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
   padding-top: 8px;
   margin-top: 2px;
+}
+
+:host ::ng-deep .register-form .mdc-checkbox__background {
+  border-color: rgba(0, 102, 51, 0.38) !important;
 }
 
 @media (max-width: 700px) {
   .row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 900px) {
+  .register-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 12px;
+    align-items: start;
+  }
+
+  .register-form > .divider,
+  .register-form > .google-helper,
+  .register-form > .full-width,
+  .register-form > .row,
+  .register-form > .legal-consent,
+  .register-form > .error-message,
+  .register-form > .google-btn,
+  .register-form > .form-actions,
+  .register-form > .google-note,
+  .register-form > .form-question {
+    grid-column: 1 / -1;
+  }
+
+  .register-form > .full-width:nth-of-type(1),
+  .register-form > .full-width:nth-of-type(2) {
+    grid-column: span 1;
+  }
+
+  .register-form > .row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

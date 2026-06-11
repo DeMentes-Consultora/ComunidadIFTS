@@ -5,10 +5,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AuthUser, GoogleIdentity, GoogleRegisterRequest } from '../../models/auth.model';
 import { Carrera, Institucion } from '../../models/institucion.model';
@@ -24,9 +26,11 @@ import { InstitucionesService } from '../../services/instituciones.service';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatCheckboxModule,
     MatSelectModule,
     MatIconModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    RouterModule
   ],
   templateUrl: './formulario-registro.html',
   styleUrl: './formulario-registro.css'
@@ -67,6 +71,7 @@ export class FormularioRegistroComponent implements OnInit {
       id_carrera: ['', [Validators.required]],
       anio_cursada: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
+      aceptar_legal: [false, [Validators.requiredTrue]],
       clave: ['', [Validators.required, Validators.minLength(6)]],
       confirmar_clave: ['', [Validators.required]]
     });

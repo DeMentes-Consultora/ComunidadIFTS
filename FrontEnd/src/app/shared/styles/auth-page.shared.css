@@ -1,0 +1,123 @@
+.auth-page {
+  min-height: calc(100vh - 140px);
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+  background:
+    radial-gradient(circle at top right, rgba(0, 102, 51, 0.08), transparent 26%),
+    linear-gradient(180deg, #f7fbf8 0%, #edf5f0 100%);
+}
+
+.auth-card {
+  width: min(100%, var(--auth-card-width, 520px));
+  border-radius: var(--auth-radius-card);
+  overflow: hidden;
+  box-shadow: var(--auth-shadow-card);
+}
+
+.auth-card mat-card-header {
+  background: linear-gradient(135deg, var(--auth-color-primary) 0%, var(--auth-color-primary-dark) 100%);
+  padding: 18px 20px 16px;
+}
+
+.auth-card-title-wrap {
+  display: grid;
+  gap: 4px;
+}
+
+.auth-card mat-card-title,
+.auth-card mat-card-subtitle {
+  color: #ffffff;
+}
+
+.auth-card mat-card-content {
+  padding: 18px;
+  background: var(--auth-color-surface);
+}
+
+.auth-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.legal-links {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+  font-size: 0.84rem;
+}
+
+.legal-links a {
+  color: var(--auth-color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.legal-links a:hover {
+  text-decoration: underline;
+}
+
+.status-message {
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+}
+
+.status-message.success {
+  background: var(--auth-color-success-bg);
+  color: var(--auth-color-success-text);
+}
+
+.status-message.error {
+  background: rgba(211, 47, 47, 0.1);
+  color: #b71c1c;
+}
+
+@media (max-width: 600px) {
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+:host ::ng-deep .auth-card .mat-mdc-form-field-focus-overlay {
+  background-color: var(--auth-color-focus);
+}
+
+:host ::ng-deep .auth-card .mdc-notched-outline__leading,
+:host ::ng-deep .auth-card .mdc-notched-outline__notch,
+:host ::ng-deep .auth-card .mdc-notched-outline__trailing {
+  border-color: var(--auth-border-outline) !important;
+}
+
+:host ::ng-deep .auth-card .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+:host ::ng-deep .auth-card .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+:host ::ng-deep .auth-card .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--auth-color-primary) !important;
+}
+
+:host ::ng-deep .auth-card .mat-mdc-raised-button.mat-primary {
+  background: linear-gradient(135deg, var(--auth-color-primary) 0%, var(--auth-color-primary-dark) 100%);
+  color: #ffffff;
+  border-radius: var(--auth-radius-control);
+}
+
+:host ::ng-deep .auth-card .mat-mdc-button,
+:host ::ng-deep .auth-card .mat-mdc-stroked-button {
+  border-radius: var(--auth-radius-control);
+}

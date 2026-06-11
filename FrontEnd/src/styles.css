@@ -5,10 +5,29 @@
 @import "leaflet.markercluster/dist/MarkerCluster.css";
 @import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
+:root {
+	--auth-color-primary: #006633;
+	--auth-color-primary-dark: #004d26;
+	--auth-color-primary-soft: rgba(0, 102, 51, 0.05);
+	--auth-color-focus: rgba(0, 102, 51, 0.04);
+	--auth-color-surface: rgba(255, 255, 255, 0.92);
+	--auth-color-surface-elevated: rgba(255, 255, 255, 0.88);
+	--auth-color-text-muted: #587164;
+	--auth-color-success-bg: rgba(0, 102, 51, 0.1);
+	--auth-color-success-text: #0f5132;
+	--auth-shadow-card: 0 18px 34px rgba(18, 24, 29, 0.08);
+	--auth-shadow-panel: 0 12px 24px rgba(18, 24, 29, 0.06);
+	--auth-border-soft: 1px solid rgba(18, 24, 29, 0.08);
+	--auth-border-outline: rgba(44, 34, 22, 0.22);
+	--auth-radius-card: 18px;
+	--auth-radius-panel: 16px;
+	--auth-radius-control: 12px;
+}
+
 .auth-dialog-panel .mat-mdc-dialog-surface {
 	border-radius: 1.5%
      !important;
-	 width:min(450px, 90vw) !important;
+	 width:min(420px, 92vw) !important;
 	 pointer-events: auto !important;
 }
 

@@ -91,6 +91,18 @@
 							<span>Contacto</span>
 						</a>
 					</li>
+					<li class="footer-item">
+						<a routerLink="/terminos-condiciones" class="footer-link">
+							<i class="material-icons">chevron_right</i>
+							<span>Terminos y Condiciones</span>
+						</a>
+					</li>
+					<li class="footer-item">
+						<a routerLink="/politica-privacidad" class="footer-link">
+							<i class="material-icons">chevron_right</i>
+							<span>Politica de Privacidad</span>
+						</a>
+					</li>
 				</ul>
 			</div>
 
@@ -150,6 +162,7 @@
 		<div class="footer-copyright">
 			<div class="copyright-left">
 				<small>&copy; {{ currentYear }} Comunidad IFTS. Todos los derechos reservados.</small>
+				<small class="footer-disclaimer">Sitio administrado por alumnos y graduados. No oficial del GCBA.</small>
 			</div>
 			<div class="copyright-right">
 				@if (footerBrandingLinkUrl) {

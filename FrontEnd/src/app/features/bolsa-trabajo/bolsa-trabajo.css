@@ -31,6 +31,26 @@
   font-size: 15px;
 }
 
+.legal-notice {
+  margin-bottom: 24px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: #f6fbf7;
+  border: 1px solid #d5e6d8;
+}
+
+.legal-notice h2 {
+  margin: 0 0 8px;
+  color: #1f4f34;
+  font-size: 1.05rem;
+}
+
+.legal-notice p {
+  margin: 0;
+  color: #4f6457;
+  line-height: 1.55;
+}
+
 .loading-container {
   display: flex;
   flex-direction: column;

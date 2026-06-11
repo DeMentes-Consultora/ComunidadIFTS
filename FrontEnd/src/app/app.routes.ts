@@ -24,6 +24,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/contacto/contacto').then(m => m.Contacto)
   },
   {
+    path: 'terminos-condiciones',
+    loadComponent: () => import('./features/legal/terminos-condiciones').then(m => m.TerminosCondiciones)
+  },
+  {
+    path: 'politica-privacidad',
+    loadComponent: () => import('./features/legal/politica-privacidad').then(m => m.PoliticaPrivacidad)
+  },
+  {
     path: 'recuperar',
     loadComponent: () => import('./features/auth/recuperar-password/recuperar-password').then(m => m.RecuperarPassword)
   },

@@ -1,5 +1,5 @@
 <div class="auth-modal-header">
-  <h2>{{ currentView === 'login' ? 'Iniciar sesión' : 'Crear cuenta' }}</h2>
+  <h2>{{ currentView === 'login' ? 'Inicio de sesion' : 'Crear cuenta' }}</h2>
   <button mat-icon-button type="button" (click)="cerrar()">
     <mat-icon>close</mat-icon>
   </button>
@@ -19,4 +19,11 @@
     (switchToLogin)="mostrarLogin()"
     (registerSuccess)="onAuthSuccess($event)">
   </app-formulario-registro>
+</div>
+
+<div class="auth-modal-footer">
+  <div class="auth-modal-legal-links">
+    <a routerLink="/terminos-condiciones" target="_blank" rel="noopener">Términos y Condiciones</a>
+    <a routerLink="/politica-privacidad" target="_blank" rel="noopener">Política de Privacidad</a>
+  </div>
 </div>
