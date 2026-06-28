@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,6 +16,7 @@ import { Contacto } from '../../features/contacto/contacto';
 export class Footer implements OnInit, OnDestroy {
   private readonly siteCustomizationService = inject(SiteCustomizationService);
   private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
   private shopTimerSub: Subscription | null = null;
   readonly maxShopSlidesVisible = 6;
 
@@ -39,6 +40,7 @@ export class Footer implements OnInit, OnDestroy {
         this.currentShopSlideIndex = 0;
         this.refreshVisibleShopSlides();
         this.startShopAutoplay();
+        setTimeout(() => this.cdr.detectChanges(), 0);
       },
       error: () => {
         this.shopSlides = [];
@@ -47,6 +49,7 @@ export class Footer implements OnInit, OnDestroy {
         this.footerBrandingText = 'Desarrollado por DeMentesConsultora';
         this.footerBrandingLogoUrl = null;
         this.footerBrandingLinkUrl = null;
+        setTimeout(() => this.cdr.detectChanges(), 0);
       },
     });
   }

@@ -31,6 +31,14 @@
       <mat-icon>map</mat-icon>
       Mapa
     </a>
+
+    <ng-container *ngIf="currentUser$ | async as user">
+      <mat-divider></mat-divider>
+      <a mat-button routerLink="/foro" (click)="closeSidenavPanel()" class="nav-link">
+        <mat-icon>forum</mat-icon>
+        Chat comunitario
+      </a>
+    </ng-container>
     
     <mat-divider></mat-divider>
 

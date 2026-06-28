@@ -82,6 +82,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/bolsa-trabajo/bolsa-trabajo').then(m => m.BolsaTrabajo)
   },
   {
+    path: 'foro',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: [] },
+    loadComponent: () => import('./features/foro/foro').then(m => m.ForoComponent)
+  },
+  {
     path: 'perfil',
     canActivate: [authGuard, roleGuard],
     data: { roles: [2] },

@@ -30,5 +30,6 @@ return [
         'carrusel' => 'ComunidadIFTS/tienda/carrusel',
         'galeria' => 'ComunidadIFTS/tienda/galeria',
     ],
+    'foro' => 'ComunidadIFTS/foro',
     'novedades' => 'ComunidadIFTS/novedades',
 ];

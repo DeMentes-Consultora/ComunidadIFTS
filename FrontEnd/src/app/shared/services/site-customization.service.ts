@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { asyncScheduler, BehaviorSubject, Observable, of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+import { observeOn } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import {
   DashboardStats,
@@ -79,7 +80,7 @@ export class SiteCustomizationService {
 
   loadPublicConfig(force = false): Observable<SiteCustomizationConfig> {
     if (this.loaded && !force) {
-      return of(this.siteConfigSubject.value);
+      return of(this.siteConfigSubject.value).pipe(observeOn(asyncScheduler));
     }
 
     return this.http.get(this.apiUrl, { responseType: 'text' }).pipe(

@@ -1,0 +1,160 @@
+<div class="chat-shell">
+  <aside class="sidebar panel">
+    <div class="hero">
+      <span class="app-badge">ComunidadIFTS</span>
+      <h1>Chat comunitario</h1>
+      <p>Mensajes en vivo con presencia, avatar y nombre completo.</p>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="presence-header">
+      <div>
+        <h2>Conectados</h2>
+        <span>{{ conectadosActivos.length }} en línea</span>
+      </div>
+      <mat-icon>radio_button_checked</mat-icon>
+    </div>
+
+    <div class="presence-list">
+      @for (persona of conectadosActivos; track persona.id) {
+        <div class="presence-item" [class.typing]="persona.typing">
+          <div class="avatar">
+            @if (persona.photoUrl) {
+              <img [src]="persona.photoUrl" [alt]="persona.displayName">
+            } @else {
+              <span>{{ persona.firstName.charAt(0) }}{{ persona.lastName.charAt(0) }}</span>
+            }
+          </div>
+          <div class="presence-meta">
+            <strong>{{ persona.displayName }}</strong>
+            <span>{{ textoUltimaActividad(persona) }}</span>
+          </div>
+          <mat-icon *ngIf="persona.typing" class="typing-icon">mode_edit</mat-icon>
+        </div>
+      } @empty {
+        <div class="empty-presence">
+          <mat-icon>groups</mat-icon>
+          <p>Aún no hay usuarios conectados.</p>
+        </div>
+      }
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="sidebar-foot">
+      <p><strong>Escribiendo ahora</strong></p>
+      @if (usuariosEscribiendo.length > 0) {
+        <div class="typing-stack">
+          @for (persona of usuariosEscribiendo; track persona.id) {
+            <span>{{ persona.displayName }}</span>
+          }
+        </div>
+      } @else {
+        <span>Nadie está escribiendo</span>
+      }
+    </div>
+  </aside>
+
+  <main class="chat-panel panel">
+    <header class="chat-header">
+      <div class="current-user">
+        <div class="avatar big-avatar">
+          @if (usuario?.foto_perfil_url) {
+            <img [src]="usuario?.foto_perfil_url" [alt]="nombreMiUsuario">
+          } @else {
+            <span>{{ usuario?.nombre?.charAt(0) || 'U' }}{{ usuario?.apellido?.charAt(0) || '' }}</span>
+          }
+        </div>
+        <div>
+          <h2>{{ nombreMiUsuario }}</h2>
+          <span>{{ usuario?.nombre_rol || 'Usuario' }}</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button mat-icon-button (click)="toggleEmojiPicker()" aria-label="Abrir emojis">
+          <mat-icon>sentiment_satisfied</mat-icon>
+        </button>
+        <button mat-icon-button (click)="cargarMensajes()" aria-label="Actualizar">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+    </header>
+
+    @if (mostrarEmojis) {
+      <section class="emoji-picker">
+        @for (emoji of emojisRapidos; track emoji) {
+          <button type="button" class="emoji-button" (click)="insertarEmoji(emoji)">{{ emoji }}</button>
+        }
+      </section>
+    }
+
+    <section #scrollContainer class="messages-window">
+      @if (cargando) {
+        <div class="loading-state">
+          <mat-progress-spinner diameter="42" mode="indeterminate"></mat-progress-spinner>
+          <p>Conectando al chat...</p>
+        </div>
+      } @else if (mensajes.length === 0) {
+        <div class="empty-chat">
+          <mat-icon>chat_bubble_outline</mat-icon>
+          <h3>El chat está vacío</h3>
+          <p>Iniciá la conversación con tu primer mensaje.</p>
+        </div>
+      } @else {
+        <div class="messages-list">
+          @for (mensaje of mensajes; track mensaje.id) {
+            <article class="message-row" [class.mine]="esMiMensaje(mensaje)">
+              <div class="message-avatar avatar">
+                @if (fotoDe(mensaje)) {
+                  <img [src]="fotoDe(mensaje)" [alt]="mensaje.senderDisplayName">
+                } @else {
+                  <span>{{ mensaje.senderFirstName.charAt(0) }}{{ mensaje.senderLastName.charAt(0) }}</span>
+                }
+              </div>
+
+              <div class="message-bubble">
+                <div class="bubble-top">
+                  <strong>{{ mensaje.senderDisplayName }}</strong>
+                  <span>{{ mensaje.createdAtMs | date:'shortTime' }}</span>
+                </div>
+                <p>{{ mensaje.text }}</p>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+
+    <footer class="composer">
+      <div class="composer-row">
+        <button mat-icon-button (click)="toggleEmojiPicker()" aria-label="Emojis">
+          <mat-icon>mood</mat-icon>
+        </button>
+
+        <mat-form-field appearance="outline" class="composer-input">
+          <mat-label>Escribí un mensaje</mat-label>
+          <textarea
+            #mensajeInput
+            matInput
+            rows="1"
+            [(ngModel)]="mensaje"
+            (ngModelChange)="onMensajeChange()"
+            placeholder="Escribí algo..."
+          ></textarea>
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" class="send-button" (click)="enviarMensaje()" [disabled]="enviando || !mensaje.trim()">
+          <mat-icon>send</mat-icon>
+          Enviar
+        </button>
+      </div>
+
+      <div class="composer-hint">
+        <mat-icon>info</mat-icon>
+        <span>Se actualiza en vivo. Avatar, nombre y apellido salen de tu perfil.</span>
+      </div>
+    </footer>
+  </main>
+</div>

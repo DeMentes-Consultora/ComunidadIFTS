@@ -4,6 +4,7 @@ export const environment = {
   firebase: {
     apiKey: "AIzaSyCP0DGVHLfLfWRI6pbUpzAkCeQ0VVWR9K0",
     authDomain: "comunidadifts.firebaseapp.com",
+    databaseURL: "https://comunidadifts-default-rtdb.firebaseio.com",
     projectId: "comunidadifts",
     storageBucket: "comunidadifts.firebasestorage.app",
     messagingSenderId: "266707300773",

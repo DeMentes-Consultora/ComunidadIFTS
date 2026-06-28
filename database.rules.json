@@ -1,0 +1,12 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "foro": {
+      "chat": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    }
+  }
+}
