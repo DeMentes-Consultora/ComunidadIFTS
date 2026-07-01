@@ -23,6 +23,11 @@ ComunidadIFTS utiliza un sistema de roles basado en IDs.
 - Aprobar, rechazar y deshabilitar oferta: rol `1`
 - Ver ofertas publicadas y postularse: rol `2`
 
+### Foro
+
+- Acceso a lista de temas, creación, respuestas, búsqueda y adjuntos: roles `1`, `2` y `3`
+- Gestión de categorías y cierre automático de inactivos: rol `1`
+
 ### Administracion general
 
 - Dashboard admin y gestion de usuarios: rol `1`

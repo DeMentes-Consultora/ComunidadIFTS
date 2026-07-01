@@ -1,0 +1,407 @@
+.foro-tema-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: #666;
+}
+
+.empty-state mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #ccc;
+}
+
+/* Tema header */
+.tema-header-card {
+  margin-bottom: 24px;
+}
+
+.tema-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 24px 0;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.link-back {
+  color: #3f51b5;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.link-back:hover {
+  text-decoration: underline;
+}
+
+.tema-header h1 {
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 24px;
+}
+
+.pin-icon { color: #4caf50; }
+.closed-icon { color: #ff9800; }
+
+.tema-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: #666;
+}
+
+.autor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.autor-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #3f51b5;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.avatar-placeholder.small {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+}
+
+.tema-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.tema-contenido {
+  padding: 16px 24px;
+}
+
+.tema-contenido p {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+/* Adjuntos */
+.adjuntos-section {
+  padding: 0 24px 16px;
+}
+
+.adjuntos-section h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.adjuntos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.adjunto-imagen {
+  max-width: 200px;
+  max-height: 150px;
+  border-radius: 8px;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.adjunto-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #333;
+  font-size: 13px;
+}
+
+.adjunto-link:hover {
+  background: #e0e0e0;
+}
+
+.adjunto-video {
+  max-width: 300px;
+  border-radius: 8px;
+}
+
+/* Respuestas */
+.respuestas-section {
+  margin-bottom: 24px;
+}
+
+.respuestas-section h2 {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.no-respuestas {
+  text-align: center;
+  padding: 32px;
+  color: #888;
+}
+
+.respuestas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.respuesta-card {
+  transition: box-shadow 0.2s;
+}
+
+.respuesta-card.editando {
+  border: 2px solid #3f51b5;
+}
+
+.respuesta-content {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+}
+
+.respuesta-avatar img,
+.respuesta-avatar .avatar-placeholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.respuesta-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.respuesta-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.respuesta-fecha {
+  font-size: 12px;
+  color: #888;
+}
+
+.cita-bloque {
+  background: #f5f5f5;
+  border-left: 3px solid #3f51b5;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 0 4px 4px 0;
+}
+
+.cita-autor {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.cita-bloque p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #555;
+}
+
+.respuesta-texto {
+  white-space: pre-wrap;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.edit-textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.respuesta-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.respuesta-actions button {
+  font-size: 12px;
+}
+
+.respuesta-actions mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Formulario respuesta */
+.respuesta-form-card {
+  margin-top: 24px;
+}
+
+.cita-preview {
+  background: #e3f2fd;
+  border-left: 3px solid #1976d2;
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 0 4px 4px 0;
+}
+
+.cita-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 13px;
+  color: #1976d2;
+}
+
+.cita-preview p {
+  margin: 0;
+  font-size: 13px;
+  color: #555;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.adjuntos-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.upload-btn-small {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 2px dashed #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #666;
+  transition: border-color 0.2s;
+}
+
+.upload-btn-small:hover {
+  border-color: #3f51b5;
+  color: #3f51b5;
+}
+
+.archivo-mini-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #f0f0f0;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.archivo-mini-chip button {
+  width: 18px;
+  height: 18px;
+}
+
+.archivo-mini-chip mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.archivos-errors {
+  margin-bottom: 8px;
+}
+
+.error-text {
+  color: #c62828;
+  font-size: 12px;
+  margin: 2px 0;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.form-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cerrado-notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  background: #fff3e0;
+  border-left: 4px solid #ff9800;
+  margin-top: 24px;
+}
+
+.cerrado-notice mat-icon {
+  color: #ff9800;
+}
+
+@media (max-width: 600px) {
+  .tema-header {
+    flex-direction: column;
+  }
+
+  .tema-actions {
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+}

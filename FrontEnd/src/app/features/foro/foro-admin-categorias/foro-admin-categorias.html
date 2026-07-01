@@ -1,0 +1,97 @@
+<div class="admin-categorias-container">
+  <div class="header-row">
+    <h1>Gestión de Categorías del Foro</h1>
+    <button mat-flat-button color="primary" (click)="abrirFormulario()">
+      <mat-icon>add</mat-icon> Nueva Categoría
+    </button>
+  </div>
+
+  @if (mostrandoFormulario()) {
+    <mat-card class="form-card">
+      <mat-card-content>
+        <h2>{{ editandoId() ? 'Editar' : 'Nueva' }} Categoría</h2>
+        <form [formGroup]="form" (ngSubmit)="guardar()">
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre</mat-label>
+              <input matInput formControlName="nombre" maxlength="150">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Icono (Material Icon)</mat-label>
+              <input matInput formControlName="icono" placeholder="ej: forum, computer">
+              <mat-hint>Nombre del icono de Material Icons</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Color</mat-label>
+              <input matInput formControlName="color" type="color">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Orden</mat-label>
+              <input matInput formControlName="orden" type="number" min="0">
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="descripcion" rows="2" maxlength="500"></textarea>
+          </mat-form-field>
+
+          <div class="form-actions">
+            <button mat-button type="button" (click)="cancelarFormulario()">Cancelar</button>
+            <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+              {{ editandoId() ? 'Actualizar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (cargando()) {
+    <div class="loading-state">
+      <p>Cargando categorías...</p>
+    </div>
+  } @else if (categorias().length === 0) {
+    <div class="empty-state">
+      <mat-icon>folder_open</mat-icon>
+      <h3>No hay categorías</h3>
+      <p>Crea la primera categoría para organizar los temas del foro.</p>
+    </div>
+  } @else {
+    <mat-card>
+      <mat-list>
+        @for (cat of categorias(); track cat.id_categoria) {
+          <mat-list-item>
+            <div class="categoria-item" matListItemLine>
+              <div class="categoria-info">
+                <span class="categoria-icon" [style.color]="cat.color">
+                  <mat-icon>{{ cat.icono || 'label' }}</mat-icon>
+                </span>
+                <div>
+                  <strong>{{ cat.nombre }}</strong>
+                  @if (cat.descripcion) {
+                    <span class="categoria-desc">{{ cat.descripcion }}</span>
+                  }
+                </div>
+              </div>
+              <div class="categoria-meta">
+                <span class="temas-count">{{ cat.cantidad_temas || 0 }} temas</span>
+                <span class="orden-badge">Orden: {{ cat.orden }}</span>
+                <button mat-icon-button (click)="editarCategoria(cat)" aria-label="Editar">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="eliminarCategoria(cat)" aria-label="Eliminar">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+        }
+      </mat-list>
+    </mat-card>
+  }
+</div>

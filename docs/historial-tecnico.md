@@ -210,6 +210,71 @@ Este archivo concentra los hitos tecnicos relevantes del proyecto y reemplaza la
 - Se sincronizo `deploy-infinityfree/` con el build frontend vigente para subir directamente esa carpeta a InfinityFree.
 - El snapshot de deploy fue resincronizado una vez mas tras el ajuste final del filtro por carreras en el mapa.
 
+## 30 de junio de 2026 - Modulo de Foro
+
+### Cambio funcional
+
+- Se implemento el modulo completo de foro con hilos de discusion, categorias, respuestas y busqueda.
+- Se migró el chat en tiempo real de `/foro` a `/chat` para mantener ambas funcionalidades separadas.
+- Se agregó sistema de categorías gestionado exclusivamente por el administrador (rol=1).
+- Se implementó búsqueda fulltext de temas y respuestas.
+- Se agregó soporte de archivos adjuntos: imágenes (jpg/jpeg/png, max 300KB), PDFs (max 300KB) y videos (mp4/webm/mov, max 500KB).
+- Se implementó cierre automático de temas inactivos después de 7 días sin respuesta, con notificación por email al creador.
+- El administrador puede eliminar temas y respuestas, fijar temas y cerrar/abrir temas.
+- Los usuarios con rol=1 y rol=3 pueden crear temas y responder.
+- Solo roles 1 y 3 pueden acceder al foro.
+
+### Superficies involucradas
+
+- `BackEnd/database/migrations/20260630_foro_modulo.sql`
+- `BackEnd/models/ForoCategoria.php`
+- `BackEnd/models/ForoTema.php`
+- `BackEnd/models/ForoRespuesta.php`
+- `BackEnd/models/ForoAdjunto.php`
+- `BackEnd/models/ForoBusqueda.php`
+- `BackEnd/services/ForoMediaService.php`
+- `BackEnd/services/ForoEmailService.php`
+- `BackEnd/api/foro-categorias.php`
+- `BackEnd/api/foro-categorias-gestion.php`
+- `BackEnd/api/foro-temas.php`
+- `BackEnd/api/foro-tema-crear.php`
+- `BackEnd/api/foro-tema.php`
+- `BackEnd/api/foro-respuestas.php`
+- `BackEnd/api/foro-respuesta.php`
+- `BackEnd/api/foro-adjunto-subir.php`
+- `BackEnd/api/foro-buscar.php`
+- `BackEnd/api/foro-cerrar-inactivos.php`
+- `BackEnd/scripts/cerrar-temas-inactivos.php`
+- `FrontEnd/src/app/shared/models/foro.model.ts`
+- `FrontEnd/src/app/shared/services/foro.service.ts`
+- `FrontEnd/src/app/shared/services/foro-media.service.ts`
+- `FrontEnd/src/app/features/foro/foro-lista/`
+- `FrontEnd/src/app/features/foro/foro-tema/`
+- `FrontEnd/src/app/features/foro/foro-crear-tema/`
+- `FrontEnd/src/app/features/foro/foro-admin-categorias/`
+- `FrontEnd/src/app/features/chat/` (renombrado desde features/foro/)
+- `FrontEnd/src/app/app.routes.ts`
+
+### Decisiones tecnicas
+
+- Se mantuvo Firebase Realtime Database para el chat existente.
+- Se usó MySQL fulltext para búsqueda de temas y respuestas.
+- Se creó `ForoMediaService` para validación y subida a Cloudinary con límites por tipo.
+- Se creó `ForoEmailService` siguiendo el patrón de `Mailer.php` existente.
+- Se creó script CLI `cerrar-temas-inactivos.php` para cron job diario.
+- Se siguió la arquitectura existente: api/ para HTTP, models/ para SQL, services/ para integraciones.
+
+### Verificaciones registradas
+
+- PHP lint OK en todos los archivos backend nuevos (modelos, servicios, endpoints).
+- Build Angular pendiente de verificación.
+
+### Dependencias operativas
+
+- Requiere aplicar la migración `BackEnd/database/migrations/20260630_foro_modulo.sql`.
+- Requiere configurar cron job para `cerrar-temas-inactivos.php`.
+- Los adjuntos usan Cloudinary (ya configurado en el proyecto).
+
 ## Relacion con otros markdown historicos
 
 - `docs/historial-conversacion.md` conserva el detalle largo y contexto de negocio.

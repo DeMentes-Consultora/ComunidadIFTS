@@ -82,10 +82,34 @@ export const routes: Routes = [
     loadComponent: () => import('./features/bolsa-trabajo/bolsa-trabajo').then(m => m.BolsaTrabajo)
   },
   {
+    path: 'chat',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/chat/chat').then(m => m.ChatComponent)
+  },
+  {
     path: 'foro',
     canActivate: [authGuard, roleGuard],
-    data: { roles: [] },
-    loadComponent: () => import('./features/foro/foro').then(m => m.ForoComponent)
+    data: { roles: [1, 2, 3] },
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/foro/foro-lista/foro-lista').then(m => m.ForoListaComponent)
+      },
+      {
+        path: 'crear',
+        loadComponent: () => import('./features/foro/foro-crear-tema/foro-crear-tema').then(m => m.ForoCrearTemaComponent)
+      },
+      {
+        path: 'tema/:id',
+        loadComponent: () => import('./features/foro/foro-tema/foro-tema').then(m => m.ForoTemaComponent)
+      },
+      {
+        path: 'admin/categorias',
+        canActivate: [roleGuard],
+        data: { roles: [1] },
+        loadComponent: () => import('./features/foro/foro-admin-categorias/foro-admin-categorias').then(m => m.ForoAdminCategoriasComponent)
+      }
+    ]
   },
   {
     path: 'perfil',

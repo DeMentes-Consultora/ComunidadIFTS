@@ -15,7 +15,7 @@ import { AuthService } from '../../shared/services/auth.service';
 import { ChatMessage, ChatPresence, ForoChatInitError, ForoChatService } from '../../shared/services/foro-chat.service';
 
 @Component({
-  selector: 'app-foro',
+  selector: 'app-chat',
   standalone: true,
   imports: [
     CommonModule,
@@ -31,10 +31,10 @@ import { ChatMessage, ChatPresence, ForoChatInitError, ForoChatService } from '.
     MatDividerModule,
     MatChipsModule
   ],
-  templateUrl: './foro.html',
-  styleUrl: './foro.css'
+  templateUrl: './chat.html',
+  styleUrl: './chat.css'
 })
-export class ForoComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly foroService = inject(ForoChatService);
   private readonly authService = inject(AuthService);
   private readonly snackBar = inject(MatSnackBar);

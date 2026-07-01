@@ -2,7 +2,7 @@
 
 ## Resumen
 
-ComunidadIFTS es una plataforma con frontend Angular 21 y backend PHP para centralizar instituciones IFTS, autenticacion, administracion por roles, personalizacion del sitio, perfiles y bolsa de trabajo.
+ComunidadIFTS es una plataforma con frontend Angular 21 y backend PHP para centralizar instituciones IFTS, autenticacion, administracion por roles, personalizacion del sitio, perfiles, bolsa de trabajo y foro comunitario.
 
 ## Estado tecnico vigente
 
@@ -12,6 +12,7 @@ ComunidadIFTS es una plataforma con frontend Angular 21 y backend PHP para centr
 - Sistema de roles vigente por ID: `1` AdministradorComunidad, `2` Alumno, `3` AdministradorIFTS.
 - Flujo de bolsa de trabajo validado documentalmente con QA pass al 16-04-2026.
 - Existen correcciones posteriores documentadas para gestion de ofertas, gestion de carreras y proxy local.
+- Modulo de foro implementado con categorias, temas, respuestas, adjuntos y busqueda fulltext.
 
 ## Stack tecnico
 
@@ -67,6 +68,8 @@ ComunidadIFTS/
 - `perfil-alumno`
 - `perfil-institucion`
 - `admin`
+- `foro`
+- `chat`
 
 ### Rutas principales
 
@@ -84,12 +87,17 @@ ComunidadIFTS/
 - `/perfil`
 - `/crear-oferta`
 - `/perfil-institucion`
+- `/foro` (lista de temas)
+- `/foro/crear` (crear tema)
+- `/foro/tema/:id` (ver tema)
+- `/foro/admin/categorias` (gestionar categorias, admin)
+- `/chat` (chat en tiempo real)
 
 ### Acceso por rol
 
-- Rol 1: rutas `/admin/*`
-- Rol 2: `/bolsa-trabajo` y `/perfil`
-- Rol 3: `/crear-oferta` y `/perfil-institucion`
+- Rol 1: rutas `/admin/*`, `/foro/*`, `/chat`
+- Rol 2: `/bolsa-trabajo`, `/perfil`, `/foro/*`, `/chat`
+- Rol 3: `/crear-oferta`, `/perfil-institucion`, `/foro/*`, `/chat`
 
 ## Backend vigente
 
@@ -104,6 +112,7 @@ ComunidadIFTS/
 - Perfil de institucion.
 - Bolsa de trabajo, postulaciones y cancelacion de postulacion.
 - Contacto.
+- Foro comunitario con categorias, temas, respuestas, adjuntos y busqueda.
 
 ### Endpoints representativos
 

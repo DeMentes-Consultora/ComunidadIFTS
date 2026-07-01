@@ -47,6 +47,16 @@ Listado operativo de endpoints del backend en `BackEnd/api/` contrastado con el 
 | `/api/perfil-institucion.php` | `GET` | Si | `1`, `3` | Obtener datos del perfil o panel de institucion |
 | `/api/actualizar-datos-academicos.php` | `PUT`, `POST` | Si | `2` | Actualizar carrera y ano del alumno |
 | `/api/migrar-logos-cloudinary.php` | `GET` | No por sesion | Token `MIGRATION_TOKEN` | Migracion de logos a Cloudinary |
+| `/api/foro-categorias.php` | `GET` | Si | `1`, `2`, `3` | Listar categorias del foro |
+| `/api/foro-categorias-gestion.php` | `POST`, `PUT`, `DELETE` | Si | `1` | CRUD de categorias (solo admin) |
+| `/api/foro-temas.php` | `GET` | Si | `1`, `2`, `3` | Listar/buscar temas del foro |
+| `/api/foro-tema-crear.php` | `POST` | Si | `1`, `2`, `3` | Crear nuevo tema |
+| `/api/foro-tema.php` | `GET`, `PUT`, `DELETE` | Si | `1`, `2`, `3` | Ver, editar, cerrar, fijar o eliminar tema |
+| `/api/foro-respuestas.php` | `GET`, `POST` | Si | `1`, `2`, `3` | Listar/crear respuestas a un tema |
+| `/api/foro-respuesta.php` | `PUT`, `DELETE` | Si | `1`, `2`, `3` | Editar o eliminar respuesta |
+| `/api/foro-adjunto-subir.php` | `POST` | Si | `1`, `2`, `3` | Subir archivo adjunto (imagen/pdf/video) |
+| `/api/foro-buscar.php` | `GET` | Si | `1`, `2`, `3` | Busqueda fulltext en temas y respuestas |
+| `/api/foro-cerrar-inactivos.php` | `GET` | Si | `1` | Cerrar temas inactivos (7+ dias sin respuesta) |
 
 ## Notas
 

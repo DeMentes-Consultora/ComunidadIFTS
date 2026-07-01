@@ -1,0 +1,263 @@
+<div class="foro-tema-container">
+  @if (cargando()) {
+    <div class="loading-state">
+      <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+      <p>Cargando tema...</p>
+    </div>
+  } @else if (!tema()) {
+    <div class="empty-state">
+      <mat-icon>error_outline</mat-icon>
+      <h3>Tema no encontrado</h3>
+      <button mat-flat-button color="primary" (click)="irALista()">Volver al foro</button>
+    </div>
+  } @else {
+    <!-- Encabezado del tema -->
+    <mat-card class="tema-header-card">
+      <div class="tema-header">
+        <div class="tema-header-info">
+          <div class="breadcrumb">
+            <a (click)="irALista()" class="link-back">Foro</a>
+            <mat-icon>chevron_right</mat-icon>
+            <span>{{ tema()!.nombre_categoria }}</span>
+          </div>
+          <h1>
+            @if (tema()!.fijo) {
+              <mat-icon class="pin-icon" matTooltip="Fijado">push_pin</mat-icon>
+            }
+            @if (tema()!.cerrado) {
+              <mat-icon class="closed-icon" matTooltip="Cerrado">lock</mat-icon>
+            }
+            {{ tema()!.titulo }}
+          </h1>
+          <div class="tema-meta">
+            <span class="autor">
+              @if (tema()!.autor_foto) {
+                <img [src]="tema()!.autor_foto" class="autor-avatar">
+              } @else {
+                <span class="avatar-placeholder small">{{ tema()!.autor_nombre?.charAt(0) }}{{ tema()!.autor_apellido?.charAt(0) }}</span>
+              }
+              {{ tema()!.autor_nombre }} {{ tema()!.autor_apellido }}
+            </span>
+            <span>{{ formatearFecha(tema()!.idCreate) }}</span>
+            <span>{{ tema()!.vistas }} vistas</span>
+          </div>
+        </div>
+
+        <!-- Acciones admin -->
+        @if (esAdmin()) {
+          <div class="tema-actions">
+            @if (tema()!.cerrado) {
+              <button mat-stroked-button color="primary" (click)="abrirTema()">
+                <mat-icon>lock_open</mat-icon> Abrir
+              </button>
+            } @else {
+              <button mat-stroked-button (click)="cerrarTema()">
+                <mat-icon>lock</mat-icon> Cerrar
+              </button>
+            }
+            <button mat-stroked-button (click)="fijarTema(!tema()!.fijo)">
+              <mat-icon>push_pin</mat-icon> {{ tema()!.fijo ? 'Desfijar' : 'Fijar' }}
+            </button>
+            <button mat-stroked-button color="warn" (click)="eliminarTema()">
+              <mat-icon>delete</mat-icon> Eliminar
+            </button>
+          </div>
+        }
+      </div>
+
+      <!-- Contenido del tema -->
+      <mat-card-content>
+        <div class="tema-contenido">
+          <p>{{ tema()!.contenido }}</p>
+        </div>
+
+        <!-- Adjuntos del tema -->
+        @if (adjuntosTema().length > 0) {
+          <div class="adjuntos-section">
+            <h4>Archivos adjuntos</h4>
+            <div class="adjuntos-grid">
+              @for (adj of adjuntosTema(); track adj.id_adjunto) {
+                <div class="adjunto-item">
+                  @if (adj.tipo === 'imagen') {
+                    <a [href]="adj.archivo_url" target="_blank">
+                      <img [src]="adj.archivo_url" [alt]="adj.archivo_nombre_original" class="adjunto-imagen">
+                    </a>
+                  } @else if (adj.tipo === 'pdf') {
+                    <a [href]="adj.archivo_url" target="_blank" class="adjunto-link">
+                      <mat-icon>picture_as_pdf</mat-icon>
+                      <span>{{ adj.archivo_nombre_original }}</span>
+                    </a>
+                  } @else if (adj.tipo === 'video') {
+                    <video controls class="adjunto-video">
+                      <source [src]="adj.archivo_url">
+                    </video>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Respuestas -->
+    <div class="respuestas-section">
+      <h2>{{ totalRespuestas() }} {{ totalRespuestas() === 1 ? 'Respuesta' : 'Respuestas' }}</h2>
+
+      @if (cargandoRespuestas()) {
+        <mat-progress-spinner diameter="30" mode="indeterminate"></mat-progress-spinner>
+      } @else if (respuestas().length === 0) {
+        <div class="no-respuestas">
+          <mat-icon>chat_bubble_outline</mat-icon>
+          <p>Sé el primero en responder</p>
+        </div>
+      } @else {
+        <div class="respuestas-list">
+          @for (respuesta of respuestas(); track respuesta.id_respuesta) {
+            <mat-card class="respuesta-card" [class.editando]="respuestaEditandoId() === respuesta.id_respuesta">
+              <div class="respuesta-content">
+                <div class="respuesta-avatar">
+                  @if (respuesta.autor_foto) {
+                    <img [src]="respuesta.autor_foto" [alt]="respuesta.autor_nombre">
+                  } @else {
+                    <span class="avatar-placeholder">{{ respuesta.autor_nombre?.charAt(0) }}{{ respuesta.autor_apellido?.charAt(0) }}</span>
+                  }
+                </div>
+                <div class="respuesta-body">
+                  <div class="respuesta-header">
+                    <strong>{{ respuesta.autor_nombre }} {{ respuesta.autor_apellido }}</strong>
+                    <span class="respuesta-fecha">{{ formatearFecha(respuesta.idCreate) }}</span>
+                  </div>
+
+                  <!-- Cita -->
+                  @if (respuesta.citando_id && respuesta.citando_contenido) {
+                    <div class="cita-bloque">
+                      <span class="cita-autor">{{ respuesta.citando_autor_nombre }} {{ respuesta.citando_autor_apellido }} dijo:</span>
+                      <p>{{ respuesta.citando_contenido }}</p>
+                    </div>
+                  }
+
+                  @if (respuestaEditandoId() === respuesta.id_respuesta) {
+                    <textarea [ngModel]="respuestaEditandoContenido()" (ngModelChange)="respuestaEditandoContenido.set($event)" rows="4" class="edit-textarea"></textarea>
+                    <div class="edit-actions">
+                      <button mat-button (click)="cancelarEdicionRespuesta()">Cancelar</button>
+                      <button mat-flat-button color="primary" (click)="guardarEdicionRespuesta()">Guardar</button>
+                    </div>
+                  } @else {
+                    <p class="respuesta-texto">{{ respuesta.contenido }}</p>
+                  }
+
+                  <!-- Acciones -->
+                  @if (respuestaEditandoId() !== respuesta.id_respuesta) {
+                    <div class="respuesta-actions">
+                      @if (!tema()!.cerrado) {
+                        <button mat-button (click)="citarRespuesta(respuesta)">
+                          <mat-icon>format_quote</mat-icon> Citar
+                        </button>
+                      }
+                      @if (esAutorRespuesta(respuesta) || esAdmin()) {
+                        <button mat-button (click)="iniciarEdicionRespuesta(respuesta)">
+                          <mat-icon>edit</mat-icon> Editar
+                        </button>
+                      }
+                      @if (esAdmin()) {
+                        <button mat-button color="warn" (click)="eliminarRespuesta(respuesta.id_respuesta)">
+                          <mat-icon>delete</mat-icon> Eliminar
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </mat-card>
+          }
+        </div>
+
+        <mat-paginator
+          [length]="totalRespuestas()"
+          [pageSize]="limitRespuestas()"
+          [pageSizeOptions]="[10, 20, 50]"
+          (page)="onPageRespuestasChange($event)"
+          showFirstLastButtons>
+        </mat-paginator>
+      }
+    </div>
+
+    <!-- Formulario de respuesta -->
+    @if (!tema()!.cerrado) {
+      <mat-card class="respuesta-form-card">
+        <mat-card-header>
+          <mat-card-title>Tu respuesta</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (citandoId()) {
+            <div class="cita-preview">
+              <div class="cita-header">
+                <mat-icon>format_quote</mat-icon>
+                <span>Respondiendo a:</span>
+                <button mat-icon-button (click)="cancelarCita()">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+              <p>{{ citandoTexto() }}</p>
+            </div>
+          }
+
+          <form (ngSubmit)="enviarRespuesta()">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Escribí tu respuesta</mat-label>
+              <textarea matInput [(ngModel)]="respuestaForm.value.contenido"
+                        [ngModelOptions]="{standalone: true}"
+                        rows="4" placeholder="Compartí tu opinión..."></textarea>
+            </mat-form-field>
+
+            <!-- Adjuntos respuesta -->
+            <div class="adjuntos-inline">
+              <label class="upload-btn-small" for="file-respuesta">
+                <mat-icon>attach_file</mat-icon>
+              </label>
+              <input id="file-respuesta" type="file" multiple hidden
+                     accept=".jpg,.jpeg,.png,.pdf,.mp4,.webm,.mov"
+                     (change)="onArchivosSeleccionados($event)">
+
+              @for (archivo of archivosAdjuntos(); track archivo.name; let i = $index) {
+                <span class="archivo-mini-chip">
+                  {{ archivo.name }}
+                  <button mat-icon-button type="button" (click)="eliminarArchivo(i)">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </span>
+              }
+            </div>
+
+            @if (archivosError().length > 0) {
+              <div class="archivos-errors">
+                @for (error of archivosError(); track error) {
+                  <p class="error-text">{{ error }}</p>
+                }
+              </div>
+            }
+
+            <div class="form-actions">
+              <button mat-flat-button color="primary" type="submit"
+                      [disabled]="respuestaForm.invalid || enviando()">
+                @if (enviando()) {
+                  <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+                } @else {
+                  <ng-container>
+                    <mat-icon>send</mat-icon> Enviar Respuesta
+                  </ng-container>
+                }
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    } @else {
+      <mat-card class="cerrado-notice">
+        <mat-icon>lock</mat-icon>
+        <p>Este tema está cerrado y no admite nuevas respuestas.</p>
+      </mat-card>
+    }
+  }
+</div>

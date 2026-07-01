@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 19-04-2026 a las 20:33:16
+-- Tiempo de generación: 01-07-2026 a las 04:18:50
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -20,9 +20,9 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `comunidad_ifts`
 --
-CREATE DATABASE IF NOT EXISTS `comunidad_ifts` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
 -- --------------------------------------------------------
-USE `comunidad_ifts`;
+
 --
 -- Estructura de tabla para la tabla `bolsadetrabajo`
 --
@@ -173,7 +173,212 @@ CREATE TABLE `carrousel` (
 INSERT INTO `carrousel` (`id_carrousel`, `titulo`, `descripcion`, `enlace`, `orden_visual`, `foto_perfil_public_id`, `foto_perfil_url`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
 (1, 'Bienvenido a Comunidad IFTS', 'Conecta con todos los Institutos Superiores de Tecnologia de Buenos Aires', '#', 1, 'ComunidadIFTS/carrusel/php86D5_sydagd', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776363189/ComunidadIFTS/carrusel/php86D5_sydagd.png', 1, 0, '2026-04-14 15:50:23', '2026-04-16 18:13:12'),
 (2, 'IFTS y comunidad', 'Descubre carreras, instituciones y oportunidades para crecer profesionalmente', '#', 2, 'ComunidadIFTS/carrusel/php8792_bpidkr', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776363190/ComunidadIFTS/carrusel/php8792_bpidkr.png', 1, 0, '2026-04-14 15:50:23', '2026-04-16 18:13:12'),
-(3, 'Estudia sistemas en el IFTS12', 'Modelo vitual y presencial', 'https://ifts12online.com.ar/', 3, NULL, NULL, 1, 0, '2026-04-19 15:34:08', '2026-04-19 15:34:08');
+(3, 'Estudia sistemas en el IFTS12', 'Modelo vitual y presencial', 'https://ifts12online.com.ar/', 3, 'ComunidadIFTS/carrusel/php6226_c9t5zf', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776612847/ComunidadIFTS/carrusel/php6226_c9t5zf.jpg', 1, 0, '2026-04-19 15:34:08', '2026-04-19 15:34:08'),
+(4, '', '', NULL, 4, 'ComunidadIFTS/carrusel/php31F0_mivyac', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715984/ComunidadIFTS/carrusel/php31F0_mivyac.jpg', 1, 0, '2026-04-20 20:13:14', '2026-04-20 20:13:14'),
+(5, '', '', NULL, 5, 'ComunidadIFTS/carrusel/php4D6A_v7h3ut', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776716254/ComunidadIFTS/carrusel/php4D6A_v7h3ut.jpg', 1, 0, '2026-04-20 20:17:35', '2026-04-20 20:17:35');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `detalle_orden`
+--
+
+CREATE TABLE `detalle_orden` (
+  `id_detalle_orden` int(11) NOT NULL,
+  `id_orden` int(11) NOT NULL,
+  `id_producto` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL,
+  `precio_final` decimal(10,2) NOT NULL,
+  `habilitado` tinyint(1) NOT NULL DEFAULT 1,
+  `cancelado` tinyint(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `envio`
+--
+
+CREATE TABLE `envio` (
+  `id_envio` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `id_orden` int(11) NOT NULL,
+  `direccion` varchar(255) NOT NULL,
+  `altura` varchar(20) DEFAULT NULL,
+  `cod_post` varchar(20) DEFAULT NULL,
+  `localidad` varchar(100) DEFAULT NULL,
+  `barrio` varchar(100) DEFAULT NULL,
+  `habilitado` tinyint(1) NOT NULL DEFAULT 1,
+  `cancelado` tinyint(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `footer_branding`
+--
+
+CREATE TABLE `footer_branding` (
+  `id_footer_branding` int(11) NOT NULL,
+  `developer_text` varchar(255) NOT NULL DEFAULT 'Desarrollado por DeMentesConsultora',
+  `enlace` varchar(255) DEFAULT NULL,
+  `foto_perfil_url` text DEFAULT NULL,
+  `foto_perfil_public_id` varchar(255) DEFAULT NULL,
+  `habilitado` tinyint(1) NOT NULL DEFAULT 1,
+  `cancelado` tinyint(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `footer_branding`
+--
+
+INSERT INTO `footer_branding` (`id_footer_branding`, `developer_text`, `enlace`, `foto_perfil_url`, `foto_perfil_public_id`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, 'Desarrollado por DeMentesConsultora', 'https://dementes.infinityfreeapp.com/', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776812776/ComunidadIFTS/footer-branding/php315F_i2d31l.png', 'ComunidadIFTS/footer-branding/php315F_i2d31l', 1, 0, '2026-04-21 23:06:16', '2026-04-21 23:13:57');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `foro_adjunto`
+--
+
+CREATE TABLE `foro_adjunto` (
+  `id_adjunto` int(11) NOT NULL,
+  `id_tema` int(11) DEFAULT NULL,
+  `id_respuesta` int(11) DEFAULT NULL,
+  `tipo` enum('imagen','pdf','video') NOT NULL,
+  `archivo_url` varchar(512) NOT NULL,
+  `archivo_public_id` varchar(255) DEFAULT NULL,
+  `archivo_nombre_original` varchar(255) NOT NULL,
+  `archivo_tamano_bytes` int(11) NOT NULL,
+  `habilitado` int(1) NOT NULL DEFAULT 1,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `foro_adjuntos`
+--
+
+CREATE TABLE `foro_adjuntos` (
+  `id_adjunto` int(11) NOT NULL,
+  `id_mensaje` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `nombre_archivo` varchar(255) NOT NULL,
+  `archivo_url` varchar(512) NOT NULL,
+  `archivo_public_id` varchar(512) NOT NULL,
+  `tipo_contenido` varchar(100) NOT NULL,
+  `bytes` int(11) NOT NULL DEFAULT 0,
+  `cancelado` int(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `foro_categoria`
+--
+
+CREATE TABLE `foro_categoria` (
+  `id_categoria` int(11) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `descripcion` varchar(500) DEFAULT NULL,
+  `icono` varchar(50) DEFAULT NULL,
+  `color` varchar(7) DEFAULT '#3f51b5',
+  `orden` int(11) NOT NULL DEFAULT 0,
+  `habilitado` int(1) NOT NULL DEFAULT 1,
+  `cancelado` int(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `foro_categoria`
+--
+
+INSERT INTO `foro_categoria` (`id_categoria`, `nombre`, `descripcion`, `icono`, `color`, `orden`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, 'General', 'Temas generales de la comunidad', 'forum', '#3f51b5', 1, 1, 0, '2026-07-01 02:15:59', '2026-07-01 02:15:59'),
+(2, 'Tecnología', 'Discusiones sobre tecnología y desarrollo', 'computer', '#4caf50', 2, 1, 0, '2026-07-01 02:15:59', '2026-07-01 02:15:59'),
+(3, 'Instituciones', 'Temas relacionados con los IFTS', 'school', '#ff9800', 3, 1, 0, '2026-07-01 02:15:59', '2026-07-01 02:15:59'),
+(4, 'Bolsa de Trabajo', 'Ofertas y oportunidades laborales', 'work', '#e91e63', 4, 1, 0, '2026-07-01 02:15:59', '2026-07-01 02:15:59'),
+(5, 'Ayuda', 'Consultas y soporte técnico', 'help', '#9c27b0', 5, 1, 0, '2026-07-01 02:15:59', '2026-07-01 02:15:59');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `foro_mensajes`
+--
+
+CREATE TABLE `foro_mensajes` (
+  `id_mensaje` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `mensaje` text NOT NULL,
+  `cancelado` int(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `foro_respuesta`
+--
+
+CREATE TABLE `foro_respuesta` (
+  `id_respuesta` int(11) NOT NULL,
+  `id_tema` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `contenido` text NOT NULL,
+  `citando_id` int(11) DEFAULT NULL,
+  `habilitado` int(1) NOT NULL DEFAULT 1,
+  `cancelado` int(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `foro_tema`
+--
+
+CREATE TABLE `foro_tema` (
+  `id_tema` int(11) NOT NULL,
+  `id_categoria` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `titulo` varchar(255) NOT NULL,
+  `contenido` text NOT NULL,
+  `vistas` int(11) NOT NULL DEFAULT 0,
+  `cantidad_respuestas` int(11) NOT NULL DEFAULT 0,
+  `cerrado` int(1) NOT NULL DEFAULT 0,
+  `motivo_cierre` varchar(500) DEFAULT NULL,
+  `fijo` int(1) NOT NULL DEFAULT 0,
+  `habilitado` int(1) NOT NULL DEFAULT 1,
+  `cancelado` int(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `foro_vista`
+--
+
+CREATE TABLE `foro_vista` (
+  `id_vista` int(11) NOT NULL,
+  `id_tema` int(11) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `idCreate` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -379,7 +584,24 @@ CREATE TABLE `navbar` (
 --
 
 INSERT INTO `navbar` (`id_navbar`, `brand_text`, `foto_perfil_public_id`, `foto_perfil_url`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
-(1, 'Todo en un solo lugar', 'ComunidadIFTS/navbar/php2585_mdlpuq', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776430687/ComunidadIFTS/navbar/php2585_mdlpuq.png', 1, 0, '2026-04-14 15:50:23', '2026-04-19 15:31:00');
+(1, 'Todo en un solo lugar', 'ComunidadIFTS/navbar/phpDC60_xfkicq', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776716225/ComunidadIFTS/navbar/phpDC60_xfkicq.png', 1, 0, '2026-04-14 15:50:23', '2026-04-20 20:17:06');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `orden`
+--
+
+CREATE TABLE `orden` (
+  `id_orden` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `fecha` datetime NOT NULL DEFAULT current_timestamp(),
+  `numeroDeOrden` varchar(20) NOT NULL,
+  `habilitado` tinyint(1) NOT NULL DEFAULT 1,
+  `cancelado` tinyint(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -415,13 +637,13 @@ INSERT INTO `persona` (`id_persona`, `apellido`, `nombre`, `edad`, `dni`, `fecha
 (5, 'Prueba', 'Ana', 26, '12345672', '2000-01-01', '1111111111', NULL, NULL, 1, 0, '2026-02-26 00:00:07', '2026-02-26 00:00:07'),
 (6, 'Prueba', 'Ana', 26, '44290499', '2000-01-01', '1111111111', NULL, NULL, 1, 0, '2026-02-26 00:02:44', '2026-02-26 00:02:44'),
 (7, 'prueba', 'prueba', 47, '26523654', '1978-05-16', '1156523654', NULL, NULL, 1, 0, '2026-02-26 00:19:47', '2026-02-26 00:19:47'),
-(8, 'Nuevo', 'Test', 25, '64533288', '2000-05-10', '1112345678', NULL, NULL, 1, 0, '2026-02-26 00:22:28', '2026-02-26 00:22:28'),
-(9, 'Test', 'Form', 25, '58800111', '2000-05-10', '1112345678', NULL, NULL, 1, 0, '2026-02-26 00:23:36', '2026-02-26 00:23:36'),
-(10, 'nuevo', 'nuevo', 26, '23654256', '2000-02-02', '1152365478', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776614615/ComunidadIFTS/perfiles/php5A15_iwjibt.jpg', 'ComunidadIFTS/perfiles/php5A15_iwjibt', 1, 0, '2026-02-26 00:26:05', '2026-04-19 16:03:36'),
+(8, 'Alumno', '3', 25, '64533288', '2000-05-10', '1112345678', NULL, NULL, 1, 0, '2026-02-26 00:22:28', '2026-06-28 22:06:24'),
+(9, 'Alumno', '2', 25, '58800111', '2000-05-10', '1112345678', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776625070/ComunidadIFTS/perfiles/phpE1B6_uiyqg2.jpg', 'ComunidadIFTS/perfiles/phpE1B6_uiyqg2', 1, 0, '2026-02-26 00:23:36', '2026-06-28 22:05:28'),
+(10, 'Alumno', '1', 26, '23654256', '2000-02-02', '1152365478', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776614615/ComunidadIFTS/perfiles/php5A15_iwjibt.jpg', 'ComunidadIFTS/perfiles/php5A15_iwjibt', 1, 0, '2026-02-26 00:26:05', '2026-06-28 22:06:34'),
 (11, 'nuevo', 'otroNuevo', 47, '12532569', '1978-10-16', '115236987', NULL, NULL, 1, 0, '2026-02-26 02:50:46', '2026-02-26 02:50:46'),
 (12, 'Pendiente', 'Mail', 25, '49254786', '2000-05-10', '1112345678', NULL, NULL, 1, 0, '2026-02-26 02:55:08', '2026-02-26 02:55:08'),
-(13, 'registro', 'registro', 47, '12523654', '1978-10-16', '1123654789', NULL, NULL, 1, 0, '2026-02-26 03:00:33', '2026-02-26 03:00:33'),
-(14, 'consultora', 'dementes', 47, '12365298', '1978-10-16', '1152365489', NULL, NULL, 1, 0, '2026-03-13 12:50:34', '2026-03-13 12:50:34'),
+(13, 'seba', 'mino', 47, '12523654', '1978-10-16', '1123654789', NULL, NULL, 1, 0, '2026-02-26 03:00:33', '2026-06-28 22:28:38'),
+(14, 'consultora', 'dementes', 47, '12365298', '1978-10-16', '1152365489', 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776814099/ComunidadIFTS/perfiles/afvofaytfxpnuinilfzi.jpg', 'ComunidadIFTS/perfiles/afvofaytfxpnuinilfzi', 1, 0, '2026-03-13 12:50:34', '2026-04-21 23:28:18'),
 (15, 'muchachos deL INAP IFTS12', 'Los', 69, '12365236', '1956-10-16', '1125365236', NULL, NULL, 1, 0, '2026-03-13 14:33:55', '2026-03-13 14:33:55'),
 (16, 'muchachos deL INAP IFTS12', 'Los', 69, '26469523', '1956-10-16', '1125365475', NULL, NULL, 1, 0, '2026-03-13 15:17:03', '2026-03-13 15:17:03'),
 (17, 'Minotti', 'Sebastian', 47, '26589632', '1978-10-16', '1152365478', NULL, NULL, 1, 0, '2026-03-13 15:22:26', '2026-03-13 15:22:26'),
@@ -459,6 +681,53 @@ INSERT INTO `postulacion` (`id_postulacion`, `id_bolsaDeTrabajo`, `id_usuario`, 
 (4, 3, 9, 'https://res.cloudinary.com/dm8ds67tb/raw/upload/v1776619177/ComunidadIFTS/CVs/CVs/phpF6B7_avzogf.tmp', 'ComunidadIFTS/CVs/CVs/phpF6B7_avzogf.tmp', 0, 0, '2026-04-19 17:19:37', '2026-04-19 17:19:37'),
 (5, 4, 9, 'https://res.cloudinary.com/dm8ds67tb/raw/upload/v1776619969/ComunidadIFTS/CVs/CVs/php8CF_bq5ez9.tmp', 'ComunidadIFTS/CVs/CVs/php8CF_bq5ez9.tmp', 0, 0, '2026-04-19 17:32:49', '2026-04-19 17:32:49'),
 (6, 2, 9, 'https://res.cloudinary.com/dm8ds67tb/raw/upload/v1776619995/ComunidadIFTS/CVs/CVs/php7296_qbxbuo.tmp', 'ComunidadIFTS/CVs/CVs/php7296_qbxbuo.tmp', 0, 0, '2026-04-19 17:33:15', '2026-04-19 17:33:15');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `producto`
+--
+
+CREATE TABLE `producto` (
+  `id_producto` int(11) NOT NULL,
+  `id_proveedor` int(11) NOT NULL,
+  `fotoProducto` text DEFAULT NULL,
+  `fotoProducto_url` varchar(512) DEFAULT NULL,
+  `fotoProducto_public_id` varchar(255) DEFAULT NULL,
+  `nombreProducto` varchar(255) NOT NULL,
+  `descripcionProducto` text DEFAULT NULL,
+  `costo` decimal(10,2) NOT NULL,
+  `ganancia` decimal(5,2) NOT NULL,
+  `precioFinal` decimal(10,2) NOT NULL,
+  `habilitado` tinyint(1) NOT NULL DEFAULT 1,
+  `cancelado` tinyint(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `proveedor`
+--
+
+CREATE TABLE `proveedor` (
+  `id_proveedor` int(11) NOT NULL,
+  `fotoPerfil` text DEFAULT NULL,
+  `fotoPerfil_url` varchar(512) DEFAULT NULL,
+  `fotoPerfil_public_id` varchar(255) DEFAULT NULL,
+  `nombreProveedor` varchar(255) NOT NULL,
+  `direccion` varchar(255) DEFAULT NULL,
+  `altura` varchar(20) DEFAULT NULL,
+  `localidad` varchar(100) DEFAULT NULL,
+  `barrio` varchar(100) DEFAULT NULL,
+  `telefono` varchar(50) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `habilitado` tinyint(1) NOT NULL DEFAULT 1,
+  `cancelado` tinyint(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -511,6 +780,99 @@ INSERT INTO `sidebar` (`id_sidebar`, `brand_text`, `foto_perfil_public_id`, `fot
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `stock`
+--
+
+CREATE TABLE `stock` (
+  `id_stock` int(11) NOT NULL,
+  `id_producto` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT 0,
+  `habilitado` tinyint(1) NOT NULL DEFAULT 1,
+  `cancelado` tinyint(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tienda_carrousel`
+--
+
+CREATE TABLE `tienda_carrousel` (
+  `id_tienda_carrousel` int(11) NOT NULL,
+  `titulo` varchar(255) NOT NULL DEFAULT '',
+  `descripcion` text DEFAULT NULL,
+  `enlace` varchar(255) DEFAULT NULL,
+  `orden_visual` int(11) NOT NULL DEFAULT 1,
+  `foto_perfil_url` text DEFAULT NULL,
+  `foto_perfil_public_id` varchar(255) DEFAULT NULL,
+  `habilitado` tinyint(1) NOT NULL DEFAULT 1,
+  `cancelado` tinyint(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `tienda_carrousel`
+--
+
+INSERT INTO `tienda_carrousel` (`id_tienda_carrousel`, `titulo`, `descripcion`, `enlace`, `orden_visual`, `foto_perfil_url`, `foto_perfil_public_id`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, '', '', NULL, 1, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715487/ComunidadIFTS/tienda/carrusel/php9CDC_wolmti.jpg', 'ComunidadIFTS/tienda/carrusel/php9CDC_wolmti', 1, 1, '2026-04-20 20:04:52', '2026-04-20 20:10:54'),
+(2, '', '', NULL, 2, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715489/ComunidadIFTS/tienda/carrusel/php9CDD_mpr2h7.jpg', 'ComunidadIFTS/tienda/carrusel/php9CDD_mpr2h7', 1, 1, '2026-04-20 20:04:52', '2026-04-20 20:10:54'),
+(3, '', '', NULL, 3, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715490/ComunidadIFTS/tienda/carrusel/php9CDE_zlwncu.jpg', 'ComunidadIFTS/tienda/carrusel/php9CDE_zlwncu', 1, 1, '2026-04-20 20:04:52', '2026-04-20 20:10:54'),
+(4, '', '', NULL, 4, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715491/ComunidadIFTS/tienda/carrusel/php9CEF_ozd686.jpg', 'ComunidadIFTS/tienda/carrusel/php9CEF_ozd686', 1, 1, '2026-04-20 20:04:52', '2026-04-20 20:10:54'),
+(5, '', '', NULL, 1, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715847/ComunidadIFTS/tienda/carrusel/phpE5D8_dh2gnm.jpg', 'ComunidadIFTS/tienda/carrusel/phpE5D8_dh2gnm', 1, 1, '2026-04-20 20:10:54', '2026-04-20 20:13:14'),
+(6, '', '', NULL, 2, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715848/ComunidadIFTS/tienda/carrusel/phpE5D9_jxiegz.jpg', 'ComunidadIFTS/tienda/carrusel/phpE5D9_jxiegz', 1, 1, '2026-04-20 20:10:54', '2026-04-20 20:13:14'),
+(7, '', '', NULL, 3, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715849/ComunidadIFTS/tienda/carrusel/phpE5E9_mxccsw.jpg', 'ComunidadIFTS/tienda/carrusel/phpE5E9_mxccsw', 1, 1, '2026-04-20 20:10:54', '2026-04-20 20:13:14'),
+(8, '', '', NULL, 4, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715850/ComunidadIFTS/tienda/carrusel/phpE5EA_jylfuw.jpg', 'ComunidadIFTS/tienda/carrusel/phpE5EA_jylfuw', 1, 1, '2026-04-20 20:10:54', '2026-04-20 20:13:14'),
+(9, '', '', NULL, 1, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715985/ComunidadIFTS/tienda/carrusel/php31F1_mbcdup.jpg', 'ComunidadIFTS/tienda/carrusel/php31F1_mbcdup', 1, 0, '2026-04-20 20:13:14', '2026-04-20 20:13:14'),
+(10, '', '', NULL, 2, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715987/ComunidadIFTS/tienda/carrusel/php31F2_ach7xz.jpg', 'ComunidadIFTS/tienda/carrusel/php31F2_ach7xz', 1, 0, '2026-04-20 20:13:14', '2026-04-20 20:13:14'),
+(11, '', '', NULL, 3, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715988/ComunidadIFTS/tienda/carrusel/php31F3_htoy9p.jpg', 'ComunidadIFTS/tienda/carrusel/php31F3_htoy9p', 1, 0, '2026-04-20 20:13:14', '2026-04-20 20:13:14'),
+(12, '', '', NULL, 4, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776811347/ComunidadIFTS/tienda/carrusel/php622B_ehtrku.jpg', 'ComunidadIFTS/tienda/carrusel/php622B_ehtrku', 1, 0, '2026-04-20 20:13:14', '2026-04-21 22:42:29'),
+(13, '', '', NULL, 5, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776810619/ComunidadIFTS/tienda/carrusel/php9CFB_qufebe.jpg', 'ComunidadIFTS/tienda/carrusel/php9CFB_qufebe', 1, 0, '2026-04-21 22:30:19', '2026-04-21 22:30:19'),
+(14, '', '', NULL, 6, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776811349/ComunidadIFTS/tienda/carrusel/php622C_xhbqie.jpg', 'ComunidadIFTS/tienda/carrusel/php622C_xhbqie', 1, 0, '2026-04-21 22:42:29', '2026-04-21 22:42:29'),
+(15, '', '', NULL, 7, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776811472/ComunidadIFTS/tienda/carrusel/php48A0_ujznq1.jpg', 'ComunidadIFTS/tienda/carrusel/php48A0_ujznq1', 1, 0, '2026-04-21 22:44:32', '2026-04-21 22:44:32');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tienda_producto`
+--
+
+CREATE TABLE `tienda_producto` (
+  `id_tienda_producto` int(11) NOT NULL,
+  `titulo` varchar(255) NOT NULL DEFAULT '',
+  `descripcion` text DEFAULT NULL,
+  `enlace` varchar(255) DEFAULT NULL,
+  `orden_visual` int(11) NOT NULL DEFAULT 1,
+  `foto_perfil_url` text DEFAULT NULL,
+  `foto_perfil_public_id` varchar(255) DEFAULT NULL,
+  `habilitado` tinyint(1) NOT NULL DEFAULT 1,
+  `cancelado` tinyint(1) NOT NULL DEFAULT 0,
+  `idCreate` timestamp NULL DEFAULT current_timestamp(),
+  `idUpdate` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `tienda_producto`
+--
+
+INSERT INTO `tienda_producto` (`id_tienda_producto`, `titulo`, `descripcion`, `enlace`, `orden_visual`, `foto_perfil_url`, `foto_perfil_public_id`, `habilitado`, `cancelado`, `idCreate`, `idUpdate`) VALUES
+(1, '', '', NULL, 1, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715853/ComunidadIFTS/tienda/galeria/phpE5EB_c6oadi.jpg', 'ComunidadIFTS/tienda/galeria/phpE5EB_c6oadi', 1, 1, '2026-04-20 20:10:54', '2026-04-20 20:13:14'),
+(2, '', '', NULL, 1, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776715992/ComunidadIFTS/tienda/galeria/php31F5_oz4c9k.jpg', 'ComunidadIFTS/tienda/galeria/php31F5_oz4c9k', 1, 0, '2026-04-20 20:13:14', '2026-04-20 20:13:14'),
+(3, '', '', NULL, 2, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776716346/ComunidadIFTS/tienda/galeria/phpB70E_wa31zy.jpg', 'ComunidadIFTS/tienda/galeria/phpB70E_wa31zy', 1, 0, '2026-04-20 20:19:13', '2026-04-20 20:19:13'),
+(4, '', '', NULL, 3, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776716347/ComunidadIFTS/tienda/galeria/phpB70F_bjbibp.jpg', 'ComunidadIFTS/tienda/galeria/phpB70F_bjbibp', 1, 0, '2026-04-20 20:19:13', '2026-04-20 20:19:13'),
+(5, '', '', NULL, 4, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776716348/ComunidadIFTS/tienda/galeria/phpB710_qpdegy.jpg', 'ComunidadIFTS/tienda/galeria/phpB710_qpdegy', 1, 0, '2026-04-20 20:19:13', '2026-04-20 20:19:13'),
+(6, '', '', NULL, 5, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776716349/ComunidadIFTS/tienda/galeria/phpB711_kdivlx.jpg', 'ComunidadIFTS/tienda/galeria/phpB711_kdivlx', 1, 0, '2026-04-20 20:19:13', '2026-04-20 20:19:13'),
+(7, '', '', NULL, 6, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776716350/ComunidadIFTS/tienda/galeria/phpB721_sw1ror.jpg', 'ComunidadIFTS/tienda/galeria/phpB721_sw1ror', 1, 0, '2026-04-20 20:19:13', '2026-04-20 20:19:13'),
+(8, '', '', NULL, 7, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776716351/ComunidadIFTS/tienda/galeria/phpB722_xdd1g9.jpg', 'ComunidadIFTS/tienda/galeria/phpB722_xdd1g9', 1, 0, '2026-04-20 20:19:13', '2026-04-20 20:19:13'),
+(9, '', '', NULL, 8, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776716351/ComunidadIFTS/tienda/galeria/phpB723_pyezhv.jpg', 'ComunidadIFTS/tienda/galeria/phpB723_pyezhv', 1, 0, '2026-04-20 20:19:13', '2026-04-20 20:19:13'),
+(10, '', '', NULL, 9, 'https://res.cloudinary.com/dm8ds67tb/image/upload/v1776716352/ComunidadIFTS/tienda/galeria/phpB724_ljwfjy.jpg', 'ComunidadIFTS/tienda/galeria/phpB724_ljwfjy', 1, 0, '2026-04-20 20:19:13', '2026-04-20 20:19:13');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `usuario`
 --
 
@@ -541,9 +903,9 @@ INSERT INTO `usuario` (`id_usuario`, `email`, `clave`, `id_rol`, `id_persona`, `
 (5, 'test1181805928@mail.com', '$2y$10$GFCawr7umar8fmW1pjWoueTBnM8SXwusQ.7E6S1IHdy1uol0hBnri', 2, 5, 1, NULL, NULL, 1, 0, '2026-02-26 00:00:07', '2026-02-26 00:15:50'),
 (6, 'test1508581466@mail.com', '$2y$10$GapybKH7bnfAFI2fWaBoEuKvxBkNQmgCSwwqVY7nSEfmAudZQ9D6u', 2, 6, 1, NULL, NULL, 1, 0, '2026-02-26 00:02:44', '2026-02-26 00:15:45'),
 (7, 'prueba@gmail.com', '$2y$10$sMLI7OocA0YLOByvaPS5bu49GTzPMaGaoAC4AU/QYr5q81RWS1W8i', 2, 7, 1, 1, 3, 1, 0, '2026-02-26 00:19:47', '2026-04-19 05:49:55'),
-(8, 'nuevo1342950043@mail.com', '$2y$10$rex5SJ0czhrKkObKCDABBeiJJebihjYfSsh/HuSuxt31rKsrz/q8i', 2, 8, 1, NULL, NULL, 0, 1, '2026-02-26 00:22:28', '2026-02-26 00:24:44'),
+(8, 'alumno3@yahoo.com.ar', '$2y$10$yrb7XSIm1FISbp0eEzDc0OhY9OYm9YxpIvUJIU73YawHRmBVeVu6y', 2, 8, 1, NULL, NULL, 0, 1, '2026-02-26 00:22:28', '2026-06-28 22:27:58'),
 (9, 'alumno2@gmail.com', '$2y$10$Eig3F9EaRK6LhLRGnBuOeO.9uZHyn2sMD7A5N418gIsfJtKKIOuHy', 2, 9, 1, 2, 1, 1, 0, '2026-02-26 00:23:36', '2026-04-19 17:27:07'),
-(10, 'alumno1@hotmail.com', '$2y$10$Eig3F9EaRK6LhLRGnBuOeO.9uZHyn2sMD7A5N418gIsfJtKKIOuHy', 2, 10, 1, 1, 3, 1, 0, '2026-02-26 00:26:05', '2026-04-19 17:17:35'),
+(10, 'alumno1@hotmail.com', '$2y$10$yrb7XSIm1FISbp0eEzDc0OhY9OYm9YxpIvUJIU73YawHRmBVeVu6y', 2, 10, 1, 1, 3, 1, 0, '2026-02-26 00:26:05', '2026-06-28 22:27:51'),
 (11, 'administradorIFTS3@gmail.com', '$2y$10$OW/BzlwyUIUIwRyC39iOr.xCAwsiJ8/Vpmjb3imURM3eG874ZsPRm', 3, 11, 3, NULL, NULL, 1, 0, '2026-02-26 02:50:46', '2026-04-19 17:26:10'),
 (12, 'administradorIFTS1@gmail.com', '$2y$10$OW/BzlwyUIUIwRyC39iOr.xCAwsiJ8/Vpmjb3imURM3eG874ZsPRm', 3, 12, 1, NULL, NULL, 1, 0, '2026-02-26 02:55:08', '2026-04-19 17:27:28'),
 (13, 'sebaminotti@gmail.com', '$2y$10$yrb7XSIm1FISbp0eEzDc0OhY9OYm9YxpIvUJIU73YawHRmBVeVu6y', 2, 13, 3, NULL, NULL, 1, 0, '2026-02-26 03:00:33', '2026-03-13 15:20:11'),
@@ -590,6 +952,85 @@ ALTER TABLE `carrousel`
   ADD PRIMARY KEY (`id_carrousel`);
 
 --
+-- Indices de la tabla `detalle_orden`
+--
+ALTER TABLE `detalle_orden`
+  ADD PRIMARY KEY (`id_detalle_orden`),
+  ADD KEY `id_orden` (`id_orden`),
+  ADD KEY `id_producto` (`id_producto`);
+
+--
+-- Indices de la tabla `envio`
+--
+ALTER TABLE `envio`
+  ADD PRIMARY KEY (`id_envio`),
+  ADD KEY `id_orden` (`id_orden`);
+
+--
+-- Indices de la tabla `footer_branding`
+--
+ALTER TABLE `footer_branding`
+  ADD PRIMARY KEY (`id_footer_branding`);
+
+--
+-- Indices de la tabla `foro_adjunto`
+--
+ALTER TABLE `foro_adjunto`
+  ADD PRIMARY KEY (`id_adjunto`),
+  ADD KEY `idx_adjunto_tema` (`id_tema`),
+  ADD KEY `idx_adjunto_respuesta` (`id_respuesta`);
+
+--
+-- Indices de la tabla `foro_adjuntos`
+--
+ALTER TABLE `foro_adjuntos`
+  ADD PRIMARY KEY (`id_adjunto`),
+  ADD KEY `idx_adjuntos_mensaje` (`id_mensaje`),
+  ADD KEY `idx_adjuntos_usuario` (`id_usuario`),
+  ADD KEY `idx_adjuntos_cancelado` (`cancelado`);
+
+--
+-- Indices de la tabla `foro_categoria`
+--
+ALTER TABLE `foro_categoria`
+  ADD PRIMARY KEY (`id_categoria`);
+
+--
+-- Indices de la tabla `foro_mensajes`
+--
+ALTER TABLE `foro_mensajes`
+  ADD PRIMARY KEY (`id_mensaje`),
+  ADD KEY `idx_foro_usuario` (`id_usuario`),
+  ADD KEY `idx_foro_cancelado` (`cancelado`);
+
+--
+-- Indices de la tabla `foro_respuesta`
+--
+ALTER TABLE `foro_respuesta`
+  ADD PRIMARY KEY (`id_respuesta`),
+  ADD KEY `idx_respuesta_tema` (`id_tema`),
+  ADD KEY `idx_respuesta_usuario` (`id_usuario`);
+ALTER TABLE `foro_respuesta` ADD FULLTEXT KEY `ft_respuesta_busqueda` (`contenido`);
+
+--
+-- Indices de la tabla `foro_tema`
+--
+ALTER TABLE `foro_tema`
+  ADD PRIMARY KEY (`id_tema`),
+  ADD KEY `idx_tema_categoria` (`id_categoria`),
+  ADD KEY `idx_tema_usuario` (`id_usuario`),
+  ADD KEY `idx_tema_estado` (`habilitado`,`cancelado`,`cerrado`),
+  ADD KEY `idx_tema_fecha` (`idCreate`);
+ALTER TABLE `foro_tema` ADD FULLTEXT KEY `ft_tema_busqueda` (`titulo`,`contenido`);
+
+--
+-- Indices de la tabla `foro_vista`
+--
+ALTER TABLE `foro_vista`
+  ADD PRIMARY KEY (`id_vista`),
+  ADD KEY `idx_vista_tema` (`id_tema`);
+
+--
 -- Indices de la tabla `institucion`
 --
 ALTER TABLE `institucion`
@@ -616,6 +1057,13 @@ ALTER TABLE `navbar`
   ADD PRIMARY KEY (`id_navbar`);
 
 --
+-- Indices de la tabla `orden`
+--
+ALTER TABLE `orden`
+  ADD PRIMARY KEY (`id_orden`),
+  ADD UNIQUE KEY `numeroDeOrden` (`numeroDeOrden`);
+
+--
 -- Indices de la tabla `persona`
 --
 ALTER TABLE `persona`
@@ -630,6 +1078,19 @@ ALTER TABLE `postulacion`
   ADD KEY `fk_postulacion_alumno` (`id_usuario`);
 
 --
+-- Indices de la tabla `producto`
+--
+ALTER TABLE `producto`
+  ADD PRIMARY KEY (`id_producto`),
+  ADD KEY `id_proveedor` (`id_proveedor`);
+
+--
+-- Indices de la tabla `proveedor`
+--
+ALTER TABLE `proveedor`
+  ADD PRIMARY KEY (`id_proveedor`);
+
+--
 -- Indices de la tabla `rol`
 --
 ALTER TABLE `rol`
@@ -640,6 +1101,25 @@ ALTER TABLE `rol`
 --
 ALTER TABLE `sidebar`
   ADD PRIMARY KEY (`id_sidebar`);
+
+--
+-- Indices de la tabla `stock`
+--
+ALTER TABLE `stock`
+  ADD PRIMARY KEY (`id_stock`),
+  ADD KEY `id_producto` (`id_producto`);
+
+--
+-- Indices de la tabla `tienda_carrousel`
+--
+ALTER TABLE `tienda_carrousel`
+  ADD PRIMARY KEY (`id_tienda_carrousel`);
+
+--
+-- Indices de la tabla `tienda_producto`
+--
+ALTER TABLE `tienda_producto`
+  ADD PRIMARY KEY (`id_tienda_producto`);
 
 --
 -- Indices de la tabla `usuario`
@@ -678,7 +1158,67 @@ ALTER TABLE `carrera_materia`
 -- AUTO_INCREMENT de la tabla `carrousel`
 --
 ALTER TABLE `carrousel`
-  MODIFY `id_carrousel` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_carrousel` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de la tabla `detalle_orden`
+--
+ALTER TABLE `detalle_orden`
+  MODIFY `id_detalle_orden` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `envio`
+--
+ALTER TABLE `envio`
+  MODIFY `id_envio` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `footer_branding`
+--
+ALTER TABLE `footer_branding`
+  MODIFY `id_footer_branding` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `foro_adjunto`
+--
+ALTER TABLE `foro_adjunto`
+  MODIFY `id_adjunto` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `foro_adjuntos`
+--
+ALTER TABLE `foro_adjuntos`
+  MODIFY `id_adjunto` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `foro_categoria`
+--
+ALTER TABLE `foro_categoria`
+  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de la tabla `foro_mensajes`
+--
+ALTER TABLE `foro_mensajes`
+  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `foro_respuesta`
+--
+ALTER TABLE `foro_respuesta`
+  MODIFY `id_respuesta` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `foro_tema`
+--
+ALTER TABLE `foro_tema`
+  MODIFY `id_tema` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `foro_vista`
+--
+ALTER TABLE `foro_vista`
+  MODIFY `id_vista` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `institucion`
@@ -705,6 +1245,12 @@ ALTER TABLE `navbar`
   MODIFY `id_navbar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT de la tabla `orden`
+--
+ALTER TABLE `orden`
+  MODIFY `id_orden` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `persona`
 --
 ALTER TABLE `persona`
@@ -717,6 +1263,18 @@ ALTER TABLE `postulacion`
   MODIFY `id_postulacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
+-- AUTO_INCREMENT de la tabla `producto`
+--
+ALTER TABLE `producto`
+  MODIFY `id_producto` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `proveedor`
+--
+ALTER TABLE `proveedor`
+  MODIFY `id_proveedor` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `rol`
 --
 ALTER TABLE `rol`
@@ -727,6 +1285,24 @@ ALTER TABLE `rol`
 --
 ALTER TABLE `sidebar`
   MODIFY `id_sidebar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `stock`
+--
+ALTER TABLE `stock`
+  MODIFY `id_stock` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tienda_carrousel`
+--
+ALTER TABLE `tienda_carrousel`
+  MODIFY `id_tienda_carrousel` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT de la tabla `tienda_producto`
+--
+ALTER TABLE `tienda_producto`
+  MODIFY `id_tienda_producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario`
@@ -746,11 +1322,76 @@ ALTER TABLE `bolsadetrabajo`
   ADD CONSTRAINT `fk_bolsa_usuario_creador` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE;
 
 --
+-- Filtros para la tabla `detalle_orden`
+--
+ALTER TABLE `detalle_orden`
+  ADD CONSTRAINT `detalle_orden_ibfk_1` FOREIGN KEY (`id_orden`) REFERENCES `orden` (`id_orden`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `detalle_orden_ibfk_2` FOREIGN KEY (`id_producto`) REFERENCES `producto` (`id_producto`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `envio`
+--
+ALTER TABLE `envio`
+  ADD CONSTRAINT `envio_ibfk_1` FOREIGN KEY (`id_orden`) REFERENCES `orden` (`id_orden`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `foro_adjunto`
+--
+ALTER TABLE `foro_adjunto`
+  ADD CONSTRAINT `fk_adjunto_respuesta` FOREIGN KEY (`id_respuesta`) REFERENCES `foro_respuesta` (`id_respuesta`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_adjunto_tema` FOREIGN KEY (`id_tema`) REFERENCES `foro_tema` (`id_tema`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `foro_adjuntos`
+--
+ALTER TABLE `foro_adjuntos`
+  ADD CONSTRAINT `fk_foro_adjunto_mensaje` FOREIGN KEY (`id_mensaje`) REFERENCES `foro_mensajes` (`id_mensaje`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_foro_adjunto_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `foro_mensajes`
+--
+ALTER TABLE `foro_mensajes`
+  ADD CONSTRAINT `fk_foro_mensaje_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `foro_respuesta`
+--
+ALTER TABLE `foro_respuesta`
+  ADD CONSTRAINT `fk_respuesta_tema` FOREIGN KEY (`id_tema`) REFERENCES `foro_tema` (`id_tema`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_respuesta_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `foro_tema`
+--
+ALTER TABLE `foro_tema`
+  ADD CONSTRAINT `fk_tema_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `foro_categoria` (`id_categoria`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_tema_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `foro_vista`
+--
+ALTER TABLE `foro_vista`
+  ADD CONSTRAINT `fk_vista_tema` FOREIGN KEY (`id_tema`) REFERENCES `foro_tema` (`id_tema`) ON UPDATE CASCADE;
+
+--
 -- Filtros para la tabla `postulacion`
 --
 ALTER TABLE `postulacion`
   ADD CONSTRAINT `fk_postulacion_alumno` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_postulacion_oferta` FOREIGN KEY (`id_bolsaDeTrabajo`) REFERENCES `bolsadetrabajo` (`id_bolsaDeTrabajo`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `producto`
+--
+ALTER TABLE `producto`
+  ADD CONSTRAINT `producto_ibfk_1` FOREIGN KEY (`id_proveedor`) REFERENCES `proveedor` (`id_proveedor`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `stock`
+--
+ALTER TABLE `stock`
+  ADD CONSTRAINT `stock_ibfk_1` FOREIGN KEY (`id_producto`) REFERENCES `producto` (`id_producto`) ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `usuario`

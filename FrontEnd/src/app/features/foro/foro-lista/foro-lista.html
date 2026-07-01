@@ -1,0 +1,108 @@
+<div class="foro-lista-container">
+  <div class="foro-header">
+    <div class="header-text">
+      <h1>Foro de la Comunidad</h1>
+      <p>Temas de discusión de los institutos IFTS</p>
+    </div>
+    <button mat-flat-button color="primary" (click)="irACrearTema()">
+      <mat-icon>add</mat-icon> Nuevo Tema
+    </button>
+  </div>
+
+  <!-- Búsqueda -->
+  <mat-form-field appearance="outline" class="busqueda-field">
+    <mat-label>Buscar temas...</mat-label>
+    <input matInput
+           [ngModel]="terminoBusqueda()"
+           (ngModelChange)="onBusquedaChange($event)"
+           placeholder="Escribí para buscar...">
+    <mat-icon matPrefix>search</mat-icon>
+  </mat-form-field>
+
+  <!-- Categorías -->
+  <div class="categorias-bar">
+    <button mat-stroked-button
+            [class.active]="categoriaSeleccionada() === null"
+            (click)="filtrarPorCategoria(null)">
+      Todos
+    </button>
+    @for (cat of categorias(); track cat.id_categoria) {
+      <button mat-stroked-button
+              [class.active]="categoriaSeleccionada() === cat.id_categoria"
+              [style.--chip-color]="cat.color"
+              (click)="filtrarPorCategoria(cat.id_categoria)">
+        <mat-icon>{{ cat.icono || 'label' }}</mat-icon>
+        {{ cat.nombre }}
+      </button>
+    }
+  </div>
+
+  <!-- Lista de temas -->
+  @if (cargando()) {
+    <div class="loading-state">
+      <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+      <p>Cargando temas...</p>
+    </div>
+  } @else if (temas().length === 0) {
+    <div class="empty-state">
+      <mat-icon>forum</mat-icon>
+      <h3>No hay temas</h3>
+      <p>Sé el primero en crear un tema de discusión.</p>
+      <button mat-flat-button color="primary" (click)="irACrearTema()">
+        <mat-icon>add</mat-icon> Crear Tema
+      </button>
+    </div>
+  } @else {
+    <div class="temas-list">
+      @for (tema of temas(); track tema.id_tema) {
+        <mat-card class="tema-card" (click)="verTema(tema.id_tema)" [class.cerrado]="tema.cerrado" [class.fijo]="tema.fijo">
+          <div class="tema-content">
+            <div class="tema-avatar">
+              @if (tema.autor_foto) {
+                <img [src]="tema.autor_foto" [alt]="tema.autor_nombre">
+              } @else {
+                <span class="avatar-placeholder">{{ tema.autor_nombre?.charAt(0) }}{{ tema.autor_apellido?.charAt(0) }}</span>
+              }
+            </div>
+            <div class="tema-info">
+              <div class="tema-titulo-row">
+                @if (tema.fijo) {
+                  <mat-icon class="pin-icon" matTooltip="Tema fijado">push_pin</mat-icon>
+                }
+                @if (tema.cerrado) {
+                  <mat-icon class="closed-icon" matTooltip="Tema cerrado">lock</mat-icon>
+                }
+                <h3>{{ tema.titulo }}</h3>
+              </div>
+              <div class="tema-meta">
+                <span class="categoria-badge" [style.background]="tema.color_categoria || '#3f51b5'">
+                  {{ tema.nombre_categoria }}
+                </span>
+                <span class="autor">{{ tema.autor_nombre }} {{ tema.autor_apellido }}</span>
+                <span class="fecha">{{ formatearFecha(tema.idCreate) }}</span>
+              </div>
+            </div>
+            <div class="tema-stats">
+              <div class="stat">
+                <mat-icon>chat_bubble_outline</mat-icon>
+                <span>{{ tema.cantidad_respuestas }}</span>
+              </div>
+              <div class="stat">
+                <mat-icon>visibility</mat-icon>
+                <span>{{ tema.vistas }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+      }
+    </div>
+
+    <mat-paginator
+      [length]="totalTemas()"
+      [pageSize]="limit()"
+      [pageSizeOptions]="[10, 15, 25, 50]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  }
+</div>

@@ -1,0 +1,98 @@
+<div class="crear-tema-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>add_circle</mat-icon> Crear Nuevo Tema
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="crearTema()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Categoría</mat-label>
+          <mat-select formControlName="id_categoria">
+            @for (cat of categorias(); track cat.id_categoria) {
+              <mat-option [value]="cat.id_categoria">
+                <mat-icon [style.color]="cat.color">{{ cat.icono || 'label' }}</mat-icon>
+                {{ cat.nombre }}
+              </mat-option>
+            }
+          </mat-select>
+          @if (form.get('id_categoria')?.hasError('required') && form.get('id_categoria')?.touched) {
+            <mat-error>Seleccioná una categoría</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Título</mat-label>
+          <input matInput formControlName="titulo" maxlength="255" placeholder="Título descriptivo del tema">
+          <mat-hint>{{ form.get('titulo')?.value?.length || 0 }}/255</mat-hint>
+          @if (form.get('titulo')?.hasError('required') && form.get('titulo')?.touched) {
+            <mat-error>El título es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contenido</mat-label>
+          <textarea matInput formControlName="contenido" rows="10"
+                    placeholder="Describí tu tema en detalle..."></textarea>
+          @if (form.get('contenido')?.hasError('required') && form.get('contenido')?.touched) {
+            <mat-error>El contenido es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Adjuntos -->
+        <div class="adjuntos-section">
+          <h3>Archivos adjuntos (opcional)</h3>
+          <p class="adjuntos-hint">
+            Imágenes (jpg, jpeg, png) hasta 300KB | PDFs hasta 300KB | Videos (mp4, webm, mov) hasta 500KB
+          </p>
+
+          <label class="upload-btn" for="file-input">
+            <mat-icon>attach_file</mat-icon> Agregar archivos
+          </label>
+          <input id="file-input" type="file" multiple hidden
+                 accept=".jpg,.jpeg,.png,.pdf,.mp4,.webm,.mov"
+                 (change)="onArchivosSeleccionados($event)">
+
+          @if (archivosAdjuntos().length > 0) {
+            <div class="archivos-list">
+              @for (archivo of archivosAdjuntos(); track archivo.name; let i = $index) {
+                <div class="archivo-chip">
+                  <mat-icon>{{ archivo.type.startsWith('image') ? 'image' : archivo.type === 'application/pdf' ? 'picture_as_pdf' : 'videocam' }}</mat-icon>
+                  <span>{{ archivo.name }}</span>
+                  <span class="file-size">({{ (archivo.size / 1024).toFixed(0) }}KB)</span>
+                  <button mat-icon-button type="button" (click)="eliminarArchivo(i)" aria-label="Eliminar archivo">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          @if (archivosError().length > 0) {
+            <div class="archivos-errors">
+              @for (error of archivosError(); track error) {
+                <p class="error-text">{{ error }}</p>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="cancelar()">Cancelar</button>
+          <button mat-flat-button color="primary" type="submit"
+                  [disabled]="form.invalid || creando()">
+            @if (creando()) {
+              <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+            } @else {
+              <ng-container>
+                <mat-icon>send</mat-icon> Publicar Tema
+              </ng-container>
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
