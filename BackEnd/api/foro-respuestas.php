@@ -9,6 +9,7 @@ require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/ForoTema.php';
 require_once __DIR__ . '/../models/ForoRespuesta.php';
+require_once __DIR__ . '/../models/ForoAdjunto.php';
 
 header('Content-Type: application/json');
 
@@ -48,10 +49,19 @@ try {
         $limit = min(50, max(1, (int)($_GET['limit'] ?? 20)));
 
         $resultado = ForoRespuesta::obtenerPorTema($pdo, $idTema, $page, $limit);
+        $respuestasConAdjuntos = [];
+
+        foreach ($resultado['respuestas'] as $respuesta) {
+            $respuestaId = (int)($respuesta['id_respuesta'] ?? 0);
+            $respuesta['adjuntos'] = $respuestaId > 0
+                ? ForoAdjunto::obtenerPorRespuesta($pdo, $respuestaId)
+                : [];
+            $respuestasConAdjuntos[] = $respuesta;
+        }
 
         echo json_encode([
             'success' => true,
-            'respuestas' => $resultado['respuestas'],
+            'respuestas' => $respuestasConAdjuntos,
             'total' => $resultado['total'],
             'page' => $resultado['page'],
             'limit' => $resultado['limit'],

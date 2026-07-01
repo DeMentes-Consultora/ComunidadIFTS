@@ -77,12 +77,12 @@ export class ForoRealtimeService {
     onChildAdded(eventsRef, (snapshot) => {
       const evento = this.buildEvent(snapshot.key ?? '', snapshot.val());
       this.eventsSubject.next(evento);
-    });
+    }, (error) => this.handlePresenceWriteError('events-listen-added', error));
 
     onChildRemoved(eventsRef, (snapshot) => {
       const evento = this.buildEvent(snapshot.key ?? '', snapshot.val());
       this.eventsSubject.next(evento);
-    });
+    }, (error) => this.handlePresenceWriteError('events-listen-removed', error));
   }
 
   /**
@@ -135,17 +135,21 @@ export class ForoRealtimeService {
     this.currentTopicPresencePath = `foro/presence/tema_${idTema}`;
     const presenceRef = ref(this.database, `${this.currentTopicPresencePath}/usuario_${user.id_usuario}`);
 
-    set(presenceRef, {
+    void set(presenceRef, {
       userId: user.id_usuario,
       displayName: `${user.nombre} ${user.apellido}`.trim(),
       photoUrl: user.foto_perfil_url ?? null,
       online: true,
       lastSeenMs: Date.now()
+    }).catch((error) => {
+      this.handlePresenceWriteError('set', error);
     });
 
-    onDisconnect(presenceRef).update({
+    void onDisconnect(presenceRef).update({
       online: false,
       lastSeenMs: Date.now()
+    }).catch((error) => {
+      this.handlePresenceWriteError('onDisconnect', error);
     });
 
     const topicPresenceRef = ref(this.database, this.currentTopicPresencePath);
@@ -158,7 +162,7 @@ export class ForoRealtimeService {
         });
       }
       this.emitPresence();
-    });
+    }, (error) => this.handlePresenceWriteError('presence-listen', error));
   }
 
   observePresence(): Observable<ForoPresence[]> {
@@ -168,10 +172,15 @@ export class ForoRealtimeService {
   async markOffline(user: AuthUser): Promise<void> {
     if (!this.currentTopicPresencePath) return;
     const presenceRef = ref(this.database, `${this.currentTopicPresencePath}/usuario_${user.id_usuario}`);
-    await update(presenceRef, {
-      online: false,
-      lastSeenMs: Date.now()
-    });
+
+    try {
+      await update(presenceRef, {
+        online: false,
+        lastSeenMs: Date.now()
+      });
+    } catch (error) {
+      this.handlePresenceWriteError('markOffline', error);
+    }
   }
 
   // ------------------------------------------------------------------
@@ -208,5 +217,15 @@ export class ForoRealtimeService {
       .filter((p) => p.online || Date.now() - p.lastSeenMs < 90000)
       .sort((a, b) => b.lastSeenMs - a.lastSeenMs);
     this.presenceSubject.next(visibles);
+  }
+
+  private handlePresenceWriteError(operation: string, error: unknown): void {
+    const firebaseError = error as { code?: string; message?: string } | null;
+    if (firebaseError?.code === 'PERMISSION_DENIED' || firebaseError?.code === 'permission-denied') {
+      console.warn(`No se pudo guardar la presencia del foro (${operation}): permisos denegados.`);
+      return;
+    }
+
+    console.error(`No se pudo guardar la presencia del foro (${operation})`, error);
   }
 }

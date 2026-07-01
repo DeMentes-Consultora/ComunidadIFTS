@@ -32,7 +32,7 @@
           <div class="tema-meta">
             <span class="autor">
               @if (tema()!.autor_foto) {
-                <img [src]="tema()!.autor_foto" class="autor-avatar">
+                <img [src]="tema()!.autor_foto" alt="{{ tema()!.autor_nombre }} {{ tema()!.autor_apellido }}" title="{{ tema()!.autor_nombre }} {{ tema()!.autor_apellido }}" class="autor-avatar">
               } @else {
                 <span class="avatar-placeholder small">{{ tema()!.autor_nombre?.charAt(0) }}{{ tema()!.autor_apellido?.charAt(0) }}</span>
               }
@@ -79,9 +79,9 @@
               @for (adj of adjuntosTema(); track adj.id_adjunto) {
                 <div class="adjunto-item">
                   @if (adj.tipo === 'imagen') {
-                    <a [href]="adj.archivo_url" target="_blank">
-                      <img [src]="adj.archivo_url" [alt]="adj.archivo_nombre_original" class="adjunto-imagen">
-                    </a>
+                    <button type="button" class="image-preview-trigger" (click)="abrirVistaImagen(adj.archivo_url, adj.archivo_nombre_original)" [attr.aria-label]="'Abrir imagen: ' + adj.archivo_nombre_original">
+                      <img [src]="adj.archivo_url" alt="{{ adj.archivo_nombre_original }}" title="{{ adj.archivo_nombre_original }}" class="adjunto-imagen">
+                    </button>
                   } @else if (adj.tipo === 'pdf') {
                     <a [href]="adj.archivo_url" target="_blank" class="adjunto-link">
                       <mat-icon>picture_as_pdf</mat-icon>
@@ -118,7 +118,7 @@
               <div class="respuesta-content">
                 <div class="respuesta-avatar">
                   @if (respuesta.autor_foto) {
-                    <img [src]="respuesta.autor_foto" [alt]="respuesta.autor_nombre">
+                    <img [src]="respuesta.autor_foto" alt="{{ respuesta.autor_nombre }} {{ respuesta.autor_apellido }}" title="{{ respuesta.autor_nombre }} {{ respuesta.autor_apellido }}">
                   } @else {
                     <span class="avatar-placeholder">{{ respuesta.autor_nombre?.charAt(0) }}{{ respuesta.autor_apellido?.charAt(0) }}</span>
                   }
@@ -138,13 +138,36 @@
                   }
 
                   @if (respuestaEditandoId() === respuesta.id_respuesta) {
-                    <textarea [ngModel]="respuestaEditandoContenido()" (ngModelChange)="respuestaEditandoContenido.set($event)" rows="4" class="edit-textarea"></textarea>
+                    <textarea [ngModel]="respuestaEditandoContenido()" (ngModelChange)="respuestaEditandoContenido.set($event)" rows="4" class="edit-textarea" placeholder="Editá tu respuesta"></textarea>
                     <div class="edit-actions">
                       <button mat-button (click)="cancelarEdicionRespuesta()">Cancelar</button>
                       <button mat-flat-button color="primary" (click)="guardarEdicionRespuesta()">Guardar</button>
                     </div>
                   } @else {
                     <p class="respuesta-texto">{{ respuesta.contenido }}</p>
+                  }
+
+                  @if (respuesta.adjuntos?.length) {
+                    <div class="respuesta-adjuntos">
+                      @for (adj of respuesta.adjuntos; track adj.id_adjunto) {
+                        <div class="respuesta-adjunto-item">
+                          @if (adj.tipo === 'imagen') {
+                                <button type="button" class="image-preview-trigger respuesta-image-preview-trigger" (click)="abrirVistaImagen(adj.archivo_url, adj.archivo_nombre_original)" [attr.aria-label]="'Abrir imagen: ' + adj.archivo_nombre_original">
+                                  <img [src]="adj.archivo_url" alt="{{ adj.archivo_nombre_original }}" title="{{ adj.archivo_nombre_original }}" class="respuesta-adjunto-imagen">
+                                </button>
+                          } @else if (adj.tipo === 'pdf') {
+                            <a [href]="adj.archivo_url" target="_blank" rel="noopener noreferrer" class="respuesta-adjunto-link">
+                              <mat-icon>picture_as_pdf</mat-icon>
+                              <span>{{ adj.archivo_nombre_original }}</span>
+                            </a>
+                          } @else if (adj.tipo === 'video') {
+                            <video controls class="respuesta-adjunto-video">
+                              <source [src]="adj.archivo_url">
+                            </video>
+                          }
+                        </div>
+                      }
+                    </div>
                   }
 
                   <!-- Acciones -->
@@ -203,11 +226,10 @@
             </div>
           }
 
-          <form (ngSubmit)="enviarRespuesta()">
+          <form [formGroup]="respuestaForm" (ngSubmit)="enviarRespuesta()">
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Escribí tu respuesta</mat-label>
-              <textarea matInput [(ngModel)]="respuestaForm.value.contenido"
-                        [ngModelOptions]="{standalone: true}"
+              <textarea matInput formControlName="contenido"
                         rows="4" placeholder="Compartí tu opinión..."></textarea>
             </mat-form-field>
 

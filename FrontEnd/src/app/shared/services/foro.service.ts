@@ -27,25 +27,26 @@ export class ForoService {
     let params = new HttpParams();
     if (admin) params = params.set('admin', '1');
     return this.http
-      .get<ForoCategoriaResponse>(`${this.api}/foro-categorias.php`, { params })
+      .get<ForoCategoriaResponse>(`${this.api}/foro-categorias.php`, { params, withCredentials: true })
       .pipe(map((r) => r.categorias ?? []));
   }
 
   crearCategoria(data: Partial<ForoCategoria>): Observable<{ success: boolean; id_categoria: number }> {
     return this.http.post<{ success: boolean; id_categoria: number }>(
-      `${this.api}/foro-categorias-gestion.php`, data
+      `${this.api}/foro-categorias-gestion.php`, data, { withCredentials: true }
     );
   }
 
   actualizarCategoria(data: Partial<ForoCategoria>): Observable<{ success: boolean }> {
     return this.http.put<{ success: boolean }>(
-      `${this.api}/foro-categorias-gestion.php`, data
+      `${this.api}/foro-categorias-gestion.php`, data, { withCredentials: true }
     );
   }
 
   eliminarCategoria(id_categoria: number): Observable<{ success: boolean }> {
     return this.http.delete<{ success: boolean }>(
       `${this.api}/foro-categorias-gestion.php`, {
+        withCredentials: true,
         body: { id_categoria }
       }
     );
@@ -61,33 +62,35 @@ export class ForoService {
       .set('limit', limit.toString());
     if (categoriaId) params = params.set('categoria', categoriaId.toString());
     if (busqueda) params = params.set('q', busqueda);
-    return this.http.get<ForoListadoResponse>(`${this.api}/foro-temas.php`, { params });
+    return this.http.get<ForoListadoResponse>(`${this.api}/foro-temas.php`, { params, withCredentials: true });
   }
 
   getTema(id: number): Observable<ForoTemaResponse> {
     return this.http.get<ForoTemaResponse>(`${this.api}/foro-tema.php`, {
-      params: new HttpParams().set('id', id.toString())
+      params: new HttpParams().set('id', id.toString()),
+      withCredentials: true
     });
   }
 
   crearTema(data: { id_categoria: number; titulo: string; contenido: string }): Observable<{ success: boolean; id_tema: number }> {
     return this.http.post<{ success: boolean; id_tema: number }>(
-      `${this.api}/foro-tema-crear.php`, data
+      `${this.api}/foro-tema-crear.php`, data, { withCredentials: true }
     );
   }
 
   actualizarTema(data: Partial<ForoTema> & { id_tema: number }): Observable<{ success: boolean }> {
-    return this.http.put<{ success: boolean }>(`${this.api}/foro-tema.php`, data);
+    return this.http.put<{ success: boolean }>(`${this.api}/foro-tema.php`, data, { withCredentials: true });
   }
 
   accionTema(id_tema: number, accion: string, payload?: Record<string, unknown>): Observable<{ success: boolean; message: string }> {
     return this.http.put<{ success: boolean; message: string }>(
-      `${this.api}/foro-tema.php`, { id_tema, accion, ...payload }
+      `${this.api}/foro-tema.php`, { id_tema, accion, ...payload }, { withCredentials: true }
     );
   }
 
   eliminarTema(id_tema: number): Observable<{ success: boolean }> {
     return this.http.delete<{ success: boolean }>(`${this.api}/foro-tema.php`, {
+      withCredentials: true,
       body: { id_tema }
     });
   }
@@ -101,21 +104,22 @@ export class ForoService {
       .set('id_tema', id_tema.toString())
       .set('page', page.toString())
       .set('limit', limit.toString());
-    return this.http.get<ForoRespuestasResponse>(`${this.api}/foro-respuestas.php`, { params });
+    return this.http.get<ForoRespuestasResponse>(`${this.api}/foro-respuestas.php`, { params, withCredentials: true });
   }
 
   crearRespuesta(data: { id_tema: number; contenido: string; citando_id?: number | null }): Observable<{ success: boolean; id_respuesta: number }> {
     return this.http.post<{ success: boolean; id_respuesta: number }>(
-      `${this.api}/foro-respuestas.php`, data
+      `${this.api}/foro-respuestas.php`, data, { withCredentials: true }
     );
   }
 
   actualizarRespuesta(data: { id_respuesta: number; contenido: string }): Observable<{ success: boolean }> {
-    return this.http.put<{ success: boolean }>(`${this.api}/foro-respuesta.php`, data);
+    return this.http.put<{ success: boolean }>(`${this.api}/foro-respuesta.php`, data, { withCredentials: true });
   }
 
   eliminarRespuesta(id_respuesta: number): Observable<{ success: boolean }> {
     return this.http.delete<{ success: boolean }>(`${this.api}/foro-respuesta.php`, {
+      withCredentials: true,
       body: { id_respuesta }
     });
   }
@@ -130,6 +134,6 @@ export class ForoService {
       .set('tipo', tipo)
       .set('page', page.toString());
     if (categoriaId) params = params.set('categoria', categoriaId.toString());
-    return this.http.get<ForoBusquedaResponse>(`${this.api}/foro-buscar.php`, { params });
+    return this.http.get<ForoBusquedaResponse>(`${this.api}/foro-buscar.php`, { params, withCredentials: true });
   }
 }

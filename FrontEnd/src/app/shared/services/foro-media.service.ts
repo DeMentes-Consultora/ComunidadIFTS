@@ -36,7 +36,7 @@ export class ForoMediaService {
     if (idTema) formData.append('id_tema', idTema.toString());
     if (idRespuesta) formData.append('id_respuesta', idRespuesta.toString());
 
-    return this.http.post<ForoUploadResponse>(this.apiUrl, formData);
+    return this.http.post<ForoUploadResponse>(this.apiUrl, formData, { withCredentials: true });
   }
 
   /**

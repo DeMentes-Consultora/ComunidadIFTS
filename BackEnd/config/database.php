@@ -101,6 +101,7 @@ class Database
             }
 
             $host = (string) self::envValue(['DB_HOST'], 'localhost');
+            $port = (string) self::envValue(['DB_PORT'], '3306');
             $dbname = (string) self::envValue(['DB_NAME'], '');
             $user = (string) self::envValue(['DB_USER', 'DB_USERNAME'], '');
             $pass = (string) self::envValue(['DB_PASS', 'DB_PASSWORD'], '');
@@ -110,14 +111,34 @@ class Database
                 throw new \RuntimeException('Faltan variables DB_NAME y/o DB_USER(DB_USERNAME) en .env');
             }
 
-            $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
             $options = [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES   => false,
             ];
 
-            $this->connection = new PDO($dsn, $user, $pass, $options);
+            $hostsToTry = [$host];
+            if ($host === 'localhost') {
+                $hostsToTry[] = '127.0.0.1';
+            } elseif ($host === '127.0.0.1') {
+                $hostsToTry[] = 'localhost';
+            }
+
+            $lastError = null;
+            foreach (array_values(array_unique($hostsToTry)) as $candidateHost) {
+                try {
+                    $dsn = "mysql:host=$candidateHost;port=$port;dbname=$dbname;charset=$charset";
+                    $this->connection = new PDO($dsn, $user, $pass, $options);
+                    $host = $candidateHost;
+                    break;
+                } catch (\Throwable $candidateError) {
+                    $lastError = $candidateError;
+                }
+            }
+
+            if (!$this->connection instanceof PDO) {
+                throw $lastError ?? new \RuntimeException('No fue posible conectar a la base de datos');
+            }
         } catch (\Throwable $e) {
             $this->handleError($e);
         }

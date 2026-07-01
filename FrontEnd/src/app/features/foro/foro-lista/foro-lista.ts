@@ -78,9 +78,13 @@ export class ForoListaComponent implements OnInit, OnDestroy {
     this.cargarCategorias();
     this.cargarTemas();
 
-    this.realtimeService.ensureAnonymousSession().then(() => {
-      this.realtimeService.startListeningEvents();
-    });
+    void this.realtimeService.ensureAnonymousSession()
+      .then(() => {
+        this.realtimeService.startListeningEvents();
+      })
+      .catch(() => {
+        // El foro carga igual aunque Firebase realtime no esté disponible.
+      });
 
     this.realtimeService.observeEventsByType('tema_creado')
       .pipe(takeUntil(this.destroy$))

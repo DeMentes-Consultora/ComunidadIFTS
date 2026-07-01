@@ -2,11 +2,12 @@
 
 ## Estado actual
 
-El chat del foro fue reemplazado por un chat realtime tipo WhatsApp.
+El foro usa Firebase Realtime Database para dos flujos distintos: un chat realtime tipo WhatsApp y la actividad en vivo del tema.
 
-- La pantalla visible está en `FrontEnd/src/app/features/foro/foro.ts`.
-- El motor de tiempo real está en `FrontEnd/src/app/shared/services/foro-chat.service.ts`.
-- La navegación al chat sigue usando la ruta `/foro`.
+- La pantalla visible del chat está en `FrontEnd/src/app/features/chat/chat.ts`.
+- El motor de tiempo real del chat está en `FrontEnd/src/app/shared/services/foro-chat.service.ts`.
+- La actividad del tema está en `FrontEnd/src/app/shared/services/foro-realtime.service.ts`.
+- La navegación al chat sigue usando la ruta `/chat`.
 - El acceso está restringido a usuarios autenticados por los guards de Angular.
 
 ## Tecnología usada
@@ -17,11 +18,16 @@ El chat del foro fue reemplazado por un chat realtime tipo WhatsApp.
 
 ## Estructura lógica
 
-El chat maneja tres flujos principales:
+El realtime maneja tres flujos principales:
 
 - Mensajes en tiempo real.
 - Presencia de usuarios conectados.
 - Indicador de escritura.
+
+Y el foro maneja otro canal realtime adicional:
+
+- Eventos de temas y respuestas.
+- Presencia por tema en `/foro/presence/tema_<id>/usuario_<id>`.
 
 ## Reglas recomendadas para Realtime Database
 
@@ -36,13 +42,21 @@ Ajustar estas reglas en la consola de Firebase o en el proyecto que administre l
       "chat": {
         ".read": "auth != null",
         ".write": "auth != null"
+      },
+      "events": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      },
+      "presence": {
+        ".read": "auth != null",
+        ".write": "auth != null"
       }
     }
   }
 }
 ```
 
-La app escribe en `foro/chat/messages` y `foro/chat/presence`, así que las reglas tienen que cubrir esa rama exacta.
+La app escribe en `foro/chat/messages`, `foro/chat/presence`, `foro/events` y `foro/presence`, así que las reglas tienen que cubrir esa rama exacta.
 
 ## Cómo crear la base
 

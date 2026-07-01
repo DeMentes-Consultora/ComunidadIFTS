@@ -55,6 +55,7 @@ export interface ForoRespuesta {
   citando_contenido?: string;
   citando_autor_nombre?: string;
   citando_autor_apellido?: string;
+  adjuntos?: ForoAdjunto[];
 }
 
 export interface ForoAdjunto {

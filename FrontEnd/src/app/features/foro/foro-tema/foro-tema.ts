@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,6 +18,7 @@ import { ForoTema, ForoRespuesta, ForoAdjunto } from '../../../shared/models/for
 import { ForoService } from '../../../shared/services/foro.service';
 import { ForoMediaService } from '../../../shared/services/foro-media.service';
 import { ForoRealtimeService, ForoEvent } from '../../../shared/services/foro-realtime.service';
+import { ForoImagenPreviewDialogComponent } from '../foro-imagen-preview-dialog';
 import { AuthService } from '../../../shared/services/auth.service';
 import { AuthUser } from '../../../shared/models/auth.model';
 import { Subject, takeUntil } from 'rxjs';
@@ -50,6 +52,7 @@ export class ForoTemaComponent implements OnInit, OnDestroy {
   private readonly foroService = inject(ForoService);
   private readonly mediaService = inject(ForoMediaService);
   private readonly realtimeService = inject(ForoRealtimeService);
+  private readonly dialog = inject(MatDialog);
   private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
   private readonly snackBar = inject(MatSnackBar);
@@ -94,23 +97,27 @@ export class ForoTemaComponent implements OnInit, OnDestroy {
 
     this.cargarTema();
 
-    this.realtimeService.ensureAnonymousSession().then(() => {
-      this.realtimeService.startListeningEvents();
+    void this.realtimeService.ensureAnonymousSession()
+      .then(() => {
+        this.realtimeService.startListeningEvents();
 
-      this.realtimeService.observeEventsByTema(this.temaId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((evento) => {
-          const user = this.usuario();
-          if (user && evento.id_usuario !== user.id_usuario) {
-            this.handleRealtimeEvent(evento);
-          }
-        });
+        this.realtimeService.observeEventsByTema(this.temaId)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((evento) => {
+            const user = this.usuario();
+            if (user && evento.id_usuario !== user.id_usuario) {
+              this.handleRealtimeEvent(evento);
+            }
+          });
 
-      const user = this.usuario();
-      if (user) {
-        this.realtimeService.startTopicPresence(user, this.temaId);
-      }
-    });
+        const user = this.usuario();
+        if (user) {
+          this.realtimeService.startTopicPresence(user, this.temaId);
+        }
+      })
+      .catch(() => {
+        // El tema carga igual aunque Firebase realtime no esté disponible.
+      });
   }
 
   ngOnDestroy(): void {
@@ -152,6 +159,16 @@ export class ForoTemaComponent implements OnInit, OnDestroy {
         this.cargarTema();
         break;
     }
+  }
+
+  abrirVistaImagen(url: string, title: string): void {
+    this.dialog.open(ForoImagenPreviewDialogComponent, {
+      data: { url, title },
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      autoFocus: false,
+      panelClass: 'foro-image-preview-dialog'
+    });
   }
 
   cargarTema(): void {
@@ -208,7 +225,7 @@ export class ForoTemaComponent implements OnInit, OnDestroy {
     }
 
     this.enviando.set(true);
-    const contenido = this.respuestaForm.value.contenido.trim();
+    const contenido = String(this.respuestaForm.value.contenido ?? '').trim();
 
     this.foroService.crearRespuesta({
       id_tema: this.temaId,
@@ -235,6 +252,7 @@ export class ForoTemaComponent implements OnInit, OnDestroy {
         }
 
         this.respuestaForm.reset();
+        this.respuestaForm.patchValue({ contenido: '' });
         this.archivosAdjuntos.set([]);
         this.archivosError.set([]);
         this.citandoId.set(null);

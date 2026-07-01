@@ -33,23 +33,27 @@ export class Footer implements OnInit, OnDestroy {
     this.currentYear = new Date().getFullYear();
     this.siteCustomizationService.loadPublicConfig().subscribe({
       next: (config) => {
-        this.shopSlides = (config.shop_carousel ?? []).filter((slide) => slide.habilitado === 1);
-        this.footerBrandingText = (config.footer_branding?.developer_text ?? 'Desarrollado por DeMentesConsultora').trim() || 'Desarrollado por DeMentesConsultora';
-        this.footerBrandingLogoUrl = config.footer_branding?.logo_url || null;
-        this.footerBrandingLinkUrl = config.footer_branding?.link_url || null;
-        this.currentShopSlideIndex = 0;
-        this.refreshVisibleShopSlides();
-        this.startShopAutoplay();
-        setTimeout(() => this.cdr.detectChanges(), 0);
+        setTimeout(() => {
+          this.shopSlides = (config.shop_carousel ?? []).filter((slide) => slide.habilitado === 1);
+          this.footerBrandingText = (config.footer_branding?.developer_text ?? 'Desarrollado por DeMentesConsultora').trim() || 'Desarrollado por DeMentesConsultora';
+          this.footerBrandingLogoUrl = config.footer_branding?.logo_url || null;
+          this.footerBrandingLinkUrl = config.footer_branding?.link_url || null;
+          this.currentShopSlideIndex = 0;
+          this.refreshVisibleShopSlides();
+          this.startShopAutoplay();
+          this.cdr.detectChanges();
+        }, 0);
       },
       error: () => {
-        this.shopSlides = [];
-        this.visibleShopSlides = [];
-        this.showShopControls = false;
-        this.footerBrandingText = 'Desarrollado por DeMentesConsultora';
-        this.footerBrandingLogoUrl = null;
-        this.footerBrandingLinkUrl = null;
-        setTimeout(() => this.cdr.detectChanges(), 0);
+        setTimeout(() => {
+          this.shopSlides = [];
+          this.visibleShopSlides = [];
+          this.showShopControls = false;
+          this.footerBrandingText = 'Desarrollado por DeMentesConsultora';
+          this.footerBrandingLogoUrl = null;
+          this.footerBrandingLinkUrl = null;
+          this.cdr.detectChanges();
+        }, 0);
       },
     });
   }

@@ -14,7 +14,7 @@
 			<div class="shop-strip-track" [class.empty]="!visibleShopSlides.length">
 				@if (visibleShopSlides.length) {
 					@for (slide of visibleShopSlides; track slide.id_carrousel) {
-						<a class="shop-strip-item" routerLink="/tienda" [attr.aria-label]="slide.titulo || 'Ir a la tienda'">
+						<a class="shop-strip-item" routerLink="/tienda" aria-label="Ir a la tienda">
 							@if (slide.foto_perfil_url) {
 								<img [src]="slide.foto_perfil_url" [alt]="slide.titulo || 'Producto de tienda'" title="Producto de tienda" loading="lazy" />
 							} @else {
