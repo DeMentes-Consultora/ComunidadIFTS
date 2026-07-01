@@ -45,7 +45,7 @@ echo OK - Dependencias del Frontend instaladas
 echo.
 
 echo [3/5] Compilando Frontend Angular para produccion...
-call ng build --configuration production
+call npm run build -- --configuration production
 if errorlevel 1 (
     echo ERROR: No se pudo compilar el Frontend
     cd ..
@@ -64,8 +64,8 @@ if exist "%DEPLOY_DIR%" (
 )
 mkdir "%DEPLOY_DIR%"
 
-if not exist "BackEnd\.env.production" (
-    echo ERROR: No existe BackEnd\.env.production
+if not exist "BackEnd\.env-produccion" (
+    echo ERROR: No existe BackEnd\.env-produccion
     echo Crea ese archivo antes de preparar el deploy.
     pause
     exit /b 1
@@ -84,7 +84,7 @@ xcopy /E /I /Y BackEnd\models "%DEPLOY_DIR%\models" >nul
 xcopy /E /I /Y BackEnd\services "%DEPLOY_DIR%\services" >nul
 copy /Y BackEnd\.htaccess "%DEPLOY_DIR%\" >nul
 copy /Y BackEnd\check-server.php "%DEPLOY_DIR%\" >nul
-copy /Y BackEnd\.env.production "%DEPLOY_DIR%\.env" >nul
+copy /Y BackEnd\.env-produccion "%DEPLOY_DIR%\.env" >nul
 
 echo    - Copiando Frontend compilado...
 powershell -Command "$browser='FrontEnd\dist\ComunidadIFTS\browser'; $root='FrontEnd\dist\ComunidadIFTS'; if (Test-Path $browser) { Copy-Item -Path ($browser + '\*') -Destination '%DEPLOY_DIR%' -Recurse -Force } elseif (Test-Path $root) { Copy-Item -Path ($root + '\*') -Destination '%DEPLOY_DIR%' -Recurse -Force; Remove-Item -Path '%DEPLOY_DIR%\browser' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path '%DEPLOY_DIR%\prerendered-routes.json' -Force -ErrorAction SilentlyContinue; Remove-Item -Path '%DEPLOY_DIR%\3rdpartylicenses.txt' -Force -ErrorAction SilentlyContinue } else { exit 1 }" 2>nul
