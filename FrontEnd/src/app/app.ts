@@ -1,7 +1,8 @@
 import { Component, signal, ViewChild, AfterViewInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
+import { MatSidenav, MatSidenavModule, MatSidenavContent } from '@angular/material/sidenav';
 import { MatDialog } from '@angular/material/dialog';
+import { filter } from 'rxjs/operators';
 import { Navbar } from './layouts/navbar/navbar';
 import { Sidenav } from './layouts/sidenav/sidenav';
 import { Footer } from './layouts/footer/footer';
@@ -18,10 +19,12 @@ export class App implements AfterViewInit {
   protected readonly title = signal('ComunidadIFTS');
   
   @ViewChild('sidenav') sidenav!: MatSidenav;
+  @ViewChild(MatSidenavContent) sidenavContent!: MatSidenavContent;
   
   constructor(
     public sidenavService: SidenavService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private router: Router
   ) {}
   
   ngAfterViewInit() {
@@ -30,6 +33,14 @@ export class App implements AfterViewInit {
         this.sidenav.open();
       } else {
         this.sidenav.close();
+      }
+    });
+
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      if (this.sidenavContent) {
+        this.sidenavContent.scrollTo({ top: 0 });
       }
     });
 
