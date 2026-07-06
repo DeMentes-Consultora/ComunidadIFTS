@@ -275,6 +275,23 @@ Este archivo concentra los hitos tecnicos relevantes del proyecto y reemplaza la
 - Requiere configurar cron job para `cerrar-temas-inactivos.php`.
 - Los adjuntos usan Cloudinary (ya configurado en el proyecto).
 
+## 1 de julio de 2026 - Correccion y unificacion de miniaturas del foro
+
+### Cambio funcional
+
+- Se unifico el tamano de las miniaturas de imagenes en el modulo de foro: tanto las imagenes adjuntas al tema principal como las de las respuestas ahora miden 140x110px con `object-fit: cover`.
+- Se corrigio un error de sintaxis CSS en `foro-tema.css` (llave extra en linea 306 que generaba warning en el build).
+- Ambas vistas (tema y respuestas) mantienen el mismo comportamiento de preview al hacer click, abriendo el dialogo `ForoImagenPreviewDialogComponent`.
+
+### Superficies involucradas
+
+- `FrontEnd/src/app/features/foro/foro-tema/foro-tema.css`
+
+### Verificaciones registradas
+
+- Build Angular sin warnings de CSS.
+- Miniaturas de imagenes con tamano unificado en vistas de tema y respuestas.
+
 ## Relacion con otros markdown historicos
 
 - `docs/historial-conversacion.md` conserva el detalle largo y contexto de negocio.

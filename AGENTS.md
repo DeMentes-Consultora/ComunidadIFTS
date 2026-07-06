@@ -2,7 +2,7 @@
 
 ## Qué es esto
 
-Angular 21 + backend PHP. Plataforma comunitaria para instituciones IFTS (mapa, auth, administración, bolsa de trabajo, perfiles, tienda).
+Angular 21 + backend PHP. Plataforma comunitaria para instituciones IFTS (mapa, auth, administración, bolsa de trabajo, perfiles, tienda, foro, chat).
 
 ## Comandos de desarrollo
 
@@ -55,7 +55,7 @@ El output va a `deploy-infinityfree/`. Editar `.env` en esa carpeta con credenci
 
 ```
 FrontEnd/src/app/
-├── features/        # módulos: home, admin, auth, bolsa-trabajo, etc.
+├── features/        # módulos: home, admin, auth, bolsa-trabajo, foro, chat, etc.
 ├── shared/          # guards, servicios, modelos, componentes, estilos
 ├── layouts/         # wrappers de layout
 ├── app.routes.ts    # definición de rutas (routing standalone de Angular)
@@ -67,9 +67,9 @@ FrontEnd/src/app/
 
 | ID | Rol | Acceso |
 |----|-----|--------|
-| 1 | AdministradorComunidad | `/admin/*` |
-| 2 | Alumno | `/bolsa-trabajo`, `/perfil` |
-| 3 | AdministradorIFTS | `/crear-oferta`, `/perfil-institucion` |
+| 1 | AdministradorComunidad | `/admin/*`, `/foro/*`, `/chat` |
+| 2 | Alumno | `/bolsa-trabajo`, `/perfil`, `/foro/*`, `/chat` |
+| 3 | AdministradorIFTS | `/crear-oferta`, `/perfil-institucion`, `/foro/*`, `/chat` |
 
 Los roles viven en la DB. Guards de rutas en `FrontEnd/src/app/shared/guards/`.
 
@@ -77,8 +77,10 @@ Los roles viven en la DB. Guards de rutas en `FrontEnd/src/app/shared/guards/`.
 
 - `docs/estado-actual.md` — arquitectura actual, rutas, módulos, stack
 - `docs/deploy.md` — guía de deploy y variables de entorno
+- `docs/historial-tecnico.md` — hitos técnicos del proyecto
 - `BackEnd/docs/ARQUITECTURA_BACKEND.md` — reglas de capas del backend
 - `BackEnd/docs/ENDPOINTS.md` — catálogo de endpoints
+- `BackEnd/database/migrations/` — migraciones SQL del proyecto
 - `docs/roles.md` — definición de roles
 - `BackEnd/.env.example` — todas las variables de entorno con valores por defecto
 
@@ -93,3 +95,5 @@ Los roles viven en la DB. Guards de rutas en `FrontEnd/src/app/shared/guards/`.
 - `BackEnd/.htaccess` bloquea acceso a `.env`, `composer.json`, `composer.lock` en el servidor.
 - El proxy solo funciona durante `ng serve`. En producción, frontend y backend se sirven del mismo host de InfinityFree.
 - Los tests de componentes están deshabilitados por defecto (`skipTests: true` en schematics de angular.json).
+- Aplicar migraciones SQL de `BackEnd/database/migrations/` al actualizar el backend.
+- El módulo de foro requiere migración `20260630_foro_modulo.sql`.

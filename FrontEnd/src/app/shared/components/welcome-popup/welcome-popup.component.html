@@ -1,0 +1,30 @@
+<div class="welcome-overlay" (click)="close()">
+  <div class="welcome-card" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="close()" aria-label="Cerrar">
+      <span>&times;</span>
+    </button>
+
+    <h1 class="welcome-title">Comunidad IFTS</h1>
+
+    <img
+      src="LOGO COMUNIDAD IFTS.png"
+      alt="Logo Comunidad IFTS"
+      class="welcome-logo"
+    />
+
+    <p class="welcome-text">
+      Uniéndote a la comunidad podrás postularte a las ofertas laborales de la
+      <strong>bolsa de trabajo</strong>, ver <strong>novedades</strong>, todas las
+      <strong>carreras</strong> que ofrecen los IFTS, <strong>fechas de
+      inscripción</strong>, <strong>eventos especiales</strong> y mucho más!
+    </p>
+
+    <p class="welcome-cta">Hacete miembro y hagamos cada vez más grande esta comunidad.</p>
+
+    <p class="welcome-final">¡¡¡TE ESPERAMOS!!!</p>
+
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="progress"></div>
+    </div>
+  </div>
+</div>

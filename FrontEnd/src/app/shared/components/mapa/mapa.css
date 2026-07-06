@@ -54,6 +54,15 @@
   position: relative;
 }
 
+/* Carreras */
+.carreras-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
 /* Buscador dentro del panel */
 .info-panel app-buscador-direccion {
   position: static;
@@ -250,21 +259,35 @@
   }
 
   .info-panel {
-    flex: 0 0 auto;
-    max-height: 40vh;
+    flex: 2 1 auto;
+    max-height: 65vh;
+    overflow-y: auto;
+    min-height: 300px;
   }
 
   .map-container {
-    flex: 0 0 50vh;
+    flex: 1 1 auto;
+    min-height: 220px;
+    max-height: 40vh;
+  }
+
+  .map-header {
+    padding: 10px 12px 8px;
   }
 
   .map-header h1 {
-    font-size: 22px;
+    font-size: 20px;
+    margin-bottom: 0;
+  }
+
+  .map-header .eyebrow {
+    font-size: 10px;
+    margin-bottom: 2px;
   }
 
   .institucion-logo-inline {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
   }
 
   .map-header .sub {
@@ -273,5 +296,51 @@
 
   .action-buttons .half-width {
     font-size: 11px !important;
+  }
+
+  .carreras-list {
+    max-height: 80px;
+    gap: 3px;
+  }
+
+  .carrera-filter-chip {
+    font-size: 11px !important;
+    min-height: 26px !important;
+  }
+
+  .institucion-info {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .institucion-title-row {
+    gap: 8px;
+    padding-bottom: 6px;
+  }
+
+  .institucion-info h3 {
+    font-size: 17px;
+  }
+
+  .info-item {
+    gap: 2px;
+  }
+
+  .info-item label {
+    font-size: 11px;
+  }
+
+  .info-item p, .info-item a {
+    font-size: 12px;
+  }
+
+  .no-selection {
+    padding: 20px 12px;
+  }
+
+  .no-selection mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
   }
 }

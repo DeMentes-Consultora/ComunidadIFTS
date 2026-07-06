@@ -24,6 +24,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/contacto/contacto').then(m => m.Contacto)
   },
   {
+    path: 'sobre-la-comunidad',
+    loadComponent: () => import('./features/sobre-comunidad/sobre-comunidad').then(m => m.SobreComunidad)
+  },
+  {
     path: 'terminos-condiciones',
     loadComponent: () => import('./features/legal/terminos-condiciones').then(m => m.TerminosCondiciones)
   },

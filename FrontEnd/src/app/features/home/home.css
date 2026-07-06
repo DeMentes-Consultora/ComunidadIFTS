@@ -54,6 +54,62 @@
   line-height: 1.3;
 }
 
+@media (max-width: 768px) {
+  .stat-card {
+    padding: 10px 12px;
+    min-width: 70px;
+    flex: 1 1 70px;
+    max-width: 100px;
+    border-radius: 8px;
+    gap: 3px;
+    border-top-width: 2px;
+  }
+
+  .stat-icon {
+    font-size: 16px;
+  }
+
+  .stat-number {
+    font-size: 1rem;
+  }
+
+  .stat-label {
+    font-size: 9px;
+    line-height: 1.2;
+  }
+
+  .stats-strip {
+    gap: 6px;
+    padding: 12px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-card {
+    padding: 8px 10px;
+    min-width: 60px;
+    flex: 1 1 60px;
+    max-width: 85px;
+  }
+
+  .stat-icon {
+    font-size: 14px;
+  }
+
+  .stat-number {
+    font-size: 0.9rem;
+  }
+
+  .stat-label {
+    font-size: 8px;
+  }
+
+  .stats-strip {
+    gap: 4px;
+    padding: 10px 6px;
+  }
+}
+
 .mapa-section {
   width: 100%;
   padding: 0;
@@ -65,23 +121,74 @@
     gap: 0;
   }
 
-  .stats-strip {
-    gap: 10px;
-    padding: 18px 12px;
+  .hero-section {
+    padding: 50px 16px;
   }
 
-  .stat-card {
-    padding: 14px 16px;
-    min-width: 120px;
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .hero-stats {
+    gap: 40px;
   }
 
   .stat-number {
-    font-size: 1.6rem;
+    font-size: 2.5rem;
+  }
+
+  .instituciones-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-header h2 {
+    font-size: 2rem;
+  }
+
+  .map-container {
+    height: 400px;
+  }
+
+  .cta-section {
+    padding: 50px 16px;
+    margin-top: 40px;
+  }
+
+  .cta-section h2 {
+    font-size: 1.8rem;
+  }
+
+  .cta-section p {
+    font-size: 1rem;
   }
 }
 
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
 
-/* Hero Section */
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .hero-stats {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .instituciones-grid {
+    gap: 20px;
+  }
+
+  .section-header h2 {
+    font-size: 1.6rem;
+  }
+
+  .map-container {
+    height: 300px;
+  }
+}
 .hero-section {
   background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
   color: white;

@@ -55,8 +55,10 @@
 				</h6>
 				<ul class="footer-list">
 					<li class="footer-item">
-						<i class="material-icons footer-icon-small">location_on</i>
-						<span>Buenos Aires, Argentina</span>
+						<a routerLink="/sobre-la-comunidad" class="footer-link">
+							<i class="material-icons">chevron_right</i>
+							<span>Sobre la Comunidad</span>
+						</a>
 					</li>
 				</ul>
 			</div>
@@ -68,25 +70,25 @@
 				</h6>
 				<ul class="footer-list">
 					<li class="footer-item">
-						<a href="/home" class="footer-link">
+						<a routerLink="/home" class="footer-link">
 							<i class="material-icons">chevron_right</i>
 							<span>Inicio</span>
 						</a>
 					</li>
 					<li class="footer-item">
-						<a href="/instituciones" class="footer-link">
+						<a routerLink="/mapa" class="footer-link">
 							<i class="material-icons">chevron_right</i>
 							<span>Instituciones</span>
 						</a>
 					</li>
 					<li class="footer-item">
-						<a href="/mapa" class="footer-link">
+						<a routerLink="/mapa" class="footer-link">
 							<i class="material-icons">chevron_right</i>
 							<span>Mapa Interactivo</span>
 						</a>
 					</li>
 					<li class="footer-item">
-						<a href="/contacto" (click)="openContacto($event)" class="footer-link">
+						<a routerLink="/contacto" (click)="openContacto($event)" class="footer-link">
 							<i class="material-icons">chevron_right</i>
 							<span>Contacto</span>
 						</a>

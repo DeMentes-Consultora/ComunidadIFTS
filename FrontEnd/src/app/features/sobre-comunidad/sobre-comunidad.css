@@ -1,0 +1,257 @@
+.sobre-page {
+  min-height: calc(100vh - 64px);
+  background: linear-gradient(180deg, #f8fbf8 0%, #eef5ee 100%);
+}
+
+/* Hero */
+.sobre-hero {
+  background: linear-gradient(135deg, #006633 0%, #004d26 100%);
+  padding: 60px 24px 50px;
+  text-align: center;
+}
+
+.sobre-hero-content {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.sobre-logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+}
+
+.sobre-hero h1 {
+  color: #fff;
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.sobre-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Contenido */
+.sobre-content {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Cards */
+.sobre-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 28px 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border-left: 4px solid #006633;
+  position: relative;
+}
+
+.sobre-card.highlight {
+  border-left-color: #1565c0;
+  background: linear-gradient(135deg, #f0f7ff 0%, #fff 100%);
+}
+
+.sobre-card.accent {
+  border-left-color: #e65100;
+  background: linear-gradient(135deg, #fff8f0 0%, #fff 100%);
+}
+
+.card-icon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 42px;
+  height: 42px;
+  background: rgba(0, 102, 51, 0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sobre-card.highlight .card-icon {
+  background: rgba(21, 101, 192, 0.1);
+}
+
+.sobre-card.accent .card-icon {
+  background: rgba(230, 81, 0, 0.1);
+}
+
+.card-icon .material-icons {
+  font-size: 22px;
+  color: #006633;
+}
+
+.sobre-card.highlight .card-icon .material-icons {
+  color: #1565c0;
+}
+
+.sobre-card.accent .card-icon .material-icons {
+  color: #e65100;
+}
+
+.sobre-card h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a3a29;
+  margin: 0 0 14px;
+  padding-right: 50px;
+}
+
+.sobre-card p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #444;
+  margin: 0 0 12px;
+}
+
+.sobre-card p:last-child {
+  margin-bottom: 0;
+}
+
+.sobre-card strong {
+  color: #006633;
+  font-weight: 600;
+}
+
+/* Módulos */
+.modulos-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.modulo-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 14px;
+  background: #f8faf8;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.modulo-icon {
+  font-size: 28px;
+  color: #006633;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.modulo-item strong {
+  display: block;
+  font-size: 1rem;
+  color: #1a3a29;
+  margin-bottom: 4px;
+}
+
+.modulo-item p {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* CTA */
+.sobre-cta {
+  text-align: center;
+  padding: 28px 20px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.sobre-cta p {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 500;
+  margin: 0 0 20px;
+}
+
+.btn-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: #006633;
+  color: #fff;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.btn-volver:hover {
+  background: #004d26;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sobre-hero {
+    padding: 40px 16px 36px;
+  }
+
+  .sobre-logo {
+    width: 90px;
+    height: 90px;
+  }
+
+  .sobre-hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .sobre-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .sobre-content {
+    padding: 24px 14px 36px;
+    gap: 18px;
+  }
+
+  .sobre-card {
+    padding: 22px 18px 20px;
+    border-radius: 12px;
+  }
+
+  .sobre-card h2 {
+    font-size: 1.2rem;
+  }
+
+  .sobre-card p {
+    font-size: 0.92rem;
+  }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    top: 16px;
+    right: 16px;
+  }
+
+  .card-icon .material-icons {
+    font-size: 20px;
+  }
+
+  .modulo-item {
+    padding: 12px;
+  }
+
+  .modulo-icon {
+    font-size: 24px;
+  }
+}

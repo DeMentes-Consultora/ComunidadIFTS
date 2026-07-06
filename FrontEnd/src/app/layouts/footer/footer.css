@@ -2,8 +2,8 @@
 .footer {
   background: #343a40;
   color: white;
-  padding: 30px 0 20px 0;
-  margin-top: 50px;
+  padding: 24px 0 16px 0;
+  margin-top: 30px;
   border-top: 2px solid #FFD700;
 }
 
@@ -429,19 +429,41 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .footer {
+    padding: 16px 0 12px 0;
+    margin-top: 20px;
+  }
+
   .footer-content {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 16px;
+    margin-bottom: 10px;
   }
 
   .footer-shop-strip-wrapper {
-    margin-top: 14px;
+    margin-top: 10px;
+    margin-bottom: 2px;
+  }
+
+  .footer-title {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .footer-item {
+    font-size: 11px;
     margin-bottom: 4px;
+  }
+
+  .footer-list {
+    gap: 1px;
   }
 
   .footer-copyright {
     flex-direction: column;
     text-align: center;
+    padding-top: 8px;
   }
 
   .copyright-left,
@@ -449,8 +471,8 @@
     width: 100%;
   }
 
-  .footer-item {
-    font-size: 14px;
+  .copyright-left small {
+    font-size: 10px;
   }
 
   .footer-link span {
@@ -459,6 +481,12 @@
 
   .social-link {
     width: fit-content;
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+
+  .social-link i {
+    font-size: 14px;
   }
 
   .map-embed iframe {
@@ -466,11 +494,82 @@
   }
 
   .shop-strip-track {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .shop-strip-track .shop-strip-item:nth-child(n+4) {
+    display: none;
+  }
+
+  .shop-strip-item {
+    height: 70px;
+  }
+
+  .shop-strip-overlay {
+    padding: 3px 5px;
+    font-size: 9px;
   }
 
   .footer-shop-strip {
-    padding: 6px 12px;
+    padding: 5px 10px;
+  }
+
+  .shop-carousel {
+    height: 70px;
+  }
+
+  .shop-carousel-overlay {
+    padding: 3px 5px;
+    font-size: 9px;
+  }
+
+  .shop-carousel-controls > button {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+  }
+
+  .footer-separator {
+    margin: 8px 0;
+  }
+
+  .footer-container {
+    padding: 0 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-content {
+    gap: 10px 12px;
+  }
+
+  .shop-strip-track {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .shop-strip-track .shop-strip-item:nth-child(n+4) {
+    display: none;
+  }
+
+  .shop-strip-item {
+    height: 60px;
+  }
+
+  .footer-title {
+    font-size: 11px;
+  }
+
+  .footer-item {
+    font-size: 10px;
+    margin-bottom: 3px;
+  }
+
+  .footer {
+    padding: 12px 0 10px 0;
+    margin-top: 14px;
   }
 }
 

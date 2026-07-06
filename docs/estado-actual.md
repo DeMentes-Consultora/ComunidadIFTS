@@ -13,6 +13,7 @@ ComunidadIFTS es una plataforma con frontend Angular 21 y backend PHP para centr
 - Flujo de bolsa de trabajo validado documentalmente con QA pass al 16-04-2026.
 - Existen correcciones posteriores documentadas para gestion de ofertas, gestion de carreras y proxy local.
 - Modulo de foro implementado con categorias, temas, respuestas, adjuntos y busqueda fulltext.
+- Miniaturas de imagenes unificadas en foro: 140x110px tanto en temas como en respuestas, con preview al click.
 
 ## Stack tecnico
 

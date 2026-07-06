@@ -46,6 +46,18 @@
 	padding: 0 !important;
 }
 
+.welcome-dialog-panel .mat-mdc-dialog-surface {
+	background: transparent !important;
+	box-shadow: none !important;
+	border-radius: 0 !important;
+	padding: 0 !important;
+	overflow: visible !important;
+}
+
+.welcome-dialog-panel .mat-mdc-dialog-container {
+	padding: 0 !important;
+}
+
 /* Snackbars globales */
 .mat-mdc-snack-bar-container.snackbar-success,
 .mat-mdc-snack-bar-container.snackbar-error,
